@@ -1,0 +1,50 @@
+!!!
+%html{:lang => "en"}
+  %head
+    %meta{:charset => "utf-8"}/
+    %title
+      A Brand New nanoc Site - #{@item[:title]}
+    %link{:href => "/stylesheets/bootstrap.css", :rel => "stylesheet", :type => "text/css"}/
+    %link{:href => "/stylesheets/bootstrap.min.css", :rel => "stylesheet", :type => "text/css"}/
+    %link{:href => "/stylesheets/customized.css", :rel => "stylesheet", :type => "text/css"}/
+    / Javascript files
+    %script{:src => "/js/jquery-1.9.1.min.js", :type => "text/javascript"}
+    %script{:src => "/js/bootstrap-affix.js", :type => "text/javascript"}
+    %script{:src => "/js/main.js", :type => "text/javascript"}
+    / you don't need to keep this, but it's cool for stats!
+    %meta{:content => "nanoc #{Nanoc::VERSION}", :name => "generator"}/
+  %body
+    .navbar.navbar-inverse.navbar-fixed-top
+      .navbar-inner
+        .row-fluid
+          %a.brand{:href => "/"} LearnOpenstack          
+    .container-fluid
+      .row-fluid
+        #sidebar.span3
+          %ul.nav.nav-list.docs-sidenav
+            %li
+              %a{:href => "/openstack-installation.html"}
+                %i.icon-chevron-right
+                Open Stack Installation
+            %li
+              %a{:href => "/single_flat_network.html"}
+                %i.icon-chevron-right
+                Single Flat Network
+            %li
+              %a{:href => "/router_with_private_network.html"}
+                %i.icon-chevron-right
+                Router With Private Network
+            %li
+              %a{:href => "/per-tenant.html"}
+                %i.icon-chevron-right
+                Per-Tenant Routers With Private Network
+            %li
+              %a{:href => "/multi_node_cluster.html"}
+                %i.icon-chevron-right
+                Multi Node Cluster Installation
+            %li
+              %a{:href => "/hbase.html"}
+                %i.icon-chevron-right
+                HBase
+        #main.span9
+          = yield
