@@ -40,9 +40,9 @@ Role Name | Description |
 
 2.1.Preparing Ubuntu
    
-Note: Create a volume group "cinder-volumes" while installing Ubuntu12.04. 
+Note: On AMD machines create a volume-group called "cinder-volumes" while installing Ubuntu12.04 and for Intel machines create an empty partition which can later be used for creating a volume-group.  
 
-After you install Ubuntu 12.04 Server 64bits, Go in sudo mode and don't leave it until the end of this guide:
+Enter into super user mode to execute commands:
 
 ```xml
     $sudo su
@@ -62,7 +62,12 @@ Update your system:
 ```
 2.2.Networking
 
-Only one NIC should have an internet access:
+For OpenStack Single-Node setup we require 2 NIC's, One NIC (10.42.0.51) is used for external network connection i.e, Internet access and the other NIC (10.10.100.51) is used for internal networking (OpenStack management). 
+
+Note: The external NIC should have a static IP address.
+
+Edit network settings using the following command
+#vi /etc/network/interfaces
 
     #For Exposing OpenStack API over the internet
     auto eth1
@@ -80,7 +85,8 @@ Only one NIC should have an internet access:
 
 Restart the networking service:
 ```xml
-    #service networking restart
+    #/etc/init.d/networking restart
+    
 ```
 2.3. MySQL & RabbitMQ
 
@@ -88,18 +94,24 @@ Install MySQL:
 ```xml
     #apt-get install -y mysql-server python-mysqldb
 ```
+###During the install, you'll be prompted for the mysql root password. Enter a password of your choice and verify it.
+
 Configure mysql to accept all incoming requests:
 ```xml
     #sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mysql/my.cnf
     #service mysql restart
 ```
-Install RabbitMQ:
+Install RabbitMQ (Message Queue):
+
+The OpenStack Cloud Controller communicates with other nova components such as the Scheduler, Network Controller, and Volume Controller via AMQP(Advanced Message Queue Protocol). Nova components use Remote Procedure Calls (RPC) to communicate to one another.
 
 ```xml
     #apt-get install -y rabbitmq-server
 ```
 
-Install NTP service:
+Install NTP service (Network Time Protocol):
+
+To keep all the services in sync, you need to install NTP, and if you do a multi-node configuration you will configure one server to be the reference server.
 
 ```xml
     #apt-get install -y ntp
@@ -114,6 +126,7 @@ Install other services:
     #apt-get install -y vlan bridge-utils
 ```
 Enable IP_Forwarding:
+Enabling IP Forwarding makes the machine to act as a router or proxy server to share one internet connection to many client machines. 
 
 ```xml
     #sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf
@@ -124,6 +137,9 @@ To save you from rebooting, perform the following
 ```
 3.Keystone
 -----------
+
+ 
+Keystone is an identity service which supports various protocols for authentication and authorization 
 
 Start by the keystone packages:
 
@@ -702,6 +718,10 @@ Then, synchronize your database:
     #cinder-manage db sync
 ```
 
+###For intel machines
+##create a volume-group called "cinder-volumes" using the empty partition
+##$system--config-lvm
+##Assign the empty partition for "cinder-volumes"
 Restart the cinder services:
 
 ```xml
@@ -742,14 +762,49 @@ You can now access your OpenStack 10.42.0.51/horizon with credentials admin:admi
 Create a external network.
 
 ```xml
-    #quantum net-create public-net --router:external=True
+root@akrantha:/home/openstack# quantum net-create public-net --router:external=True
+Created a new network:
++---------------------------+--------------------------------------+
+| Field                     | Value                                |
++---------------------------+--------------------------------------+
+| admin_state_up            | True                                 |
+| id                        | 21ea48fb-ee1e-46a4-b589-b3c2b359291d |
+| name                      | public-net                           |
+| provider:network_type     | gre                                  |
+| provider:physical_network |                                      |
+| provider:segmentation_id  | 1                                    |
+| router:external           | True                                 |
+| shared                    | False                                |
+| status                    | ACTIVE                               |
+| subnets                   |                                      |
+| tenant_id                 | 2b942273713741b1868eb86b11e08df8     |
++---------------------------+--------------------------------------+
 ```
+ ![import](/images/create_ext_net.png)
+
 Create a subnet.
 
 ```xml
-    #quantum subnet-create --tenant-id 6973efb023c748d6b8a4fff747faad92 --name public-
-    net-subnet01 --gateway 10.42.0.1 public-net 10.42.0.0/24 --enable_dhcp False
+root@akrantha:/home/openstack# quantum subnet-create --tenant-id 2b942273713741b1868eb86b11e08df8 --name public-net-subnet01 --gateway 10.42.0.1 public-net 10.42.0.0/24 --enable_dhcp False
+Created a new subnet:
++------------------+----------------------------------------------+
+| Field            | Value                                        |
++------------------+----------------------------------------------+
+| allocation_pools | {"start": "10.42.0.2", "end": "10.42.0.254"} |
+| cidr             | 10.42.0.0/24                                 |
+| dns_nameservers  |                                              |
+| enable_dhcp      | False                                        |
+| gateway_ip       | 10.42.0.1                                    |
+| host_routes      |                                              |
+| id               | d5b8d223-c2b2-4b87-ae7c-187d37f8b762         |
+| ip_version       | 4                                            |
+| name             | public-net-subnet01                          |
+| network_id       | 21ea48fb-ee1e-46a4-b589-b3c2b359291d         |
+| tenant_id        | 2b942273713741b1868eb86b11e08df8             |
++------------------+----------------------------------------------+
 ```
+ ![import](/images/create_subnet_ext.png)
+
 Allocation of IP's to Vm's.
 
 ```xml
@@ -758,17 +813,70 @@ Allocation of IP's to Vm's.
     #quantum subnet-create --tenant-id 6973efb023c748d6b8a4fff747faad92 --name 
     public-net-subnet01 --gateway 10.42.0.1 public-net 10.42.0.0/24 --enable_dhcp False --allocation-pool start=10.42.0.75,end=10.42.0.254
 ```
-    #quantum net-create private-net
+
+Create a private-network:
+
+```bash
+root@akrantha:/home/openstack# quantum net-create private-net
+Created a new network:
++---------------------------+--------------------------------------+
+| Field                     | Value                                |
++---------------------------+--------------------------------------+
+| admin_state_up            | True                                 |
+| id                        | 428dbfc9-73e1-4e8d-88e2-471a3e91f6a6 |
+| name                      | private-net                          |
+| provider:network_type     | gre                                  |
+| provider:physical_network |                                      |
+| provider:segmentation_id  | 2                                    |
+| router:external           | False                                |
+| shared                    | False                                |
+| status                    | ACTIVE                               |
+| subnets                   |                                      |
+| tenant_id                 | 2b942273713741b1868eb86b11e08df8     |
++---------------------------+--------------------------------------+
+```
+ ![import](/images/create_pvt_net.png)
 
 Attach subnet to private network:
 ```xml
-    #quantum subnet-create --name private-subnet private-net 10.0.0.0/24
+root@akrantha:/home/openstack# quantum subnet-create --name private-subnet private-net 10.0.0.0/24
+Created a new subnet:
++------------------+--------------------------------------------+
+| Field            | Value                                      |
++------------------+--------------------------------------------+
+| allocation_pools | {"start": "10.0.0.2", "end": "10.0.0.254"} |
+| cidr             | 10.0.0.0/24                                |
+| dns_nameservers  |                                            |
+| enable_dhcp      | True                                       |
+| gateway_ip       | 10.0.0.1                                   |
+| host_routes      |                                            |
+| id               | 5421a4eb-5b4b-4c3e-9b56-6bb721f99653       |
+| ip_version       | 4                                          |
+| name             | private-subnet                             |
+| network_id       | 428dbfc9-73e1-4e8d-88e2-471a3e91f6a6       |
+| tenant_id        | 2b942273713741b1868eb86b11e08df8           |
++------------------+--------------------------------------------+
 ```
+ ![import](/images/create_subnet_pvt.png)
+
 Create router
 
 ```xml
-    #quantum router-create router1
+root@akrantha:/home/openstack#quantum router-create router1
+Created a new router:
++-----------------------+--------------------------------------+
+| Field                 | Value                                |
++-----------------------+--------------------------------------+
+| admin_state_up        | True                                 |
+| external_gateway_info |                                      |
+| id                    | ca972d3b-788e-4e16-8552-dd335575c5c0 |
+| name                  | router1                              |
+| status                | ACTIVE                               |
+| tenant_id             | 2b942273713741b1868eb86b11e08df8     |
++-----------------------+--------------------------------------+
 ```
+ ![import](/images/create_router.png)
+
 Uplink router to public network:
 
 ```xml
@@ -779,21 +887,79 @@ Attach private network to router:
 ```xml
     #quantum router-interface-add router1 private-subnet
 ```
+ ![import](/images/router_add_iface.png)
 
 To show the net list:
-```xml
-    
-    #ip netns list
-    #ip netns exec qrouter-36f5ccde-1876-4554-be59-032af24c419c ip addr list
+
+```bash
+root@akrantha:/home/openstack# ip netns list
+qrouter-ca972d3b-788e-4e16-8552-dd335575c5c0
 ```
 
-To ping the Vm machine, do the following
-
-```xml
-     #ip netns exec qrouter-36f5ccde-1876-4554-be59-032af24c419c ping 10.0.0.2
+```bash
+root@akrantha:/home/openstack# ip netns exec qrouter-ca972d3b-788e-4e16-8552-dd335575c5c0 ip addr list
+10: lo: <LOOPBACK,UP,LOWER_UP> mtu 16436 qdisc noqueue state UNKNOWN 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+11: qg-e045e129-e0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN 
+    link/ether fa:16:3e:23:30:ef brd ff:ff:ff:ff:ff:ff
+    inet 10.42.0.2/24 brd 10.42.0.255 scope global qg-e045e129-e0
+    inet6 fe80::f816:3eff:fe23:30ef/64 scope link 
+       valid_lft forever preferred_lft forever
+12: qr-696c2816-7e: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN 
+    link/ether fa:16:3e:c8:2f:1a brd ff:ff:ff:ff:ff:ff
+    inet 10.0.0.1/24 brd 10.0.0.255 scope global qr-696c2816-7e
+    inet6 fe80::f816:3eff:fec8:2f1a/64 scope link 
+       valid_lft forever preferred_lft forever
 ```
 
-To do ssh into the Vm machine, do the follwing:
+Create a Security Group:
+ ![import](/images/create_security_group.png)
+ ![import](/images/create_security_group_desc.png)
+
+Create Keypairs
+ ![import](/images/create_keypair.png)
+
+Add Rule:
+ ![import](/images/add_rule.png)
+
+Edit Security Group Rules:
+ ![import](/images/security_group_rules.png)
+
+Access and Security
+ ![import](/images/access_and_security.png)
+
+
+
+>>>> Create a VM using the Horizon dashboard
+
+Before creating a VM
+ ![import](/images/empty_instances.png)
+
+Launch Instance:
+ ![import](/images/launch_instance.png)
+
+Launch Instance Keypair:
+ ![import](/images/launch_instance_keypair.png)
+
+Launch Instance Networking:
+ ![import](/images/launch_instance_networking.png)
+
+My first VM
+ ![import](/images/first_instances.png)
+
+Network Topology
+ ![import](/images/network_topology.png)
+
+To ping vm, do the following
+
+```xml
+    ip netns exec qrouter-ca972d3b-788e-4e16-8552-dd335575c5c0 ping 10.0.0.2
+```
+
+To do ssh into vm, do the follwing:
 
 ```xml
     #ip netns exec qrouter-36f5ccde-1876-4554-be59-032af24c419c ssh 10.0.0.2 -l cirros
