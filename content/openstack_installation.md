@@ -2,72 +2,75 @@
 title: OpenStack Installation
 ---
                        
-Contents:
----------
-1.Requirements
+##Contents 
 
-2.Getting Started
 
-3.Keystone
+1. Requirements
 
-4.Glance
+2. Getting Started
 
-5.Quantum
+3. Keystone
 
-6.Nova
+4. Glance
 
-7.Cinder
+5. Quantum
 
-8.Horizon
+6. Nova
 
-9.Your first VM 
+7. Cinder
+
+8. Horizon
+
+9. Your first VM 
 
 
 
 **Table 1.** Requirements
 
-
-Role Name | Description |
+|---
+| Role Name | Description 
 |:-|:-:|
-|Node   Role :   | NICs |	
-|Single Node : | eth0 (10.10.100.51),eth1 (10.42.0.51) | 
+| Node Role  | NICs|
+| Single Node | eth0 (10.10.100.51),eth1 (10.42.0.51) |
 |---
 
-{: rules="groups"}
+##Getting Started
 
-2.Getting Started
-------------------
-
-2.1.Preparing Ubuntu
+###Preparing Ubuntu
    
-Note: On AMD machines create a volume-group called "cinder-volumes" while installing Ubuntu12.04 and for Intel machines create an empty partition which can later be used for creating a volume-group.  
+*Note: On AMD machines create a volume-group called "cinder-volumes" while installing Ubuntu12.04 and for Intel machines create an empty partition which can later be used for creating a volume-group*
 
 Enter into super user mode to execute commands:
 
-```xml
-    $sudo su
+```bash
+$sudo su
 ```
+
 Add Grizzly repositories:
-```xml
-    #apt-get install ubuntu-cloud-keyring python-software-properties software-properties- 
-     common python-keyring
-    #echo deb http://ubuntu-cloud.archive.canonical.com/ubuntu precise-updates/grizzly main >>
-     /etc/apt/sources.list.d/grizzly.list
+
+```bash
+#apt-get install ubuntu-cloud-keyring python-software-properties software-properties-common python-keyring
+#echo deb http://ubuntu-cloud.archive.canonical.com/ubuntu precise-updates/grizzly main >> /etc/apt/sources.list.d/grizzly.list
 ```
+
 Update your system:
-```xml
-    #apt-get update
-    #apt-get upgrade
-    #apt-get dist-upgrade
+```bash
+#apt-get update
+#apt-get upgrade
+#apt-get dist-upgrade
 ```
-2.2.Networking
+
+###Networking
 
 For OpenStack Single-Node setup we require 2 NIC's, One NIC (10.42.0.51) is used for external network connection i.e, Internet access and the other NIC (10.10.100.51) is used for internal networking (OpenStack management). 
 
 Note: The external NIC should have a static IP address.
 
 Edit network settings using the following command
+
+```bash
 #vi /etc/network/interfaces
+```
 
     #For Exposing OpenStack API over the internet
     auto eth1
@@ -88,22 +91,26 @@ Restart the networking service:
     #/etc/init.d/networking restart
     
 ```
-2.3. MySQL & RabbitMQ
+### MySQL & RabbitMQ
 
-Install MySQL:
+**Install MySQL:**
+
 ```xml
     #apt-get install -y mysql-server python-mysqldb
 ```
-###During the install, you'll be prompted for the mysql root password. Enter a password of your choice and verify it.
+
+During the install, you'll be prompted for the mysql root password. Enter a password of your choice and verify it.
 
 Configure mysql to accept all incoming requests:
+
 ```xml
     #sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mysql/my.cnf
     #service mysql restart
 ```
-Install RabbitMQ (Message Queue):
 
-The OpenStack Cloud Controller communicates with other nova components such as the Scheduler, Network Controller, and Volume Controller via AMQP(Advanced Message Queue Protocol). Nova components use Remote Procedure Calls (RPC) to communicate to one another.
+**Install RabbitMQ (Message Queue):**
+
+The OpenStack Cloud Controller communicates with other nova components such as `Scheduler`, `Network Controller`, and `Volume Controller` usinf `AMQP` (Advanced Message Queue Protocol). Nova components use Remote Procedure Calls (RPC) to communicate to one another.
 
 ```xml
     #apt-get install -y rabbitmq-server
@@ -117,10 +124,9 @@ To keep all the services in sync, you need to install NTP, and if you do a multi
     #apt-get install -y ntp
 ```
 
-2.4. Others
------------
+###Others Services
 
-Install other services:
+**Install other services:**
 
 ```xml
     #apt-get install -y vlan bridge-utils
