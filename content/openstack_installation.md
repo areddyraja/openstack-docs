@@ -25,7 +25,7 @@ title: OpenStack Installation
 
 
 
-**Table 1.** Requirements
+##Requirements
 
 |---
 | Role Name | Description 
@@ -54,6 +54,7 @@ Add Grizzly repositories:
 ```
 
 Update your system:
+
 ```bash
 #apt-get update
 #apt-get upgrade
@@ -70,8 +71,6 @@ Edit network settings using the following command
 
 ```bash
 #vi /etc/network/interfaces
-```
-
     #For Exposing OpenStack API over the internet
     auto eth1
     iface eth1 inet static
@@ -85,158 +84,169 @@ Edit network settings using the following command
     iface eth0 inet static
     address 10.10.100.51
     netmask 255.255.255.0
+```
+
 
 Restart the networking service:
-```xml
-    #/etc/init.d/networking restart
-    
+
+```bash
+#/etc/init.d/networking restart
 ```
-### MySQL & RabbitMQ
+
+###MySQL & RabbitMQ
 
 **Install MySQL:**
 
-```xml
-    #apt-get install -y mysql-server python-mysqldb
+```bash
+#apt-get install -y mysql-server python-mysqldb
 ```
 
 During the install, you'll be prompted for the mysql root password. Enter a password of your choice and verify it.
 
 Configure mysql to accept all incoming requests:
 
-```xml
-    #sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mysql/my.cnf
-    #service mysql restart
+```bash
+#sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mysql/my.cnf
+#service mysql restart
 ```
 
 **Install RabbitMQ (Message Queue):**
 
-The OpenStack Cloud Controller communicates with other nova components such as `Scheduler`, `Network Controller`, and `Volume Controller` usinf `AMQP` (Advanced Message Queue Protocol). Nova components use Remote Procedure Calls (RPC) to communicate to one another.
+The OpenStack Cloud Controller communicates with other nova components such as `Scheduler`, `Network Controller`, and `Volume Controller` using `AMQP` (Advanced Message Queue Protocol). Nova components use Remote Procedure Calls (RPC) to communicate to one another.
 
-```xml
-    #apt-get install -y rabbitmq-server
+```bash
+#apt-get install -y rabbitmq-server
 ```
 
-Install NTP service (Network Time Protocol):
+**Install NTP service (Network Time Protocol):**
 
 To keep all the services in sync, you need to install NTP, and if you do a multi-node configuration you will configure one server to be the reference server.
 
-```xml
-    #apt-get install -y ntp
+```bash
+#apt-get install -y ntp
 ```
 
 ###Others Services
 
-**Install other services:**
-
-```xml
-    #apt-get install -y vlan bridge-utils
+```bash
+#apt-get install -y vlan bridge-utils
 ```
+
 Enable IP_Forwarding:
+
 Enabling IP Forwarding makes the machine to act as a router or proxy server to share one internet connection to many client machines. 
 
-```xml
-    #sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf
+```bash
+#sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf
 ```
-To save you from rebooting, perform the following
-```xml
-    #sysctl net.ipv4.ip_forward=1
-```
-3.Keystone
------------
 
- 
+To save you from rebooting, perform the following
+
+```bash
+#sysctl net.ipv4.ip_forward=1
+```
+
+##Keystone
+
+
 Keystone is an identity service which supports various protocols for authentication and authorization 
 
 Start by the keystone packages:
 
-```xml
-    #apt-get install -y keystone
+```bash
+#apt-get install -y keystone
 ```
+
 Verify your keystone is running:
 
-```xml
-    #service keystone status
+```bash
+#service keystone status
 ```
+
 Create a new MySQL database for keystone:
 
-```xml
+```bash
     mysql -u root -p
     CREATE DATABASE keystone;
     GRANT ALL ON keystone.* TO 'keystoneUser'@'%' IDENTIFIED BY 'keystonePass';
     quit;
 ```
+
 Adapt the connection attribute in the /etc/keystone/keystone.conf to the new database:
 
-```xml
+```bash
     connection = mysql://keystoneUser:keystonePass@10.10.100.51/keystone
 ```
+
 Restart the identity service then synchronize the database:
 
-```xml
-    #service keystone restart
-    #keystone-manage db_sync
+```bash
+#service keystone restart
+#keystone-manage db_sync
 ```
+
 Fill up the keystone database using the two scripts available in the Scripts folder of this git repository:
 
-```xml
-    #Modify the HOST_IP and HOST_IP_EXT variables before executing the scripts HOST_IP(10.10.100.51) AND HOST_IP_EXT(10.42.0.51)
+Modify the HOST_IP and HOST_IP_EXT variables before executing the scripts HOST_IP(10.10.100.51) and HOST_IP_EXT(10.42.0.51)
 
-    #wget https://raw.github.com/mseknibilel/OpenStack-Grizzly-Install-Guide/OVS_SingleNode/
-    KeystoneScripts/keystone_basic.sh
-    #wget https://raw.github.com/mseknibilel/OpenStack-Grizzly-Install-Guide/OVS_SingleNode/
-    KeystoneScripts/keystone_endpoints_basic.sh
-
-    #chmod +x keystone_basic.sh
-    #chmod +x keystone_endpoints_basic.sh
-
-    ./keystone_basic.sh
-    ./keystone_endpoints_basic.sh
+```bash
+#wget https://raw.github.com/mseknibilel/OpenStack-Grizzly-Install-Guide/OVS_SingleNode/KeystoneScripts/keystone_basic.sh
+#wget https://raw.github.com/mseknibilel/OpenStack-Grizzly-Install-Guide/OVS_SingleNode/KeystoneScripts/keystone_endpoints_basic.sh
+#chmod +x keystone_basic.sh
+#chmod +x keystone_endpoints_basic.sh
+#./keystone_basic.sh
+#./keystone_endpoints_basic.sh
 ```
+
 Create a simple credential file and load it so you won't be bothered later:
 
-```xml
-    #nano creds
-
-    #Paste the following:
+```bash
+#nano creds
+#Paste the following:
     export OS_TENANT_NAME=admin
     export OS_USERNAME=admin
     export OS_PASSWORD=admin_pass
     export OS_AUTH_URL="http://10.42.0.51:5000/v2.0/"
 ```
 Load it:
-```xml
-    #source creds
+
+```bash
+#source creds
 ```
+
 To test Keystone, we use a simple CLI command:
 
-```xml
-    #keystone user-list
+```bash
+#keystone user-list
 ```
-4.Glance
---------
+
+##Glance
 
 We Move now to Glance installation:
 
-```xml
-   #apt-get install -y glance
+```bash
+#apt-get install -y glance
 ```
+
 Verify your glance services are running:
 
-```xml
-    #service glance-api status
-    #service glance-registry status
+```bash
+#service glance-api status
+#service glance-registry status
 ```
+
 Create a new MySQL database for Glance:
 
-```xml
+```bash
     mysql -u root -p
     CREATE DATABASE glance;
     GRANT ALL ON glance.* TO 'glanceUser'@'%' IDENTIFIED BY 'glancePass';
     quit;
 ```
+
 Update /etc/glance/glance-api-paste.ini with:
 
-```xml
+```bash
 
     [filter:authtoken]
     paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
@@ -248,9 +258,10 @@ Update /etc/glance/glance-api-paste.ini with:
     admin_user = glance
     admin_password = service_pass
 ```
+
 Update the /etc/glance/glance-registry-paste.ini with:
 
-```xml
+```bash
     [filter:authtoken]
     paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
     auth_host = 10.10.100.51
@@ -260,84 +271,82 @@ Update the /etc/glance/glance-registry-paste.ini with:
     admin_user = glance
     admin_password = service_pass
 ```
+
 Update /etc/glance/glance-api.conf with:
 
-```xml
+```bash
     sql_connection = mysql://glanceUser:glancePass@10.10.100.51/glance
-
     And:
-
     [paste_deploy]
     flavor = keystone
 ```
+
 Update the /etc/glance/glance-registry.conf with:
 
-```xml
+```bash
     sql_connection = mysql://glanceUser:glancePass@10.10.100.51/glance
-
     And:
-
     [paste_deploy]
     flavor = keystone
 ```
 
 Restart the glance-api and glance-registry services:
-```xml
 
-    #service glance-api restart; service glance-registry restart
+```bash
+#service glance-api restart; service glance-registry restart
 ```
-Synchronize the glance database:
-```xml
 
-    #glance-manage db_sync
+Synchronize the glance database:
+
+```bash
+#glance-manage db_sync
 ```
 
 Restart the services again to take into account the new modifications:
-```xml
 
-    #service glance-registry restart; service glance-api restart
+```bash
+#service glance-registry restart; service glance-api restart
 ```
 
 To test Glance, upload the cirros cloud image directly from the internet:
-```xml
 
-    #glance image-create --name myFirstImage --is-public true --container-format bare --disk-format qcow2 -
-     -location https://launchpad.net/    cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-disk.img
+```bash
+#glance image-create --name myFirstImage --is-public true --container-format bare --disk-format qcow2 --location https://launchpad.net/    cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-disk.img
 ```
 
 Now list the image to see what you have just uploaded:
-```xml
-    #glance image-list
+
+```bash
+#glance image-list
 ```
 
-5.Quantum
----------
+##Quantum
 
-5.1. OpenVSwitch
+###OpenVSwitch
 
+**Install the openVSwitch:**
 
-Install the openVSwitch:
-
-```xml
-    #apt-get install -y openvswitch-switch openvswitch-datapath-dkms
+```bash
+#apt-get install -y openvswitch-switch openvswitch-datapath-dkms
 ```
 
 Create the bridges:
 
-```xml
-    #br-int will be used for VM integration
-    #ovs-vsctl add-br br-int
+```bash
+#br-int will be used for VM integration
+#ovs-vsctl add-br br-int
 ```
+
 br-ex is used to make to access the internet (not covered in this guide)
 
-```xml
-    #ovs-vsctl add-br br-ex
+```bash
+#ovs-vsctl add-br br-ex
 ```
 
 This will guide you to setting up the br-ex interface. Edit the eth1 in /etc/network/interfaces to become like this:
 
-```xml
-    # VM internet Access
+```bash
+# VM internet Access
     auto eth1
     iface eth1 inet manual
     up ifconfig $IFACE 0.0.0.0 up
@@ -345,16 +354,18 @@ This will guide you to setting up the br-ex interface. Edit the eth1 in /etc/net
     down ip link set $IFACE promisc off
     down ifconfig $IFACE down
 ```
+
 Add the eth1 to the br-ex:
 
-```xml
-    #Internet connectivity will be lost after this step but this won't affect OpenStack's work
-    #ovs-vsctl add-port br-ex eth1
+Internet connectivity will be lost after this step but this won't affect OpenStack's work
+
+```bash
+#ovs-vsctl add-port br-ex eth1
 ```
 
 Optional, If you want to get internet connection back, you can assign the eth1's IP address to the br-ex in the /etc/network/interfaces file:
 
-```xml
+```bash
     auto br-ex
     iface br-ex inet static
     address 10.42.0.51
@@ -363,17 +374,17 @@ Optional, If you want to get internet connection back, you can assign the eth1's
     dns-nameservers 8.8.8.8
 ```
 
-5.2. Quantum
+###Quantum
 
 Install the Quantum components:
 
-```xml
-    #apt-get install -y quantum-server quantum-plugin-openvswitch quantum-plugin-openvswitch-
-    agent dnsmasq quantum-dhcp-agent quantum-l3-agent
+```bash
+#apt-get install -y quantum-server quantum-plugin-openvswitch quantum-plugin-openvswitch-agent dnsmasq quantum-dhcp-agent quantum-l3-agent
 ```
+
 Create a database:
 
-```xml
+```bash
     mysql -u root -p
     CREATE DATABASE quantum;
     GRANT ALL ON quantum.* TO 'quantumUser'@'%' IDENTIFIED BY 'quantumPass';
@@ -382,13 +393,13 @@ Create a database:
 
 Verify all Quantum components are running:
 
-```xml
-    #cd /etc/init.d/; for i in $( ls quantum-* ); do sudo service $i status; done
+```bash
+#cd /etc/init.d/; for i in $( ls quantum-* ); do sudo service $i status; done
 ```
 
 Edit /etc/quantum/api-paste.ini
 
-```xml
+```bash
     [filter:authtoken]
     paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
     auth_host = 10.10.100.51
@@ -401,15 +412,16 @@ Edit /etc/quantum/api-paste.ini
 
 Edit the OVS plugin configuration file /etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini with::
 
-```xml
-    #Under the database section
+Under the database section
+
+```bash
     [DATABASE]
     sql_connection = mysql://quantumUser:quantumPass@10.10.100.51/quantum
 ```
 
 Under the OVS section
 
-```xml
+```bash
     [OVS]
     tenant_network_type = gre
     tunnel_id_ranges = 1:1000
@@ -425,26 +437,25 @@ Under the OVS section
 
 Update /etc/quantum/metadata_agent.ini:
 
-```xml
-    # The Quantum user information for accessing the Quantum API.
+```bash
+#The Quantum user information for accessing the Quantum API.
     auth_url = http://10.10.100.51:35357/v2.0
     auth_region = RegionOne
     admin_tenant_name = service
     admin_user = quantum
     admin_password = service_pass
 
-    # IP address used by Nova metadata server
+#IP address used by Nova metadata server
     nova_metadata_ip = 127.0.0.1
 
-    # TCP Port used by Nova metadata server
+#TCP Port used by Nova metadata server
     nova_metadata_port = 8775
-
     metadata_proxy_shared_secret = helloOpenStack
 ```
 
 Edit your /etc/quantum/quantum.conf:
 
-```xml
+```bash
     [keystone_authtoken]
     auth_host = 10.10.100.51
     auth_port = 35357
@@ -457,33 +468,31 @@ Edit your /etc/quantum/quantum.conf:
 
 Restart all quantum services:
 
-```xml
-    #cd /etc/init.d/; for i in $( ls quantum-* ); do sudo service $i restart; done
-    #service dnsmasq restart
+```bash
+#cd /etc/init.d/; for i in $( ls quantum-* ); do sudo service $i restart; done
+#service dnsmasq restart
 ```
 
-6.Nova
-------
+##Nova
 
-6.1 KVM
+###KVM
 
-    
 Make sure that your hardware enables virtualization:
 
-```xml
-    #apt-get install cpu-checker
-    #kvm-ok
+```bash
+#apt-get install cpu-checker
+#kvm-ok
 ```
 
 Normally you would get a good response. Now, move to install kvm and configure it:
 
-```xml
-    #apt-get install -y kvm libvirt-bin pm-utils
+```bash
+#apt-get install -y kvm libvirt-bin pm-utils
 ```
 
 Edit the cgroup_device_acl array in the /etc/libvirt/qemu.conf file to:
 
-```xml
+```bash
     cgroup_device_acl = [
     "/dev/null", "/dev/full", "/dev/zero",
     "/dev/random", "/dev/urandom",
@@ -494,14 +503,14 @@ Edit the cgroup_device_acl array in the /etc/libvirt/qemu.conf file to:
 
 Delete default virtual bridge
 
-```xml
-    #virsh net-destroy default
-    #virsh net-undefine default
+```bash
+#virsh net-destroy default
+#virsh net-undefine default
 ```
 
 Enable live migration by updating /etc/libvirt/libvirtd.conf file:
 
-```xml
+```bash
     listen_tls = 0
     listen_tcp = 1
     auth_tcp = "none"
@@ -509,39 +518,38 @@ Enable live migration by updating /etc/libvirt/libvirtd.conf file:
 
 Edit libvirtd_opts variable in /etc/init/libvirt-bin.conf file:
 
-```xml
+```bash
     env libvirtd_opts="-d -l"
 ```
 
 Edit /etc/default/libvirt-bin file
 
-```xml
+```bash
     libvirtd_opts="-d -l"
 ```
 
 Restart the libvirt service and dbus to load the new values:
 
-```xml
-    #service dbus restart && service libvirt-bin restart
+```bash
+#service dbus restart && service libvirt-bin restart
 ```
 
-6.2 Nova
+##Nova
 
 Start by installing nova components:
 
-```xml
-    #apt-get install -y nova-api nova-cert novnc nova-consoleauth nova-scheduler nova-novncproxy 
-    nova-doc nova-conductor nova-compute-kvm
+```bash
+#apt-get install -y nova-api nova-cert novnc nova-consoleauth nova-scheduler nova-novncproxy nova-doc nova-conductor nova-compute-kvm
 ```
 Check the status of all nova-services:
 
-```xml
-    #cd /etc/init.d/; for i in $( ls nova-* ); do service $i status; cd; done
+```bash
+#cd /etc/init.d/; for i in $( ls nova-* ); do service $i status; cd; done
 ```
 
 Prepare a Mysql database for Nova:
 
-```xml
+```bash
     mysql -u root -p
     CREATE DATABASE nova;
     GRANT ALL ON nova.* TO 'novaUser'@'%' IDENTIFIED BY 'novaPass';
@@ -550,7 +558,7 @@ Prepare a Mysql database for Nova:
 
 Now modify authtoken section in the /etc/nova/api-paste.ini file to this:
 
-```xml
+```bash
     [filter:authtoken]
     paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
     auth_host = 10.10.100.51
@@ -566,7 +574,7 @@ Now modify authtoken section in the /etc/nova/api-paste.ini file to this:
 
 Modify the /etc/nova/nova.conf like this:
 
-```xml
+```bash
     [DEFAULT]
     logdir=/var/log/nova
     state_path=/var/lib/nova
@@ -627,7 +635,7 @@ Modify the /etc/nova/nova.conf like this:
 
 Edit the /etc/nova/nova-compute.conf:
 
-```xml
+```bash
     [DEFAULT]
     libvirt_type=kvm
     libvirt_ovs_bridge=br-int
@@ -638,49 +646,47 @@ Edit the /etc/nova/nova-compute.conf:
 
 Synchronize your database:
 
-```xml
 
-    #nova-manage db sync
+```bash
+#nova-manage db sync
 ```
     
 Restart nova-* services:
 
-```xml
-    #cd /etc/init.d/; for i in $( ls nova-* ); do sudo service $i restart; done
+```bash
+#cd /etc/init.d/; for i in $( ls nova-* ); do sudo service $i restart; done
 ```
 
 Check for the smiling faces on nova-* services to confirm your installation:
 
-```xml
-    #nova-manage service list
+```bash
+#nova-manage service list
 ```
 
-7.Cinder
---------
+##Cinder
 
 Install the required packages:
 
-```xml
-    #apt-get install -y cinder-api cinder-scheduler cinder-volume iscsitarget open-
-    iscsi iscsitarget-dkms
+```bash
+#apt-get install -y cinder-api cinder-scheduler cinder-volume iscsitarget open-iscsi iscsitarget-dkms
 ```
 
 Configure the iscsi services:
 
-```xml
-    #sed -i 's/false/true/g' /etc/default/iscsitarget
+```bash
+#sed -i 's/false/true/g' /etc/default/iscsitarget
 ```
 
 Restart the services:
 
-```xml
-    #service iscsitarget start
-    #service open-iscsi start
+```bash
+#service iscsitarget start
+#service open-iscsi start
 ```
 
 Prepare a Mysql database for Cinder:
 
-```xml
+```bash
     mysql -u root -p
     CREATE DATABASE cinder;
     GRANT ALL ON cinder.* TO 'cinderUser'@'%' IDENTIFIED BY 'cinderPass';
@@ -689,7 +695,7 @@ Prepare a Mysql database for Cinder:
 
 Configure /etc/cinder/api-paste.ini like the following:
 
-```xml
+```bash
     [filter:authtoken]
     paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
     service_protocol = http
@@ -705,7 +711,7 @@ Configure /etc/cinder/api-paste.ini like the following:
 
 Edit the /etc/cinder/cinder.conf to:
 
-```xml
+```bash
     [DEFAULT]
     rootwrap_config=/etc/cinder/rootwrap.conf
     sql_connection = mysql://cinderUser:cinderPass@10.10.100.51/cinder
@@ -720,55 +726,60 @@ Edit the /etc/cinder/cinder.conf to:
     
 Then, synchronize your database:
 
-```xml
-    #cinder-manage db sync
+```bash
+#cinder-manage db sync
 ```
 
-###For intel machines
-##create a volume-group called "cinder-volumes" using the empty partition
-##$system--config-lvm
-##Assign the empty partition for "cinder-volumes"
+**For intel machines**
+
+create a volume-group called "cinder-volumes" using the empty partition
+
+```bash
+#system--config-lvm
+#Assign the empty partition for "cinder-volumes"
+```
+
 Restart the cinder services:
 
-```xml
-    #cd /etc/init.d/; for i in $( ls cinder-* ); do sudo service $i restart; done
+```bash
+#cd /etc/init.d/; for i in $( ls cinder-* ); do sudo service $i restart; done
 ```
 
 Verify if cinder services are running:
 
-```xml
-    #cd /etc/init.d/; for i in $( ls cinder-* ); do sudo service $i status; done
+```bash
+#cd /etc/init.d/; for i in $( ls cinder-* ); do sudo service $i status; done
 ```
 
-8.Horizon
----------
+##Horizon
 
 To install horizon, proceed like this
 
-```xml
-    #apt-get -y install openstack-dashboard memcached
+```bash
+#apt-get -y install openstack-dashboard memcached
 ```
 
 Optional:If you don't like the OpenStack ubuntu theme, you can remove the package to disable it:
 
-```xml
-    #dpkg --purge openstack-dashboard-ubuntu-theme
+```bash
+#dpkg --purge openstack-dashboard-ubuntu-theme
 ```
 
 Reload Apache and memcached:
 
-```xml
-    #service apache2 restart; service memcached restart
+```bash
+#service apache2 restart; service memcached restart
 ```
+
 You can now access your OpenStack 10.42.0.51/horizon with credentials admin:admin_pass.
 
-9.VM Creation
--------------
+##VM Creation
 
-Create a external network.
+**Create a external network:**
 
-```xml
-root@akrantha:/home/openstack# quantum net-create public-net --router:external=True
+```bash
+#quantum net-create public-net --router:external=True
+
 Created a new network:
 +---------------------------+--------------------------------------+
 | Field                     | Value                                |
@@ -786,12 +797,14 @@ Created a new network:
 | tenant_id                 | 2b942273713741b1868eb86b11e08df8     |
 +---------------------------+--------------------------------------+
 ```
+ 
  ![import](/images/create_ext_net.png)
 
-Create a subnet.
+**Create a subnet:**
 
-```xml
-root@akrantha:/home/openstack# quantum subnet-create --tenant-id 2b942273713741b1868eb86b11e08df8 --name public-net-subnet01 --gateway 10.42.0.1 public-net 10.42.0.0/24 --enable_dhcp False
+```bash
+#quantum subnet-create --tenant-id 2b942273713741b1868eb86b11e08df8 --name public-net-subnet01 --gateway 10.42.0.1 public-net 10.42.0.0/24 --enable_dhcp False
+
 Created a new subnet:
 +------------------+----------------------------------------------+
 | Field            | Value                                        |
@@ -809,21 +822,24 @@ Created a new subnet:
 | tenant_id        | 2b942273713741b1868eb86b11e08df8             |
 +------------------+----------------------------------------------+
 ```
+ 
  ![import](/images/create_subnet_ext.png)
 
-Allocation of IP's to Vm's.
 
-```xml
-    #This is not tried but, we can try allocation pool also - this command not tried , pls verify before trying.
- 
-    #quantum subnet-create --tenant-id 6973efb023c748d6b8a4fff747faad92 --name 
-    public-net-subnet01 --gateway 10.42.0.1 public-net 10.42.0.0/24 --enable_dhcp False --allocation-pool start=10.42.0.75,end=10.42.0.254
-```
+**Allocation of IP's to VM's:**
 
-Create a private-network:
+
+This is not tried but, we can try allocation pool also - this command not tried , pls verify before trying.
 
 ```bash
-root@akrantha:/home/openstack# quantum net-create private-net
+#quantum subnet-create --tenant-id 6973efb023c748d6b8a4fff747faad92 --name public-net-subnet01 --gateway 10.42.0.1 public-net 10.42.0.0/24 --enable_dhcp False --allocation-pool start=10.42.0.75,end=10.42.0.254
+```
+
+**Create a private-network:**
+
+```bash
+#quantum net-create private-net
+
 Created a new network:
 +---------------------------+--------------------------------------+
 | Field                     | Value                                |
@@ -841,11 +857,15 @@ Created a new network:
 | tenant_id                 | 2b942273713741b1868eb86b11e08df8     |
 +---------------------------+--------------------------------------+
 ```
+ 
  ![import](/images/create_pvt_net.png)
 
-Attach subnet to private network:
-```xml
-root@akrantha:/home/openstack# quantum subnet-create --name private-subnet private-net 10.0.0.0/24
+
+**Attach subnet to private network:**
+
+```bash
+#quantum subnet-create --name private-subnet private-net 10.0.0.0/24
+
 Created a new subnet:
 +------------------+--------------------------------------------+
 | Field            | Value                                      |
@@ -863,12 +883,15 @@ Created a new subnet:
 | tenant_id        | 2b942273713741b1868eb86b11e08df8           |
 +------------------+--------------------------------------------+
 ```
+ 
  ![import](/images/create_subnet_pvt.png)
 
-Create router
 
-```xml
-root@akrantha:/home/openstack#quantum router-create router1
+**Create router:**
+
+```bash
+#quantum router-create router1
+
 Created a new router:
 +-----------------------+--------------------------------------+
 | Field                 | Value                                |
@@ -881,29 +904,34 @@ Created a new router:
 | tenant_id             | 2b942273713741b1868eb86b11e08df8     |
 +-----------------------+--------------------------------------+
 ```
+ 
  ![import](/images/create_router.png)
 
-Uplink router to public network:
 
-```xml
-    #quantum router-gateway-set router1 public-net
-```
-Attach private network to router:
-
-```xml
-    #quantum router-interface-add router1 private-subnet
-```
- ![import](/images/router_add_iface.png)
-
-To show the net list:
+**Uplink router to public network:**
 
 ```bash
-root@akrantha:/home/openstack# ip netns list
+#quantum router-gateway-set router1 public-net
+```
+
+**Attach private network to router:**
+
+```bash
+#quantum router-interface-add router1 private-subnet
+```
+ 
+ ![import](/images/router_add_iface.png)
+
+
+**To show the net list:**
+
+```bash
+#ip netns list
 qrouter-ca972d3b-788e-4e16-8552-dd335575c5c0
 ```
 
 ```bash
-root@akrantha:/home/openstack# ip netns exec qrouter-ca972d3b-788e-4e16-8552-dd335575c5c0 ip addr list
+#ip netns exec qrouter-ca972d3b-788e-4e16-8552-dd335575c5c0 ip addr list
 10: lo: <LOOPBACK,UP,LOWER_UP> mtu 16436 qdisc noqueue state UNKNOWN 
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
     inet 127.0.0.1/8 scope host lo
@@ -921,154 +949,171 @@ root@akrantha:/home/openstack# ip netns exec qrouter-ca972d3b-788e-4e16-8552-dd3
        valid_lft forever preferred_lft forever
 ```
 
-Create a Security Group:
+
+**Create a Security Group:**
  ![import](/images/create_security_group.png)
  ![import](/images/create_security_group_desc.png)
 
-Create Keypairs
+
+**Create Keypairs:**
  ![import](/images/create_keypair.png)
 
-Add Rule:
+
+**Add Rule:**
  ![import](/images/add_rule.png)
 
-Edit Security Group Rules:
+
+**Edit Security Group Rules:**
  ![import](/images/security_group_rules.png)
 
-Access and Security
+
+**Access and Security**
  ![import](/images/access_and_security.png)
 
 
 
->>>> Create a VM using the Horizon dashboard
+**NOTE: Create a VM using the Horizon dashboard**
 
-Before creating a VM
+
+**Before creating a VM**
  ![import](/images/empty_instances.png)
 
-Launch Instance:
+
+**Launch Instance:**
  ![import](/images/launch_instance.png)
 
-Launch Instance Keypair:
+
+**Launch Instance Keypair:**
  ![import](/images/launch_instance_keypair.png)
 
-Launch Instance Networking:
+
+**Launch Instance Networking:**
  ![import](/images/launch_instance_networking.png)
 
-My first VM
- ![import](/images/first_instances.png)
 
-Network Topology
+**My first VM**
+ ![import](/images/first_instance.png)
+
+
+**Network Topology**
  ![import](/images/network_topology.png)
 
-To ping vm, do the following
 
-```xml
-    ip netns exec qrouter-ca972d3b-788e-4e16-8552-dd335575c5c0 ping 10.0.0.2
+**To ping VM:**
+
+```bash
+#ip netns exec qrouter-ca972d3b-788e-4e16-8552-dd335575c5c0 ping 10.0.0.2
 ```
 
-To do ssh into vm, do the follwing:
+**To do ssh into VM, do the follwing:**
 
-```xml
-    #ip netns exec qrouter-36f5ccde-1876-4554-be59-032af24c419c ssh 10.0.0.2 -l cirros
+```bash
+#ip netns exec qrouter-36f5ccde-1876-4554-be59-032af24c419c ssh 10.0.0.2 -l cirros
     userid: cirros
     password: cubswin:)
 ```
 
-To get all the ports listed
+**To get all the ports listed:**
 
-```xml
-    #quantum port-list
+```bash
+#quantum port-list
 ```
 
 
-GETTING THE VMPORT id FOR ASSIGNING FLOATING IP:
+**GETTING THE VMPORT id FOR ASSIGNING FLOATING IP:**
 
-```xml
-    #quantum port-list -c id -c fixed_ips -c device_owner 
- 
-    +--------------------------------------+---------------------------------------------------------------------------------     +---------------------+| id          |                    fixed_ips           device_owner             |+--------+
-    | 848d2e3a-ab3f-4e92-ad6d-269d793dde54 | {"subnet_id": "6bfd8ae6-a2b9-4259-b813-4581a15c8d0f", "ip_address": "10.0.0.2"}  |      compute:None             |
-    | 9e069dc1-4af7-4c5f-a527-3c53d64affc6 | {"subnet_id": "55cbc646-6271-4148-b426-a7e90619e28d", "ip_address": "10.42.0.2"} |  network:router_gateway   |
-    | b36a8a56-84db-4b2e-ab0e-2adf2cef88a4 | {"subnet_id": "6bfd8ae6-a2b9-4259-b813-4581a15c8d0f", "ip_address": "10.0.0.3"}  | network:dhcp             |
-    | e40639e1-5986-4787-9f6c-452f608b24ff | {"subnet_id": "6bfd8ae6-a2b9-4259-b813-4581a15c8d0f", "ip_address": "10.0.0.1"}  | network:router_interface |
-+--------------------------------------+----------------------------------------------------------------------------------+---+
+```bash
+#quantum port-list -c id -c fixed_ips -c device_owner 
 ```
+
+|---
+| id | fixed-ips | device-owner | 
+|:-|:-:|
+| 848d2e3a-ab3f-4e92-ad6d-269d793dde54 | {"subnet_id": "6bfd8ae6-a2b9-4259-b813-4581a15c8d0f", "ip_address": "10.0.0.2"} | compute:None |
+| 9e069dc1-4af7-4c5f-a527-3c53d64affc6 | {"subnet_id": "55cbc646-6271-4148-b426-a7e90619e28d", "ip_address": "10.42.0.2"} |network:router_gateway |
+| b36a8a56-84db-4b2e-ab0e-2adf2cef88a4 | {"subnet_id": "6bfd8ae6-a2b9-4259-b813-4581a15c8d0f", "ip_address": "10.0.0.3"} | network:dhcp |
+| e40639e1-5986-4787-9f6c-452f608b24ff | {"subnet_id": "6bfd8ae6-a2b9-4259-b813-4581a15c8d0f", "ip_address": "10.0.0.1"} | network:router_interface |
+|---
+
 
 The compute port is 848d2e3a-ab3f-4e92-ad6d-269d793dde54 , which has IP 10.0.0.2 in the private subnet id.
 
-```xml
+```bash
 We will use this port id to create a floating IP in the Public network.
     848d2e3a-ab3f-4e92-ad6d-269d793dde54
 ```
 
-Alternate way to get the VM port ID:
+**Alternate way to get the VM port ID:**
 
-```xml
-    #nova list
+```bash
 
-    +--------------------------------------+---------------+--------+----------------------+
-    | ID                                   | Name          | Status | Networks             |
-    +--------------------------------------+---------------+--------+----------------------+
-    | 2b23d81b-b6db-4dfc-9440-ddf2ed4ef144 | firstinstance | ACTIVE | private-net=10.0.0.2 |
-    +--------------------------------------+---------------+--------+----------------------+
+#nova list
++--------------------------------------+---------------+--------+----------------------+
+| ID                                   | Name          | Status | Networks             |
++--------------------------------------+---------------+--------+----------------------+
+| 2b23d81b-b6db-4dfc-9440-ddf2ed4ef144 | firstinstance | ACTIVE | private-net=10.0.0.2 |
++--------------------------------------+---------------+--------+----------------------+
 ```
+
 
 Now use the Device id to get the VM port ID:
 
-```xml
-    #quantum port-list -- --device_id  2b23d81b-b6db-4dfc-9440-ddf2ed4ef144
+```bash
+#quantum port-list -- --device_id  2b23d81b-b6db-4dfc-9440-ddf2ed4ef144
 
-    +--------------------------------------+------+-------------------                             +----------------------------------------------------------------------------+
-    | id                                   | name | mac_address |
-    fixed_ips                                                                  |
-    +--------------------------------------+------+-------------------        +---------------------------------------------------------------------------------+
-| 848d2e3a-ab3f-4e92-ad6d-269d793dde54 |      | fa:16:3e:79:9e:c4 | {"subnet_id": "6bfd8ae6-a2b9-4259-b813-4581a15c8d0f", "ip_address": "10.0.0.2"} |
-+--------------------------------------+------+-------------------+---------------------------------------------------------------------------------+
+
+|---
+| id | name | mac-address | fixed-ips 
+|:-|:-:|
+| 848d2e3a-ab3f-4e92-ad6d-269d793dde54 | fa:16:3e:79:9e:c4 | {"subnet_id": "6bfd8ae6-a2b9-4259-b813-4581a15c8d0f", "ip_address": "10.0.0.2"} |
+|---
 ```
 
-You can see that we got the Vm PORT ID,  848d2e3a-ab3f-4e92-ad6d-269d793dde54 which is same as in the previous case.
+You can see that we got the VM PORT ID,  848d2e3a-ab3f-4e92-ad6d-269d793dde54 which is same as in the previous case.
 
 
-Now create a floating IP for the Vm: with port_id as given above
+Now create a floating IP for the VM with port_id as given above
 
-```xml
+```bash
 
-    #quantum floatingip-list
-    should return empty list, since we have not created any ip
+#quantum floatingip-list
+#should return empty list, since we have not created any ip
 ```
 
 You can see subnet information with the following command:
-```xml
 
-    #quantum subnet-list
+```bash
 
-    +--------------------------------------+---------------------+--------------+----------------------------------------------+
-    | id                                   | name                | cidr         | allocation_pools                             |
-    +--------------------------------------+---------------------+--------------+----------------------------------------------+
-    | 55cbc646-6271-4148-b426-a7e90619e28d | public-net-subnet01 | 10.42.0.0/24 | {"start": "10.42.0.2", "end": "10.42.0.254"} |
-    | 6bfd8ae6-a2b9-4259-b813-4581a15c8d0f | private-subnet      | 10.0.0.0/24  | {"start": "10.0.0.2", "end": "10.0.0.254"}   |
-    +--------------------------------------+---------------------+--------------+----------------------------------------------+
+#quantum subnet-list
+
++--------------------------------------+---------------------+--------------+----------------------------------------------+
+| id                                   | name                | cidr         | allocation_pools                             |
++--------------------------------------+---------------------+--------------+----------------------------------------------+
+| 55cbc646-6271-4148-b426-a7e90619e28d | public-net-subnet01 | 10.42.0.0/24 | {"start": "10.42.0.2", "end": "10.42.0.254"} |
+| 6bfd8ae6-a2b9-4259-b813-4581a15c8d0f | private-subnet      | 10.0.0.0/24  | {"start": "10.0.0.2", "end": "10.0.0.254"}   |
++--------------------------------------+---------------------+--------------+----------------------------------------------+
 ```
 
-You can see spcific subnet info using
 
-```xml
-    #quantum subnet-show  55cbc646-6271-4148-b426-a7e90619e28d
+Command to see specific subnet information
+
+```bash
+#quantum subnet-show  55cbc646-6271-4148-b426-a7e90619e28d
 ```
+
 Since we have not created allocation pool initially we need to update the subnet with an allocation pool:
 But the below command is not working.
 
-```xml 
-    #quantum subnet-update 55cbc646-6271-4148-b426-a7e90619e28d --allocation-pool 
-    start=10.42.0.75,end=10.42.0.254 public-net 10.42.0.0/24
+```bash 
+#quantum subnet-update 55cbc646-6271-4148-b426-a7e90619e28d --allocation-pool start=10.42.0.75,end=10.42.0.254 public-net 10.42.0.0/24
 ```
-Unrecognized attribute(s) 'allocation_pool'
 
-Hence we will creatae flaoting point which is already there.
+Hence we will create floating point which is already there.
 
-```xml
+```bash
 
-    #quantum floatingip-list
-    #quantum floatingip-create --port-id 848d2e3a-ab3f-4e92-ad6d-269d793dde54 public-net
+#quantum floatingip-list
+#quantum floatingip-create --port-id 848d2e3a-ab3f-4e92-ad6d-269d793dde54 public-net
 
    
     Created a new floatingip:
@@ -1084,10 +1129,11 @@ Hence we will creatae flaoting point which is already there.
     | tenant_id           | 6973efb023c748d6b8a4fff747faad92     |
     +---------------------+--------------------------------------+
 ```
-You ssh the virtual machine:
 
-```xml
-    #ssh 10.42.0.3 -l cirros 
+**ssh the virtual machine:**
+
+```bash
+#ssh 10.42.0.3 -l cirros 
     The authenticity of host '10.42.0.3 (10.42.0.3)' can't be established.
     RSA key fingerprint is da:f6:87:1a:3f:b6:e9:a4:92:8b:ca:a8:b8:d5:28:0d.
     Are you sure you want to continue connecting (yes/no)? yes
@@ -1097,16 +1143,18 @@ You ssh the virtual machine:
     $ 
 ```
 
+**Portforwarding:**
+
 After this we did the port forwarding on Zentyal
 
-```xml 
-    #eth1 src = TCP/IP port=25920   dest ip=10.42.0.3  dest port =  22 
+```bash 
+#eth1 src = TCP/IP port=25920   dest ip=10.42.0.3  dest port =  22 
 ```
 
-Logging in to the Vm from external network
+Logging in to the VM from external network
 
-```xml
-    #ssh 183.83.27.73 -p 25920 -l cirros
+```bash
+#ssh 183.83.27.73 -p 25920 -l cirros
     The authenticity of host '10.42.0.3 (10.42.0.3)' can't be established.
     RSA key fingerprint is da:f6:87:1a:3f:b6:e9:a4:92:8b:ca:a8:b8:d5:28:0d.
     Are you sure you want to continue connecting (yes/no)? yes
@@ -1131,7 +1179,7 @@ Logging in to the Vm from external network
     tmpfs                   252056         0    252056   0% /dev/shm
 ```
 
----------------------------------continue----------------------------------
+
 
 
 
