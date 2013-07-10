@@ -40,26 +40,29 @@ title: OpenStack Installation
    
 *Note: On AMD machines create a volume-group called "cinder-volumes" while installing Ubuntu12.04 and for Intel machines create an empty partition which can later be used for creating a volume-group*
 
-Enter into super user mode to execute commands:
+<ol>
+<li><p>Enter into super user mode to execute commands:</p>
 
 ```bash
 $sudo su
 ```
-
-Add Grizzly repositories:
+</li>
+<li><p>Add Grizzly repositories:</p>
 
 ```bash
 #apt-get install ubuntu-cloud-keyring python-software-properties software-properties-common python-keyring
 #echo deb http://ubuntu-cloud.archive.canonical.com/ubuntu precise-updates/grizzly main >> /etc/apt/sources.list.d/grizzly.list
 ```
-
-Update your system:
-
+</li>
+<li>Update your system:
 ```bash
 #apt-get update
 #apt-get upgrade
 #apt-get dist-upgrade
 ```
+</li>
+</ol>
+
 
 ###Networking
 
@@ -71,7 +74,7 @@ Edit network settings using the following command
 
 ```bash
 #vi /etc/network/interfaces
-    #For Exposing OpenStack API over the internet
+#For Exposing OpenStack API over the internet
     auto eth1
     iface eth1 inet static
     address 10.42.0.51
@@ -85,7 +88,6 @@ Edit network settings using the following command
     address 10.10.100.51
     netmask 255.255.255.0
 ```
-
 
 Restart the networking service:
 
