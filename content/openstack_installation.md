@@ -1,9 +1,10 @@
 ---
 title: OpenStack Installation
 ---
-                       
-##Contents 
 
+#OpenStack Grizzly Installation - Single Node                   
+
+##Contents 
 
 1. Requirements
 
@@ -44,12 +45,13 @@ width:50%;
 <tr>
 </tr>
 <tr>
-<th height="30" bgcolor="#90EE90">Node Role</th>
-<th bgcolor="#90EE90">NICS</th>
+<th height="30" bgcolor="#bad2e9">Node Role</th>
+<th bgcolor="#bad2e9">NICS</th>
 </tr>
 <tr>
 <td height="30">Single Node</td>
-<td>eth0 (10.10.100.51),eth1 (10.42.0.51)</td>
+<td>eth0 (10.10.100.51)
+eth1 (10.42.0.51)</td>
 </tr>
 </table>
 </body>
@@ -59,23 +61,21 @@ width:50%;
 
 ###Preparing Ubuntu
    
-*Note: On AMD machines create a volume-group called "cinder-volumes" while installing Ubuntu12.04 and for Intel machines create an empty partition which can later be used for creating a volume-group*
-
 <ol>
-<li><p>Enter into super user mode to execute commands:</p>
+<li><p>Change to super user mode for rest of the document</p>
 
 ```bash
 $sudo su
 ```
 </li>
-<li><p>Add Grizzly repositories:</p>
+<li><p>Add Grizzly repositories to get the packages for OpenStack Grizzly release:</p>
 
 ```bash
 #apt-get install ubuntu-cloud-keyring python-software-properties software-properties-common python-keyring
 #echo deb http://ubuntu-cloud.archive.canonical.com/ubuntu precise-updates/grizzly main >> /etc/apt/sources.list.d/grizzly.list
 ```
 </li>
-<li>Update your system:
+<li>Update and Upgrade the ubuntu OS:
 ```bash
 #apt-get update
 #apt-get upgrade
@@ -84,15 +84,23 @@ $sudo su
 </li>
 </ol>
 
+*Note: On AMD machines create a volume-group called "cinder-volumes" while installing Ubuntu12.04 and for Intel machines create an empty partition which can later be used for creating a volume-group*
+
 
 ###Networking
 <ol>
-<li><p>For OpenStack Single-Node setup we require 2 NIC's, One NIC (10.42.0.51) is used for external network connection i.e, Internet access and the other NIC (10.10.100.51) is used for internal networking (OpenStack management).</p></li>
+<li><p>For OpenStack Single-Node setup you will require 2 NIC's, One NIC (<code>10.42.0.51</code>) is used for external network connection i.e, Internet access and the other NIC (<code>10.10.100.51</code>) is used for internal networking (OpenStack management).</p></li>
 
-Note: The external NIC should have a static IP address.
+*Note: The external NIC should have a static IP address.*
 
-<li><p>Edit network settings using the following command</p>
+<li><p>Edit network settings to add configuration for two interfaces <code>eth0</code> and <code>eth1</code>. </p>
 
+<table >
+<tr>
+<td>
+<img src="/images/network-interfaces.png" alt="network-interfaces"/>
+</td>
+<td>
 ```bash
 #vi /etc/network/interfaces
 #For Exposing OpenStack API over the internet
@@ -109,9 +117,14 @@ Note: The external NIC should have a static IP address.
     address 10.10.100.51
     netmask 255.255.255.0
 ```
+</td>
+</tr>
+</table>
+
+
 </li>
 
-<li><p>Restart the networking service:</p>
+<li><p>Restart the Networking Service:</p>
 
 ```bash
 #/etc/init.d/networking restart
@@ -1279,18 +1292,6 @@ border:1px solid black;
 </table>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
