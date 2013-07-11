@@ -27,12 +27,33 @@ title: OpenStack Installation
 
 ##Requirements
 
-|---
-| Role Name | Description 
-|:-|:-:|
-| Node Role  | NICs|
-| Single Node | eth0 (10.10.100.51),eth1 (10.42.0.51) |
-|---
+<html>
+<head>
+<style>
+
+.dam
+{
+width:50%;
+}
+
+</style>
+</head>
+
+<body>
+<table class="dam">
+<tr>
+</tr>
+<tr>
+<th height="30" bgcolor="#90EE90">Node Role</th>
+<th bgcolor="#90EE90">NICS</th>
+</tr>
+<tr>
+<td height="30">Single Node</td>
+<td>eth0 (10.10.100.51),eth1 (10.42.0.51)</td>
+</tr>
+</table>
+</body>
+</html>
 
 ##Getting Started
 
@@ -65,12 +86,12 @@ $sudo su
 
 
 ###Networking
-
-For OpenStack Single-Node setup we require 2 NIC's, One NIC (10.42.0.51) is used for external network connection i.e, Internet access and the other NIC (10.10.100.51) is used for internal networking (OpenStack management). 
+<ol>
+<li><p>For OpenStack Single-Node setup we require 2 NIC's, One NIC (10.42.0.51) is used for external network connection i.e, Internet access and the other NIC (10.10.100.51) is used for internal networking (OpenStack management).</p></li>
 
 Note: The external NIC should have a static IP address.
 
-Edit network settings using the following command
+<li><p>Edit network settings using the following command</p>
 
 ```bash
 #vi /etc/network/interfaces
@@ -88,84 +109,101 @@ Edit network settings using the following command
     address 10.10.100.51
     netmask 255.255.255.0
 ```
+</li>
 
-Restart the networking service:
+<li><p>Restart the networking service:</p>
 
 ```bash
 #/etc/init.d/networking restart
 ```
+</li>
+</ol>
 
 ###MySQL & RabbitMQ
 
-**Install MySQL:**
+<ol>
+<li><p>Install MySQL:</p>
 
 ```bash
 #apt-get install -y mysql-server python-mysqldb
 ```
 
-During the install, you'll be prompted for the mysql root password. Enter a password of your choice and verify it.
+<p>During the install, you'll be prompted for the mysql root password. Enter a password of your choice and verify it.</p>
+</li>
 
-Configure mysql to accept all incoming requests:
+<li><p>Configure mysql to accept all incoming requests:</p>
+</li>
 
 ```bash
 #sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mysql/my.cnf
 #service mysql restart
 ```
 
-**Install RabbitMQ (Message Queue):**
+<li><p>Install RabbitMQ (Message Queue):</p>
 
-The OpenStack Cloud Controller communicates with other nova components such as `Scheduler`, `Network Controller`, and `Volume Controller` using `AMQP` (Advanced Message Queue Protocol). Nova components use Remote Procedure Calls (RPC) to communicate to one another.
+<p>The OpenStack Cloud Controller communicates with other nova components such as `Scheduler`, `Network Controller`, and `Volume Controller` using `AMQP` (Advanced Message Queue Protocol). Nova components use Remote Procedure Calls (RPC) to communicate to one another.</p>
 
 ```bash
 #apt-get install -y rabbitmq-server
 ```
+</li>
 
-**Install NTP service (Network Time Protocol):**
+<li><p>Install NTP service (Network Time Protocol):</p>
 
 To keep all the services in sync, you need to install NTP, and if you do a multi-node configuration you will configure one server to be the reference server.
 
 ```bash
 #apt-get install -y ntp
 ```
+</li>
+</ol>
 
 ###Others Services
-
+<ol>
+<li><p>Install vlan and bridge-utility</p> 
 ```bash
 #apt-get install -y vlan bridge-utils
 ```
+</li>
 
-Enable IP_Forwarding:
+<li><p>Enable IP_Forwarding:</p>
 
-Enabling IP Forwarding makes the machine to act as a router or proxy server to share one internet connection to many client machines. 
+<p>Enabling IP Forwarding makes the machine to act as a router or proxy server to share one internet connection to many client machines.</p>
 
 ```bash
 #sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf
 ```
+</li>
 
-To save you from rebooting, perform the following
+<li><p>To save you from rebooting, perform the following</p>
 
 ```bash
 #sysctl net.ipv4.ip_forward=1
 ```
+</li>
+</ol>
+
 
 ##Keystone
+<ol>
 
-
-Keystone is an identity service which supports various protocols for authentication and authorization 
-
-Start by the keystone packages:
+Keystone is an identity service which supports various protocols for authentication and authorization. 
+<li>
+<p>Install keystone packages:</p>
 
 ```bash
 #apt-get install -y keystone
 ```
+</li>
 
-Verify your keystone is running:
+<li><p>Verify your keystone is running:</p>
 
 ```bash
 #service keystone status
 ```
+</li>
 
-Create a new MySQL database for keystone:
+<li><p>Create a new MySQL database for keystone:</p>
 
 ```bash
     mysql -u root -p
@@ -173,23 +211,26 @@ Create a new MySQL database for keystone:
     GRANT ALL ON keystone.* TO 'keystoneUser'@'%' IDENTIFIED BY 'keystonePass';
     quit;
 ```
+</li>
 
-Adapt the connection attribute in the /etc/keystone/keystone.conf to the new database:
+<li><p>Adapt the connection attribute in the /etc/keystone/keystone.conf to the new database:</p>
 
 ```bash
     connection = mysql://keystoneUser:keystonePass@10.10.100.51/keystone
 ```
+</li>
 
-Restart the identity service then synchronize the database:
+<li><p>Restart the identity service then synchronize the database:</p>
 
 ```bash
 #service keystone restart
 #keystone-manage db_sync
 ```
+</li>
 
-Fill up the keystone database using the two scripts available in the Scripts folder of this git repository:
+<li><p>Fill up the keystone database using the two scripts available in the Scripts folder of this git repository:</p>
 
-Modify the HOST_IP and HOST_IP_EXT variables before executing the scripts HOST_IP(10.10.100.51) and HOST_IP_EXT(10.42.0.51)
+<p>Modify the HOST_IP and HOST_IP_EXT variables before executing the scripts HOST_IP(10.10.100.51) and HOST_IP_EXT(10.42.0.51)</p>
 
 ```bash
 #wget https://raw.github.com/mseknibilel/OpenStack-Grizzly-Install-Guide/OVS_SingleNode/KeystoneScripts/keystone_basic.sh
@@ -199,8 +240,9 @@ Modify the HOST_IP and HOST_IP_EXT variables before executing the scripts HOST_I
 #./keystone_basic.sh
 #./keystone_endpoints_basic.sh
 ```
+</li>
 
-Create a simple credential file and load it so you won't be bothered later:
+<li><p>Create a simple credential file and load it so you won't be bothered later:</p>
 
 ```bash
 #nano creds
@@ -210,34 +252,42 @@ Create a simple credential file and load it so you won't be bothered later:
     export OS_PASSWORD=admin_pass
     export OS_AUTH_URL="http://10.42.0.51:5000/v2.0/"
 ```
-Load it:
+</li>
+
+<li><p>Load it:</p>
 
 ```bash
 #source creds
 ```
+</li>
 
-To test Keystone, we use a simple CLI command:
+<li><p>To test Keystone, we use a simple CLI command:</p>
 
 ```bash
 #keystone user-list
 ```
+</li>
+</ol>
 
 ##Glance
-
-We Move now to Glance installation:
+<ol>
+<li><p>
+Install Glance packages:</p>
 
 ```bash
 #apt-get install -y glance
 ```
+</li>
 
-Verify your glance services are running:
+<li><p>Verify your glance services are running:</p>
 
 ```bash
 #service glance-api status
 #service glance-registry status
 ```
+</li>
 
-Create a new MySQL database for Glance:
+<li><p>Create a new MySQL database for Glance:</p>
 
 ```bash
     mysql -u root -p
@@ -245,8 +295,9 @@ Create a new MySQL database for Glance:
     GRANT ALL ON glance.* TO 'glanceUser'@'%' IDENTIFIED BY 'glancePass';
     quit;
 ```
+</li>
 
-Update /etc/glance/glance-api-paste.ini with:
+<li><p>Update /etc/glance/glance-api-paste.ini with:</p>
 
 ```bash
 
@@ -260,8 +311,9 @@ Update /etc/glance/glance-api-paste.ini with:
     admin_user = glance
     admin_password = service_pass
 ```
+</li>
 
-Update the /etc/glance/glance-registry-paste.ini with:
+<li><p>pdate the /etc/glance/glance-registry-paste.ini with:</p>
 
 ```bash
     [filter:authtoken]
@@ -273,17 +325,9 @@ Update the /etc/glance/glance-registry-paste.ini with:
     admin_user = glance
     admin_password = service_pass
 ```
+</li>
 
-Update /etc/glance/glance-api.conf with:
-
-```bash
-    sql_connection = mysql://glanceUser:glancePass@10.10.100.51/glance
-    And:
-    [paste_deploy]
-    flavor = keystone
-```
-
-Update the /etc/glance/glance-registry.conf with:
+<li><p>Update /etc/glance/glance-api.conf with:</p>
 
 ```bash
     sql_connection = mysql://glanceUser:glancePass@10.10.100.51/glance
@@ -291,61 +335,81 @@ Update the /etc/glance/glance-registry.conf with:
     [paste_deploy]
     flavor = keystone
 ```
+</li>
 
-Restart the glance-api and glance-registry services:
+<li><p>Update the /etc/glance/glance-registry.conf with:</p>
+
+```bash
+    sql_connection = mysql://glanceUser:glancePass@10.10.100.51/glance
+    And:
+    [paste_deploy]
+    flavor = keystone
+```
+</li>
+
+<li><p>Restart the glance-api and glance-registry services:</p>
 
 ```bash
 #service glance-api restart; service glance-registry restart
 ```
+</li>
 
-Synchronize the glance database:
+<li><p>Synchronize the glance database:</p>
 
 ```bash
 #glance-manage db_sync
 ```
+</li>
 
-Restart the services again to take into account the new modifications:
+<li><p>Restart the services again to take into account the new modifications:</p>
 
 ```bash
 #service glance-registry restart; service glance-api restart
 ```
+</li>
 
-To test Glance, upload the cirros cloud image directly from the internet:
+<li><p>To test Glance, upload the cirros cloud image directly from the internet:</p>
 
 ```bash
 #glance image-create --name myFirstImage --is-public true --container-format bare --disk-format qcow2 --location https://launchpad.net/    cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-disk.img
 ```
+</li>
 
-Now list the image to see what you have just uploaded:
+<li><p>Now list the image to see what you have just uploaded:</p>
 
 ```bash
 #glance image-list
 ```
+</li>
+</ol>
 
 ##Quantum
 
 ###OpenVSwitch
-
-**Install the openVSwitch:**
+<ol>
+<li><p>Install the openVSwitch:</p>
 
 ```bash
 #apt-get install -y openvswitch-switch openvswitch-datapath-dkms
 ```
+</li>
 
-Create the bridges:
+<li><p>Create the bridges:</p>
 
 ```bash
 #br-int will be used for VM integration
 #ovs-vsctl add-br br-int
 ```
+</li>
 
-br-ex is used to make to access the internet (not covered in this guide)
+<li><p>br-ex is used to access the external network.</p>
 
 ```bash
 #ovs-vsctl add-br br-ex
 ```
+</li>
 
-This will guide you to setting up the br-ex interface. Edit the eth1 in /etc/network/interfaces to become like this:
+<li><p>This will guide you to setting up the br-ex interface. Edit eth1 in /etc/network/interfaces:</p>
 
 ```bash
 # VM internet Access
@@ -356,16 +420,18 @@ This will guide you to setting up the br-ex interface. Edit the eth1 in /etc/net
     down ip link set $IFACE promisc off
     down ifconfig $IFACE down
 ```
+</li>
 
-Add the eth1 to the br-ex:
+<li><p>Add the eth1 to the br-ex:</p>
 
-Internet connectivity will be lost after this step but this won't affect OpenStack's work
+<p>Internet connectivity will be lost after this step but this won't affect OpenStack's work</p>
 
 ```bash
 #ovs-vsctl add-port br-ex eth1
 ```
+</li>
 
-Optional, If you want to get internet connection back, you can assign the eth1's IP address to the br-ex in the /etc/network/interfaces file:
+<li><p>Optional, If you want to get internet connection back, you can assign the eth1's IP address to the br-ex in the /etc/network/interfaces file:</p>
 
 ```bash
     auto br-ex
@@ -375,16 +441,19 @@ Optional, If you want to get internet connection back, you can assign the eth1's
     gateway 10.42.0.1
     dns-nameservers 8.8.8.8
 ```
+</li>
+</ol>
 
 ###Quantum
-
-Install the Quantum components:
+<ol>
+<li><p>Install the Quantum components:</p>
 
 ```bash
 #apt-get install -y quantum-server quantum-plugin-openvswitch quantum-plugin-openvswitch-agent dnsmasq quantum-dhcp-agent quantum-l3-agent
 ```
+</li>
 
-Create a database:
+<li><p>Create a database:</p>
 
 ```bash
     mysql -u root -p
@@ -392,14 +461,16 @@ Create a database:
     GRANT ALL ON quantum.* TO 'quantumUser'@'%' IDENTIFIED BY 'quantumPass';
     quit;
 ```
+</li>
 
-Verify all Quantum components are running:
+<li><p>Verify all Quantum components are running:</p>
 
 ```bash
 #cd /etc/init.d/; for i in $( ls quantum-* ); do sudo service $i status; done
 ```
+</li>
 
-Edit /etc/quantum/api-paste.ini
+<li><p>Edit /etc/quantum/api-paste.ini</p>
 
 ```bash
     [filter:authtoken]
@@ -411,8 +482,9 @@ Edit /etc/quantum/api-paste.ini
     admin_user = quantum
     admin_password = service_pass
 ```
+</li>
 
-Edit the OVS plugin configuration file /etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini with::
+<li><p>Edit the OVS plugin configuration file /etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini with:</p>
 
 Under the database section
 
@@ -436,8 +508,9 @@ Under the OVS section
     [SECURITYGROUP]
     firewall_driver = quantum.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
 ```
+</li>
 
-Update /etc/quantum/metadata_agent.ini:
+<li><p>Update /etc/quantum/metadata_agent.ini:</p>
 
 ```bash
 #The Quantum user information for accessing the Quantum API.
@@ -454,8 +527,9 @@ Update /etc/quantum/metadata_agent.ini:
     nova_metadata_port = 8775
     metadata_proxy_shared_secret = helloOpenStack
 ```
+</li>
 
-Edit your /etc/quantum/quantum.conf:
+<li><p>Edit your /etc/quantum/quantum.conf:</p>
 
 ```bash
     [keystone_authtoken]
@@ -467,32 +541,37 @@ Edit your /etc/quantum/quantum.conf:
     admin_password = service_pass
     signing_dir = /var/lib/quantum/keystone-signing
 ```
+</li>
 
-Restart all quantum services:
+<li><p>Restart all quantum services:</p>
 
 ```bash
 #cd /etc/init.d/; for i in $( ls quantum-* ); do sudo service $i restart; done
 #service dnsmasq restart
 ```
+</li>
+</ol>
 
 ##Nova
 
 ###KVM
-
-Make sure that your hardware enables virtualization:
+<ol>
+<li><p>Make sure that your hardware enables virtualization:</p>
 
 ```bash
 #apt-get install cpu-checker
 #kvm-ok
 ```
+</li>
 
-Normally you would get a good response. Now, move to install kvm and configure it:
+<li><p>Normally you would get a good response. Now, move to install kvm and configure it:</p>
 
 ```bash
 #apt-get install -y kvm libvirt-bin pm-utils
 ```
+</li>
 
-Edit the cgroup_device_acl array in the /etc/libvirt/qemu.conf file to:
+<li><p>Edit the cgroup_device_acl array in the /etc/libvirt/qemu.conf file to:</p>
 
 ```bash
     cgroup_device_acl = [
@@ -502,54 +581,65 @@ Edit the cgroup_device_acl array in the /etc/libvirt/qemu.conf file to:
     "/dev/rtc", "/dev/hpet","/dev/net/tun"
     ]
 ```
+</li>
 
-Delete default virtual bridge
+<li><p>Delete default virtual bridge</p>
 
 ```bash
 #virsh net-destroy default
 #virsh net-undefine default
 ```
+</li>
 
-Enable live migration by updating /etc/libvirt/libvirtd.conf file:
+<li><p>Enable live migration by updating /etc/libvirt/libvirtd.conf file:</p>
 
 ```bash
     listen_tls = 0
     listen_tcp = 1
     auth_tcp = "none"
 ```
+</li>
 
-Edit libvirtd_opts variable in /etc/init/libvirt-bin.conf file:
+<li><p>Edit libvirtd_opts variable in /etc/init/libvirt-bin.conf file:</p>
 
 ```bash
     env libvirtd_opts="-d -l"
 ```
+</li>
 
-Edit /etc/default/libvirt-bin file
+<li><p>Edit /etc/default/libvirt-bin file</p>
 
 ```bash
     libvirtd_opts="-d -l"
 ```
+</li>
 
-Restart the libvirt service and dbus to load the new values:
+<li><p>Restart the libvirt service and dbus to load the new values:</p>
 
 ```bash
 #service dbus restart && service libvirt-bin restart
 ```
+</li>
+</ol>
 
-##Nova
+###Nova
 
-Start by installing nova components:
+<ol>
+<li><p>Start by installing nova components:</p>
 
 ```bash
 #apt-get install -y nova-api nova-cert novnc nova-consoleauth nova-scheduler nova-novncproxy nova-doc nova-conductor nova-compute-kvm
 ```
-Check the status of all nova-services:
+</li>
+
+<li><p>Check the status of all nova-services:</p>
 
 ```bash
 #cd /etc/init.d/; for i in $( ls nova-* ); do service $i status; cd; done
 ```
+</li>
 
-Prepare a Mysql database for Nova:
+<li><p>Prepare a Mysql database for Nova:</p>
 
 ```bash
     mysql -u root -p
@@ -557,8 +647,9 @@ Prepare a Mysql database for Nova:
     GRANT ALL ON nova.* TO 'novaUser'@'%' IDENTIFIED BY 'novaPass';
     quit;
 ```
+</li>
 
-Now modify authtoken section in the /etc/nova/api-paste.ini file to this:
+<li><p>Now modify authtoken section in the /etc/nova/api-paste.ini file to this:</p>
 
 ```bash
     [filter:authtoken]
@@ -573,8 +664,9 @@ Now modify authtoken section in the /etc/nova/api-paste.ini file to this:
     # Workaround for https://bugs.launchpad.net/nova/+bug/1154809
     auth_version = v2.0
 ```
+</li>
 
-Modify the /etc/nova/nova.conf like this:
+<li><p>Modify the /etc/nova/nova.conf like this:</p>
 
 ```bash
     [DEFAULT]
@@ -634,8 +726,9 @@ Modify the /etc/nova/nova.conf like this:
     volume_api_class=nova.volume.cinder.API
     osapi_volume_listen_port=5900
 ```
+</li>
 
-Edit the /etc/nova/nova-compute.conf:
+<li><p>Edit the /etc/nova/nova-compute.conf:</p>
 
 ```bash
     [DEFAULT]
@@ -645,48 +738,54 @@ Edit the /etc/nova/nova-compute.conf:
     libvirt_vif_driver=nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver
     libvirt_use_virtio_for_bridges=True
 ```
+</li>
 
-Synchronize your database:
-
+<li><p>Synchronize your database:</p>
 
 ```bash
 #nova-manage db sync
 ```
+</li>
     
-Restart nova-* services:
+<li><p>Restart nova-* services:</p>
 
 ```bash
 #cd /etc/init.d/; for i in $( ls nova-* ); do sudo service $i restart; done
 ```
+</li>
 
-Check for the smiling faces on nova-* services to confirm your installation:
+<li><p>Check for the smiling faces on nova-* services to confirm your installation:</p>
 
 ```bash
 #nova-manage service list
 ```
+</li>
+</ol>
 
 ##Cinder
-
-Install the required packages:
+<ol>
+<li><p>Install the required packages:</p>
 
 ```bash
 #apt-get install -y cinder-api cinder-scheduler cinder-volume iscsitarget open-iscsi iscsitarget-dkms
 ```
+</li>
 
-Configure the iscsi services:
+<li><p>Configure the iscsi services:</p>
 
 ```bash
 #sed -i 's/false/true/g' /etc/default/iscsitarget
 ```
-
-Restart the services:
+</li>
+<li><p>Restart the services:</p>
 
 ```bash
 #service iscsitarget start
 #service open-iscsi start
 ```
+</li>
 
-Prepare a Mysql database for Cinder:
+<li><p>Prepare a Mysql database for Cinder:</p>
 
 ```bash
     mysql -u root -p
@@ -694,8 +793,9 @@ Prepare a Mysql database for Cinder:
     GRANT ALL ON cinder.* TO 'cinderUser'@'%' IDENTIFIED BY 'cinderPass';
     quit;
 ```
+</li>
 
-Configure /etc/cinder/api-paste.ini like the following:
+<li><p>Configure /etc/cinder/api-paste.ini like the following:</p>
 
 ```bash
     [filter:authtoken]
@@ -710,8 +810,9 @@ Configure /etc/cinder/api-paste.ini like the following:
     admin_user = cinder
     admin_password = service_pass
 ```
+</li>
 
-Edit the /etc/cinder/cinder.conf to:
+<li><p>Edit the /etc/cinder/cinder.conf to:</p>
 
 ```bash
     [DEFAULT]
@@ -725,33 +826,39 @@ Edit the /etc/cinder/cinder.conf to:
     auth_strategy = keystone
     #osapi_volume_listen_port=5900
 ```
-    
-Then, synchronize your database:
+</li>
+
+<li><p>Then, synchronize your database:</p>
 
 ```bash
 #cinder-manage db sync
 ```
+</li>
 
-**For intel machines**
+<li><p>For intel machines</p>
 
-create a volume-group called "cinder-volumes" using the empty partition
+<p>create a volume-group called "cinder-volumes" using the empty partition</p>
 
 ```bash
 #system--config-lvm
-#Assign the empty partition for "cinder-volumes"
+#Assign the empty partition to "cinder-volumes"
 ```
+</li>
 
-Restart the cinder services:
+<li><p>Restart the cinder services:</p>
 
 ```bash
 #cd /etc/init.d/; for i in $( ls cinder-* ); do sudo service $i restart; done
 ```
+</li>
 
-Verify if cinder services are running:
+<li><p>Verify if cinder services are running:</p>
 
 ```bash
 #cd /etc/init.d/; for i in $( ls cinder-* ); do sudo service $i status; done
 ```
+</li>
+</ol>
 
 ##Horizon
 
@@ -1038,6 +1145,7 @@ qrouter-ca972d3b-788e-4e16-8552-dd335575c5c0
 |---
 
 
+
 The compute port is 848d2e3a-ab3f-4e92-ad6d-269d793dde54 , which has IP 10.0.0.2 in the private subnet id.
 
 ```bash
@@ -1048,28 +1156,76 @@ We will use this port id to create a floating IP in the Public network.
 **Alternate way to get the VM port ID:**
 
 ```bash
-
 #nova list
-+--------------------------------------+---------------+--------+----------------------+
-| ID                                   | Name          | Status | Networks             |
-+--------------------------------------+---------------+--------+----------------------+
-| 2b23d81b-b6db-4dfc-9440-ddf2ed4ef144 | firstinstance | ACTIVE | private-net=10.0.0.2 |
-+--------------------------------------+---------------+--------+----------------------+
 ```
+
+<html>
+<head>
+</head>
+<style>
+table,td,th
+{
+border:1px solid black;
+}
+</style>
+<body>
+<table>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Status</th>
+<th>Networks</th>
+</tr>
+<tr>
+<td>2b23d81b-b6db-4dfc-9440-ddf2ed4ef144</td>
+<td>firstinstance</td>
+<td>ACTIVE</td>
+<td> private-net=10.0.0.2</td>
+</tr>
+</table>
+</body>
+</html>
+
+
+
+
 
 
 Now use the Device id to get the VM port ID:
 
 ```bash
 #quantum port-list -- --device_id  2b23d81b-b6db-4dfc-9440-ddf2ed4ef144
-
-
-|---
-| id | name | mac-address | fixed-ips 
-|:-|:-:|
-| 848d2e3a-ab3f-4e92-ad6d-269d793dde54 | fa:16:3e:79:9e:c4 | {"subnet_id": "6bfd8ae6-a2b9-4259-b813-4581a15c8d0f", "ip_address": "10.0.0.2"} |
-|---
 ```
+
+<html>
+<head>
+</head>
+<style>
+table,td,th
+{
+border:1px solid black;
+}
+</style>
+<body>
+<table>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>mac_address</th>
+<th>fixed_ips</th>
+</tr>
+<tr>
+<td>848d2e3a-ab3f-4e92-ad6d-269d793dde54</td>
+<td></td>
+<td>fa:16:3e:79:9e:c4</td>
+<td>{"subnet_id": "6bfd8ae6-a2b9-4259-b813-4581a15c8d0f", "ip_address": "10.0.0.2"}</td>
+</tr>
+</table>
+</body>
+</html>
+
+
+
 
 You can see that we got the VM PORT ID,  848d2e3a-ab3f-4e92-ad6d-269d793dde54 which is same as in the previous case.
 
@@ -1084,17 +1240,58 @@ Now create a floating IP for the VM with port_id as given above
 
 You can see subnet information with the following command:
 
+
 ```bash
-
 #quantum subnet-list
-
-+--------------------------------------+---------------------+--------------+----------------------------------------------+
-| id                                   | name                | cidr         | allocation_pools                             |
-+--------------------------------------+---------------------+--------------+----------------------------------------------+
-| 55cbc646-6271-4148-b426-a7e90619e28d | public-net-subnet01 | 10.42.0.0/24 | {"start": "10.42.0.2", "end": "10.42.0.254"} |
-| 6bfd8ae6-a2b9-4259-b813-4581a15c8d0f | private-subnet      | 10.0.0.0/24  | {"start": "10.0.0.2", "end": "10.0.0.254"}   |
-+--------------------------------------+---------------------+--------------+----------------------------------------------+
 ```
+
+
+
+<html>
+<head>
+</head>
+<style>
+table,td,th
+{
+border:1px solid black;
+}
+</style>
+<body>
+<table>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>cidr</th>
+<th>allocation_pools</th>
+</tr>
+<tr>
+<td>55cbc646-6271-4148-b426-a7e90619e28d</td>
+<td>public-net-subnet01</td>
+<td>10.42.0.0/24</td>
+<td>{"start": "10.42.0.2", "end": "10.42.0.254"}</td>
+</tr>
+<tr>
+<td> 6bfd8ae6-a2b9-4259-b813-4581a15c8d0f</td>
+<td> private-subnet </td>
+<td>10.0.0.0/24</td>
+<td> {"start": "10.0.0.2", "end": "10.0.0.254"}</td>
+</tr>
+</table>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 Command to see specific subnet information
