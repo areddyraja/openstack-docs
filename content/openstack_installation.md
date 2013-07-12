@@ -33,6 +33,7 @@ title: OpenStack Installation
 <style>
 
 .dam
+
 {
 width:50%;
 }
@@ -45,12 +46,12 @@ width:50%;
 <tr>
 </tr>
 <tr>
-<th height="30" bgcolor="#bad2e9">Node Role</th>
-<th bgcolor="#bad2e9">NICS</th>
+<th  height="30" bgcolor="#bad2e9">Node Role</th>
+<th  bgcolor="#bad2e9">NICS</th>
 </tr>
 <tr>
-<td height="30">Single Node</td>
-<td>eth0 (10.10.100.51)
+<td  height="30">Single Node</td>
+<td>eth0 (10.10.100.51)<br>
 eth1 (10.42.0.51)</td>
 </tr>
 </table>
@@ -154,7 +155,7 @@ $sudo su
 
 <li><p>Install RabbitMQ (Message Queue):</p>
 
-<p>The OpenStack Cloud Controller communicates with other nova components such as `Scheduler`, `Network Controller`, and `Volume Controller` using `AMQP` (Advanced Message Queue Protocol). Nova components use Remote Procedure Calls (RPC) to communicate to one another.</p>
+<p>The OpenStack Cloud Controller communicates with other nova components such as <code>`Scheduler`</code>, <code>`Network Controller`</code>, and <code>`Volume Controller`</code> using <code>`AMQP`</code> (Advanced Message Queue Protocol). Nova components use Remote Procedure Calls (RPC) to communicate to one another.</p>
 
 ```bash
 #apt-get install -y rabbitmq-server
@@ -226,7 +227,7 @@ Keystone is an identity service which supports various protocols for authenticat
 ```
 </li>
 
-<li><p>Adapt the connection attribute in the /etc/keystone/keystone.conf to the new database:</p>
+<li><p>Adapt the connection attribute in the (<code>/etc/keystone/keystone.conf</code>) to the new database:</p>
 
 ```bash
     connection = mysql://keystoneUser:keystonePass@10.10.100.51/keystone
@@ -243,7 +244,7 @@ Keystone is an identity service which supports various protocols for authenticat
 
 <li><p>Fill up the keystone database using the two scripts available in the Scripts folder of this git repository:</p>
 
-<p>Modify the HOST_IP and HOST_IP_EXT variables before executing the scripts HOST_IP(10.10.100.51) and HOST_IP_EXT(10.42.0.51)</p>
+<p>Modify the HOST_IP and HOST_IP_EXT variables before executing the scripts (<code>HOST_IP(10.10.100.51)</code>) and (<code>HOST_IP_EXT(10.42.0.51)</code>)</p>
 
 ```bash
 #wget https://raw.github.com/mseknibilel/OpenStack-Grizzly-Install-Guide/OVS_SingleNode/KeystoneScripts/keystone_basic.sh
@@ -255,7 +256,7 @@ Keystone is an identity service which supports various protocols for authenticat
 ```
 </li>
 
-<li><p>Create a simple credential file and load it so you won't be bothered later:</p>
+<li><p>Create a simple credential file and load it:</p>
 
 ```bash
 #nano creds
@@ -283,6 +284,8 @@ Keystone is an identity service which supports various protocols for authenticat
 </ol>
 
 ##Glance
+
+Glance provides services for discovering, registering, and retrieving virtual machine images. Stored images can be used as a template. It can also be used to store and catalog an unlimited number of backups.
 <ol>
 <li><p>
 Install Glance packages:</p>
@@ -310,7 +313,7 @@ Install Glance packages:</p>
 ```
 </li>
 
-<li><p>Update /etc/glance/glance-api-paste.ini with:</p>
+<li><p>Update (<code>/etc/glance/glance-api-paste.ini</code>) with:</p>
 
 ```bash
 
@@ -326,7 +329,7 @@ Install Glance packages:</p>
 ```
 </li>
 
-<li><p>pdate the /etc/glance/glance-registry-paste.ini with:</p>
+<li><p>Update the (<code>/etc/glance/glance-registry-paste.ini</code>) with:</p>
 
 ```bash
     [filter:authtoken]
@@ -340,7 +343,7 @@ Install Glance packages:</p>
 ```
 </li>
 
-<li><p>Update /etc/glance/glance-api.conf with:</p>
+<li><p>Update (<code>/etc/glance/glance-api.conf</code>) with:</p>
 
 ```bash
     sql_connection = mysql://glanceUser:glancePass@10.10.100.51/glance
@@ -350,7 +353,7 @@ Install Glance packages:</p>
 ```
 </li>
 
-<li><p>Update the /etc/glance/glance-registry.conf with:</p>
+<li><p>Update the (<code>/etc/glance/glance-registry.conf</code>) with:</p>
 
 ```bash
     sql_connection = mysql://glanceUser:glancePass@10.10.100.51/glance
@@ -398,9 +401,9 @@ Install Glance packages:</p>
 
 ##Quantum
 
-###OpenVSwitch
+###Open vSwitch
 <ol>
-<li><p>Install the openVSwitch:</p>
+<li><p>Install the open vSwitch:</p>
 
 ```bash
 #apt-get install -y openvswitch-switch openvswitch-datapath-dkms
@@ -415,7 +418,7 @@ Install Glance packages:</p>
 ```
 </li>
 
-<li><p>br-ex is used to access the external network.</p>
+<li><p>(<code>br-ex</code>) is used to access the external network.</p>
 
 ```bash
 #ovs-vsctl add-br br-ex
@@ -435,7 +438,7 @@ Install Glance packages:</p>
 ```
 </li>
 
-<li><p>Add the eth1 to the br-ex:</p>
+<li><p>Add the (<code>eth1</code>) interface to (<code>br-ex</code>):</p>
 
 <p>Internet connectivity will be lost after this step but this won't affect OpenStack's work</p>
 
@@ -444,7 +447,7 @@ Install Glance packages:</p>
 ```
 </li>
 
-<li><p>Optional, If you want to get internet connection back, you can assign the eth1's IP address to the br-ex in the /etc/network/interfaces file:</p>
+<li><p>Optional, If you want to get internet connection back, you can assign the eth1's IP address to the br-ex in the (<code>/etc/network/interfaces</code> file:</p>
 
 ```bash
     auto br-ex
@@ -483,7 +486,7 @@ Install Glance packages:</p>
 ```
 </li>
 
-<li><p>Edit /etc/quantum/api-paste.ini</p>
+<li><p>Edit (<code>/etc/quantum/api-paste.ini</code>)</p>
 
 ```bash
     [filter:authtoken]
@@ -497,7 +500,7 @@ Install Glance packages:</p>
 ```
 </li>
 
-<li><p>Edit the OVS plugin configuration file /etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini with:</p>
+<li><p>Edit the OVS plugin configuration file (<code>/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini with</code>):</p>
 
 Under the database section
 
@@ -523,7 +526,7 @@ Under the OVS section
 ```
 </li>
 
-<li><p>Update /etc/quantum/metadata_agent.ini:</p>
+<li><p>Update  (<code>/etc/quantum/metadata_agent.ini</code>):</p>
 
 ```bash
 #The Quantum user information for accessing the Quantum API.
@@ -542,7 +545,7 @@ Under the OVS section
 ```
 </li>
 
-<li><p>Edit your /etc/quantum/quantum.conf:</p>
+<li><p>Edit your (<code>/etc/quantum/quantum.conf</code>):</p>
 
 ```bash
     [keystone_authtoken]
@@ -569,12 +572,22 @@ Under the OVS section
 
 ###KVM
 <ol>
-<li><p>Make sure that your hardware enables virtualization:</p>
+<li><p>Checking for hardware virtualization support:</p>
+
+<p>The processors of your compute host need to support virtualization technology (VT) to use KVM.</p>
+<p>Install the cpu package and use the kvm-ok command to check if your processor has VT support.</p>
 
 ```bash
 #apt-get install cpu-checker
 #kvm-ok
 ```
+If the VT is enabled, you should see something like:
+
+```bash
+INFO: /dev/kvm exists
+KVM acceleration can be used
+```
+
 </li>
 
 <li><p>Normally you would get a good response. Now, move to install kvm and configure it:</p>
@@ -584,7 +597,7 @@ Under the OVS section
 ```
 </li>
 
-<li><p>Edit the cgroup_device_acl array in the /etc/libvirt/qemu.conf file to:</p>
+<li><p>Edit the (<code>cgroup_device_acl</code>) array in the (<code>/etc/libvirt/qemu.conf</code>) file to:</p>
 
 ```bash
     cgroup_device_acl = [
@@ -604,7 +617,7 @@ Under the OVS section
 ```
 </li>
 
-<li><p>Enable live migration by updating /etc/libvirt/libvirtd.conf file:</p>
+<li><p>Enable live migration by updating (<code>/etc/libvirt/libvirtd.conf</code>) file:</p>
 
 ```bash
     listen_tls = 0
@@ -613,14 +626,14 @@ Under the OVS section
 ```
 </li>
 
-<li><p>Edit libvirtd_opts variable in /etc/init/libvirt-bin.conf file:</p>
+<li><p>Edit libvirtd_opts variable in (<code>/etc/init/libvirt-bin.conf</code>) file:</p>
 
 ```bash
     env libvirtd_opts="-d -l"
 ```
 </li>
 
-<li><p>Edit /etc/default/libvirt-bin file</p>
+<li><p>Edit (<code>/etc/default/libvirt-bin</code>) file</p>
 
 ```bash
     libvirtd_opts="-d -l"
@@ -636,7 +649,7 @@ Under the OVS section
 </ol>
 
 ###Nova
-
+OpenStack Compute (Nova) is a cloud computing fabric controller (the main part of an IaaS system). 
 <ol>
 <li><p>Start by installing nova components:</p>
 
@@ -662,7 +675,7 @@ Under the OVS section
 ```
 </li>
 
-<li><p>Now modify authtoken section in the /etc/nova/api-paste.ini file to this:</p>
+<li><p>Now modify authtoken section in the (<code>/etc/nova/api-paste.ini</code>) file to this:</p>
 
 ```bash
     [filter:authtoken]
@@ -679,7 +692,7 @@ Under the OVS section
 ```
 </li>
 
-<li><p>Modify the /etc/nova/nova.conf like this:</p>
+<li><p>Modify the (<code>/etc/nova/nova.conf</code>) like this:</p>
 
 ```bash
     [DEFAULT]
@@ -741,7 +754,7 @@ Under the OVS section
 ```
 </li>
 
-<li><p>Edit the /etc/nova/nova-compute.conf:</p>
+<li><p>Edit the (<code>/etc/nova/nova-compute.conf</code>):</p>
 
 ```bash
     [DEFAULT]
@@ -776,6 +789,7 @@ Under the OVS section
 </ol>
 
 ##Cinder
+OpenStack Block Storage (Cinder) provides persistent block level storage devices for use with OpenStack compute instances. The block storage system manages the creation, attaching and detaching of the block devices to servers.
 <ol>
 <li><p>Install the required packages:</p>
 
@@ -808,7 +822,7 @@ Under the OVS section
 ```
 </li>
 
-<li><p>Configure /etc/cinder/api-paste.ini like the following:</p>
+<li><p>Configure (<code>/etc/cinder/api-paste.ini</code>) like the following:</p>
 
 ```bash
     [filter:authtoken]
@@ -825,7 +839,7 @@ Under the OVS section
 ```
 </li>
 
-<li><p>Edit the /etc/cinder/cinder.conf to:</p>
+<li><p>Edit the (<code>/etc/cinder/cinder.conf</code>) to:</p>
 
 ```bash
     [DEFAULT]
@@ -875,26 +889,32 @@ Under the OVS section
 
 ##Horizon
 
-To install horizon, proceed like this
+OpenStack Dashboard (Horizon) provides administrators and users a graphical interface to access, provision and automate cloud-based resources.
+The dashboard is just one way to interact with OpenStack resources.
+<ol>
+<li><p>To install horizon, proceed like this</p>
+</li>
 
 ```bash
 #apt-get -y install openstack-dashboard memcached
 ```
-
-Optional:If you don't like the OpenStack ubuntu theme, you can remove the package to disable it:
+<li><p>
+Optional:If you don't like the OpenStack ubuntu theme, you can remove the package to disable it:</p>
+</li>
 
 ```bash
 #dpkg --purge openstack-dashboard-ubuntu-theme
 ```
-
-Reload Apache and memcached:
+<li><p>
+Reload Apache and memcached:<p>
+ </li>
 
 ```bash
 #service apache2 restart; service memcached restart
 ```
 
 You can now access your OpenStack 10.42.0.51/horizon with credentials admin:admin_pass.
-
+</ol>
 ##VM Creation
 
 **Create a external network:**
