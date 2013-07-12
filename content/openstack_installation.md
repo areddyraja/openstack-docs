@@ -90,7 +90,7 @@ $sudo su
 
 ###Networking
 <ol>
-<li><p>For OpenStack Single-Node setup you will require 2 NIC's, One NIC (<code>10.42.0.51</code>) is used for external network connection i.e, Internet access and the other NIC (<code>10.10.100.51</code>) is used for internal networking (OpenStack management).</p></li>
+<li><p>For OpenStack Single-Node setup you will require 2 NIC's, One NIC <code>10.42.0.51</code> is used for external network connection i.e, Internet access and the other NIC <code>10.10.100.51</code> is used for internal networking (OpenStack management).</p></li>
 
 *Note: The external NIC should have a static IP address.*
 
@@ -227,7 +227,7 @@ Keystone is an identity service which supports various protocols for authenticat
 ```
 </li>
 
-<li><p>Adapt the connection attribute in the (<code>/etc/keystone/keystone.conf</code>) to the new database:</p>
+<li><p>Adapt the connection attribute in the <code>/etc/keystone/keystone.conf</code> to the new database:</p>
 
 ```bash
     connection = mysql://keystoneUser:keystonePass@10.10.100.51/keystone
@@ -244,7 +244,7 @@ Keystone is an identity service which supports various protocols for authenticat
 
 <li><p>Fill up the keystone database using the two scripts available in the Scripts folder of this git repository:</p>
 
-<p>Modify the HOST_IP and HOST_IP_EXT variables before executing the scripts (<code>HOST_IP(10.10.100.51)</code>) and (<code>HOST_IP_EXT(10.42.0.51)</code>)</p>
+<p>Modify the HOST_IP and HOST_IP_EXT variables before executing the scripts <code>HOST_IP(10.10.100.51)</code> and <code>HOST_IP_EXT(10.42.0.51)</code></p>
 
 ```bash
 #wget https://raw.github.com/mseknibilel/OpenStack-Grizzly-Install-Guide/OVS_SingleNode/KeystoneScripts/keystone_basic.sh
@@ -313,7 +313,7 @@ Install Glance packages:</p>
 ```
 </li>
 
-<li><p>Update (<code>/etc/glance/glance-api-paste.ini</code>) with:</p>
+<li><p>Update <code>/etc/glance/glance-api-paste.ini</code> with:</p>
 
 ```bash
 
@@ -329,7 +329,7 @@ Install Glance packages:</p>
 ```
 </li>
 
-<li><p>Update the (<code>/etc/glance/glance-registry-paste.ini</code>) with:</p>
+<li><p>Update the <code>/etc/glance/glance-registry-paste.ini</code> with:</p>
 
 ```bash
     [filter:authtoken]
@@ -343,7 +343,7 @@ Install Glance packages:</p>
 ```
 </li>
 
-<li><p>Update (<code>/etc/glance/glance-api.conf</code>) with:</p>
+<li><p>Update <code>/etc/glance/glance-api.conf</code> with:</p>
 
 ```bash
     sql_connection = mysql://glanceUser:glancePass@10.10.100.51/glance
@@ -353,7 +353,7 @@ Install Glance packages:</p>
 ```
 </li>
 
-<li><p>Update the (<code>/etc/glance/glance-registry.conf</code>) with:</p>
+<li><p>Update the <code>/etc/glance/glance-registry.conf</code> with:</p>
 
 ```bash
     sql_connection = mysql://glanceUser:glancePass@10.10.100.51/glance
@@ -418,14 +418,14 @@ Install Glance packages:</p>
 ```
 </li>
 
-<li><p>(<code>br-ex</code>) is used to access the external network.</p>
+<li><p><code>br-ex</code> is used to access the external network.</p>
 
 ```bash
 #ovs-vsctl add-br br-ex
 ```
 </li>
 
-<li><p>This will guide you to setting up the br-ex interface. Edit eth1 in /etc/network/interfaces:</p>
+<li><p>This will guide you to setting up the br-ex interface. Edit eth1 in <code>/etc/network/interfaces</code>:</p>
 
 ```bash
 # VM internet Access
@@ -438,7 +438,7 @@ Install Glance packages:</p>
 ```
 </li>
 
-<li><p>Add the (<code>eth1</code>) interface to (<code>br-ex</code>):</p>
+<li><p>Add the <code>eth1</code> interface to <code>br-ex</code>:</p>
 
 <p>Internet connectivity will be lost after this step but this won't affect OpenStack's work</p>
 
@@ -447,7 +447,7 @@ Install Glance packages:</p>
 ```
 </li>
 
-<li><p>Optional, If you want to get internet connection back, you can assign the eth1's IP address to the br-ex in the (<code>/etc/network/interfaces</code> file:</p>
+<li><p>Optional, If you want to get internet connection back, you can assign the <code>eth1's</code> IP address to the <code>br-ex</code> in the <code>/etc/network/interfaces</code> file:</p>
 
 ```bash
     auto br-ex
@@ -486,7 +486,7 @@ Install Glance packages:</p>
 ```
 </li>
 
-<li><p>Edit (<code>/etc/quantum/api-paste.ini</code>)</p>
+<li><p>Edit <code>/etc/quantum/api-paste.ini</code></p>
 
 ```bash
     [filter:authtoken]
@@ -500,7 +500,7 @@ Install Glance packages:</p>
 ```
 </li>
 
-<li><p>Edit the OVS plugin configuration file (<code>/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini with</code>):</p>
+<li><p>Edit the OVS plugin configuration file <code>/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini with</code>:</p>
 
 Under the database section
 
@@ -526,7 +526,7 @@ Under the OVS section
 ```
 </li>
 
-<li><p>Update  (<code>/etc/quantum/metadata_agent.ini</code>):</p>
+<li><p>Update  <code>/etc/quantum/metadata_agent.ini</code>:</p>
 
 ```bash
 #The Quantum user information for accessing the Quantum API.
@@ -545,7 +545,7 @@ Under the OVS section
 ```
 </li>
 
-<li><p>Edit your (<code>/etc/quantum/quantum.conf</code>):</p>
+<li><p>Edit your <code>/etc/quantum/quantum.conf</code>:</p>
 
 ```bash
     [keystone_authtoken]
@@ -597,7 +597,7 @@ KVM acceleration can be used
 ```
 </li>
 
-<li><p>Edit the (<code>cgroup_device_acl</code>) array in the (<code>/etc/libvirt/qemu.conf</code>) file to:</p>
+<li><p>Edit the <code>cgroup_device_acl</code> array in the <code>/etc/libvirt/qemu.conf</code> file to:</p>
 
 ```bash
     cgroup_device_acl = [
@@ -617,7 +617,7 @@ KVM acceleration can be used
 ```
 </li>
 
-<li><p>Enable live migration by updating (<code>/etc/libvirt/libvirtd.conf</code>) file:</p>
+<li><p>Enable live migration by updating <code>/etc/libvirt/libvirtd.conf</code> file:</p>
 
 ```bash
     listen_tls = 0
@@ -626,14 +626,14 @@ KVM acceleration can be used
 ```
 </li>
 
-<li><p>Edit libvirtd_opts variable in (<code>/etc/init/libvirt-bin.conf</code>) file:</p>
+<li><p>Edit libvirtd_opts variable in <code>/etc/init/libvirt-bin.conf</code> file:</p>
 
 ```bash
     env libvirtd_opts="-d -l"
 ```
 </li>
 
-<li><p>Edit (<code>/etc/default/libvirt-bin</code>) file</p>
+<li><p>Edit <code>/etc/default/libvirt-bin</code> file</p>
 
 ```bash
     libvirtd_opts="-d -l"
@@ -675,7 +675,7 @@ OpenStack Compute (Nova) is a cloud computing fabric controller (the main part o
 ```
 </li>
 
-<li><p>Now modify authtoken section in the (<code>/etc/nova/api-paste.ini</code>) file to this:</p>
+<li><p>Now modify authtoken section in the <code>/etc/nova/api-paste.ini</code> file to this:</p>
 
 ```bash
     [filter:authtoken]
@@ -692,7 +692,7 @@ OpenStack Compute (Nova) is a cloud computing fabric controller (the main part o
 ```
 </li>
 
-<li><p>Modify the (<code>/etc/nova/nova.conf</code>) like this:</p>
+<li><p>Modify the <code>/etc/nova/nova.conf</code> like this:</p>
 
 ```bash
     [DEFAULT]
@@ -754,7 +754,7 @@ OpenStack Compute (Nova) is a cloud computing fabric controller (the main part o
 ```
 </li>
 
-<li><p>Edit the (<code>/etc/nova/nova-compute.conf</code>):</p>
+<li><p>Edit the <code>/etc/nova/nova-compute.conf</code>:</p>
 
 ```bash
     [DEFAULT]
@@ -822,7 +822,7 @@ OpenStack Block Storage (Cinder) provides persistent block level storage devices
 ```
 </li>
 
-<li><p>Configure (<code>/etc/cinder/api-paste.ini</code>) like the following:</p>
+<li><p>Configure <code>/etc/cinder/api-paste.ini</code> like the following:</p>
 
 ```bash
     [filter:authtoken]
@@ -839,7 +839,7 @@ OpenStack Block Storage (Cinder) provides persistent block level storage devices
 ```
 </li>
 
-<li><p>Edit the (<code>/etc/cinder/cinder.conf</code>) to:</p>
+<li><p>Edit the <code>/etc/cinder/cinder.conf</code> to:</p>
 
 ```bash
     [DEFAULT]
@@ -893,31 +893,34 @@ OpenStack Dashboard (Horizon) provides administrators and users a graphical inte
 The dashboard is just one way to interact with OpenStack resources.
 <ol>
 <li><p>To install horizon, proceed like this</p>
-</li>
 
 ```bash
 #apt-get -y install openstack-dashboard memcached
 ```
-<li><p>
-Optional:If you don't like the OpenStack ubuntu theme, you can remove the package to disable it:</p>
 </li>
+
+<li><p>Optional:If you don't like the OpenStack ubuntu theme, you can remove the package to disable it:</p>
 
 ```bash
 #dpkg --purge openstack-dashboard-ubuntu-theme
 ```
-<li><p>
-Reload Apache and memcached:<p>
- </li>
+</li>
+
+<li><p>Reload Apache and memcached:</p>
 
 ```bash
 #service apache2 restart; service memcached restart
 ```
 
-You can now access your OpenStack 10.42.0.51/horizon with credentials admin:admin_pass.
+<p>You can now access your OpenStack <code>10.42.0.51/horizon</code> with credentials <code>admin:admin_pass</code>.</p>
+</li>
 </ol>
+
+
 ##VM Creation
 
-**Create a external network:**
+<ol>
+<li><p>Create a external network:</p>
 
 ```bash
 #quantum net-create public-net --router:external=True
@@ -939,10 +942,11 @@ Created a new network:
 | tenant_id                 | 2b942273713741b1868eb86b11e08df8     |
 +---------------------------+--------------------------------------+
 ```
- 
  ![import](/images/create_ext_net.png)
+</li>
 
-**Create a subnet:**
+
+<li><p>Create a subnet:</p>
 
 ```bash
 #quantum subnet-create --tenant-id 2b942273713741b1868eb86b11e08df8 --name public-net-subnet01 --gateway 10.42.0.1 public-net 10.42.0.0/24 --enable_dhcp False
@@ -965,19 +969,20 @@ Created a new subnet:
 +------------------+----------------------------------------------+
 ```
  
- ![import](/images/create_subnet_ext.png)
+![import](/images/create_subnet_ext.png)
+</li>
+
+<li><p>Allocation of IP's to VM's:</p>
 
 
-**Allocation of IP's to VM's:**
-
-
-This is not tried but, we can try allocation pool also - this command not tried , pls verify before trying.
+<p>This is not tried but, we can try allocation pool also - this command not tried , pls verify before trying.</p>
 
 ```bash
 #quantum subnet-create --tenant-id 6973efb023c748d6b8a4fff747faad92 --name public-net-subnet01 --gateway 10.42.0.1 public-net 10.42.0.0/24 --enable_dhcp False --allocation-pool start=10.42.0.75,end=10.42.0.254
 ```
+</li>
 
-**Create a private-network:**
+<li><p>Create a private-network:</p>
 
 ```bash
 #quantum net-create private-net
@@ -999,11 +1004,12 @@ Created a new network:
 | tenant_id                 | 2b942273713741b1868eb86b11e08df8     |
 +---------------------------+--------------------------------------+
 ```
- 
- ![import](/images/create_pvt_net.png)
+
+![import](/images/create_pvt_net.png)
+</li>
 
 
-**Attach subnet to private network:**
+<li><p>Attach subnet to private network:</p>
 
 ```bash
 #quantum subnet-create --name private-subnet private-net 10.0.0.0/24
@@ -1026,10 +1032,10 @@ Created a new subnet:
 +------------------+--------------------------------------------+
 ```
  
- ![import](/images/create_subnet_pvt.png)
+![import](/images/create_subnet_pvt.png)
+</li>
 
-
-**Create router:**
+<li><p>Create router:</p>
 
 ```bash
 #quantum router-create router1
@@ -1047,25 +1053,26 @@ Created a new router:
 +-----------------------+--------------------------------------+
 ```
  
- ![import](/images/create_router.png)
+![import](/images/create_router.png)
+</li>
 
-
-**Uplink router to public network:**
+<li><p>Uplink router to public network:</p>
 
 ```bash
 #quantum router-gateway-set router1 public-net
 ```
+</li>
 
-**Attach private network to router:**
+<li><p>Attach private network to router:</p>
 
 ```bash
 #quantum router-interface-add router1 private-subnet
 ```
  
- ![import](/images/router_add_iface.png)
+![import](/images/router_add_iface.png)
+</li>
 
-
-**To show the net list:**
+<li><p>To show the net list:</p>
 
 ```bash
 #ip netns list
@@ -1090,107 +1097,126 @@ qrouter-ca972d3b-788e-4e16-8552-dd335575c5c0
     inet6 fe80::f816:3eff:fec8:2f1a/64 scope link 
        valid_lft forever preferred_lft forever
 ```
+</li>
+</ol>
+
+<ul>
+<li><p>Create a Security Group:</p>
+![import](/images/create_security_group.png)
+![import](/images/create_security_group_desc.png)
+
+</li>
+
+<li><p>Create Keypairs:<p>
+![import](/images/create_keypair.png)
+</li>
+
+<li><p>Add Rule:</p>
+![import](/images/add_rule.png)
+</li>
+
+<li><p>Edit Security Group Rules:</p>
+![import](/images/security_group_rules.png)
+</li>
+
+<li><p>Access and Security</p>
+![import](/images/access_and_security.png)
+</li>
 
 
-**Create a Security Group:**
- ![import](/images/create_security_group.png)
- ![import](/images/create_security_group_desc.png)
+<code>Note: Create a VM using the Horizon dashboard</code>
 
 
-**Create Keypairs:**
- ![import](/images/create_keypair.png)
+<li><p>Before creating a VM</p>
+![import](/images/empty_instances.png)
+</li>
 
-
-**Add Rule:**
- ![import](/images/add_rule.png)
-
-
-**Edit Security Group Rules:**
- ![import](/images/security_group_rules.png)
-
-
-**Access and Security**
- ![import](/images/access_and_security.png)
-
-
-
-**NOTE: Create a VM using the Horizon dashboard**
-
-
-**Before creating a VM**
- ![import](/images/empty_instances.png)
-
-
-**Launch Instance:**
+<li><p>Launch Instance:</p>
  ![import](/images/launch_instance.png)
+</li>
 
-
-**Launch Instance Keypair:**
+<li><p>Launch Instance Keypair:</p>
  ![import](/images/launch_instance_keypair.png)
+</li>
 
-
-**Launch Instance Networking:**
+<li><p>Launch Instance Networking:</p>
  ![import](/images/launch_instance_networking.png)
+</li>
 
-
-**My first VM**
+<li><p>My first VM</p>
  ![import](/images/first_instance.png)
+</li>
 
-
-**Network Topology**
+<li><p>Network Topology</p>
  ![import](/images/network_topology.png)
+</li>
 
-
-**To ping VM:**
+<li><p>To ping VM:</p>
 
 ```bash
 #ip netns exec qrouter-ca972d3b-788e-4e16-8552-dd335575c5c0 ping 10.0.0.2
 ```
+</li>
 
-**To do ssh into VM, do the follwing:**
+<li><p>To do ssh into VM, do the follwing:</p>
 
 ```bash
 #ip netns exec qrouter-36f5ccde-1876-4554-be59-032af24c419c ssh 10.0.0.2 -l cirros
     userid: cirros
     password: cubswin:)
 ```
+</li>
 
-**To get all the ports listed:**
+<li><p>To get all the ports listed:</p>
 
 ```bash
 #quantum port-list
 ```
+</li>
 
-
-**GETTING THE VMPORT id FOR ASSIGNING FLOATING IP:**
+<li><p>Getting the VM Port-id for assigning Floating IP:</p>
 
 ```bash
 #quantum port-list -c id -c fixed_ips -c device_owner 
 ```
+<table>
+<tr bgcolor="#bad2e9"><th>id</th><th>fixed-ips </th><th>device-owner</th></tr>
+<tr>
+<td>848d2e3a-ab3f-4e92-ad6d-269d793dde54</td>
+<td>{"subnet_id": "6bfd8ae6-a2b9-4259-b813-4581a15c8d0f", "ip_address": "10.0.0.2"}</td>
+<td> compute:None</td>
+</tr>
+<tr>
+<td>9e069dc1-4af7-4c5f-a527-3c53d64affc6</td>
+<td>{"subnet_id": "55cbc646-6271-4148-b426-a7e90619e28d", "ip_address": "10.42.0.2"}</td>
+<td>network:router_gateway </td>
+</tr>
+<tr>
+<td>b36a8a56-84db-4b2e-ab0e-2adf2cef88a4</td>
+<td>{"subnet_id": "6bfd8ae6-a2b9-4259-b813-4581a15c8d0f", "ip_address": "10.0.0.3"}</td>
+<td>network:dhcp </td>
+</tr>
+<tr>
+<td>e40639e1-5986-4787-9f6c-452f608b24ff</td>
+<td> {"subnet_id": "6bfd8ae6-a2b9-4259-b813-4581a15c8d0f", "ip_address": "10.0.0.1"}</td>
+<td>network:router_interface </td>
+</tr>
+</table>
 
-|---
-| id | fixed-ips | device-owner | 
-|:-|:-:|
-| 848d2e3a-ab3f-4e92-ad6d-269d793dde54 | {"subnet_id": "6bfd8ae6-a2b9-4259-b813-4581a15c8d0f", "ip_address": "10.0.0.2"} | compute:None |
-| 9e069dc1-4af7-4c5f-a527-3c53d64affc6 | {"subnet_id": "55cbc646-6271-4148-b426-a7e90619e28d", "ip_address": "10.42.0.2"} |network:router_gateway |
-| b36a8a56-84db-4b2e-ab0e-2adf2cef88a4 | {"subnet_id": "6bfd8ae6-a2b9-4259-b813-4581a15c8d0f", "ip_address": "10.0.0.3"} | network:dhcp |
-| e40639e1-5986-4787-9f6c-452f608b24ff | {"subnet_id": "6bfd8ae6-a2b9-4259-b813-4581a15c8d0f", "ip_address": "10.0.0.1"} | network:router_interface |
-|---
+<p>The compute port-id is 848d2e3a-ab3f-4e92-ad6d-269d793dde54 , which has IP 10.0.0.2 in the private subnet id.</p>
 
-
-
-The compute port is 848d2e3a-ab3f-4e92-ad6d-269d793dde54 , which has IP 10.0.0.2 in the private subnet id.
-
+<p>We will use this port id to create a floating IP in the Public network.</p>
 ```bash
-We will use this port id to create a floating IP in the Public network.
-    848d2e3a-ab3f-4e92-ad6d-269d793dde54
+848d2e3a-ab3f-4e92-ad6d-269d793dde54
 ```
+</li>
 
-**Alternate way to get the VM port ID:**
+<li><p>Alternate way to get the VM port ID:</p>
 
 ```bash
 #nova list
 ```
+</li>
 
 <html>
 <head>
@@ -1202,16 +1228,16 @@ border:1px solid black;
 }
 </style>
 <body>
-<table>
-<tr>
+<table width="600">
+<tr bgcolor="#bad2e9">
 <th>ID</th>
 <th>Name</th>
 <th>Status</th>
 <th>Networks</th>
 </tr>
-<tr>
+<tr >
 <td>2b23d81b-b6db-4dfc-9440-ddf2ed4ef144</td>
-<td>firstinstance</td>
+<td >firstinstance</td>
 <td>ACTIVE</td>
 <td> private-net=10.0.0.2</td>
 </tr>
@@ -1220,15 +1246,12 @@ border:1px solid black;
 </html>
 
 
-
-
-
-
-Now use the Device id to get the VM port ID:
+<li><p>Now use the Device id to get the VM port ID:</p>
 
 ```bash
 #quantum port-list -- --device_id  2b23d81b-b6db-4dfc-9440-ddf2ed4ef144
 ```
+</li>
 
 <html>
 <head>
@@ -1240,8 +1263,8 @@ border:1px solid black;
 }
 </style>
 <body>
-<table>
-<tr>
+<table width="800">
+<tr bgcolor="#bad2e9">
 <th>ID</th>
 <th>Name</th>
 <th>mac_address</th>
@@ -1259,25 +1282,22 @@ border:1px solid black;
 
 
 
+<p>You can see that we got the VM PORT ID,  848d2e3a-ab3f-4e92-ad6d-269d793dde54 which is same as in the previous case.</p>
 
-You can see that we got the VM PORT ID,  848d2e3a-ab3f-4e92-ad6d-269d793dde54 which is same as in the previous case.
-
-
-Now create a floating IP for the VM with port_id as given above
+<li><p>Now create a floating IP for the VM with port_id as given above:</p>
 
 ```bash
-
 #quantum floatingip-list
 #should return empty list, since we have not created any ip
 ```
+</li>
 
-You can see subnet information with the following command:
-
+<li><p>You can see subnet information with the following command:</p>
 
 ```bash
 #quantum subnet-list
 ```
-
+</li>
 
 
 <html>
@@ -1291,7 +1311,7 @@ border:1px solid black;
 </style>
 <body>
 <table>
-<tr>
+<tr bgcolor="#bad2e9">
 <th>ID</th>
 <th>Name</th>
 <th>cidr</th>
@@ -1315,20 +1335,22 @@ border:1px solid black;
 
 
 
-Command to see specific subnet information
+<li><p>Command to see specific subnet information:</p>
 
 ```bash
 #quantum subnet-show  55cbc646-6271-4148-b426-a7e90619e28d
 ```
+</li>
 
-Since we have not created allocation pool initially we need to update the subnet with an allocation pool:
-But the below command is not working.
+<li><p>Since we have not created allocation pool initially we need to update the subnet with an allocation pool:</p>
+<p>But the below command is not working.</p>
 
 ```bash 
 #quantum subnet-update 55cbc646-6271-4148-b426-a7e90619e28d --allocation-pool start=10.42.0.75,end=10.42.0.254 public-net 10.42.0.0/24
 ```
+</li>
 
-Hence we will create floating point which is already there.
+<li><p>Hence we will create floating point which is already there.</p>
 
 ```bash
 
@@ -1349,8 +1371,9 @@ Hence we will create floating point which is already there.
     | tenant_id           | 6973efb023c748d6b8a4fff747faad92     |
     +---------------------+--------------------------------------+
 ```
+</li>
 
-**ssh the virtual machine:**
+<li><p>ssh the virtual machine:</p>
 
 ```bash
 #ssh 10.42.0.3 -l cirros 
@@ -1362,16 +1385,18 @@ Hence we will create floating point which is already there.
     cubswin:)
     $ 
 ```
+</li>
 
-**Portforwarding:**
+<li><p>Portforwarding:</p>
 
 After this we did the port forwarding on Zentyal
 
 ```bash 
 #eth1 src = TCP/IP port=25920   dest ip=10.42.0.3  dest port =  22 
 ```
+</li>
 
-Logging in to the VM from external network
+<li><p>Logging in to the VM from external network:</p>
 
 ```bash
 #ssh 183.83.27.73 -p 25920 -l cirros
@@ -1398,8 +1423,8 @@ Logging in to the VM from external network
     /dev/vda1                23797     13201      9368  58% /
     tmpfs                   252056         0    252056   0% /dev/shm
 ```
-
-
+</li>
+</ul>
 
 
 
