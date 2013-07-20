@@ -1389,7 +1389,7 @@ border:1px solid black;
 
 <li><p>Portforwarding:</p>
 
-After this we did the port forwarding on Zentyal
+Enable Portforwarding on Gateway:
 
 ```bash 
 #eth1 src = TCP/IP port=25920   dest ip=10.42.0.3  dest port =  22 
