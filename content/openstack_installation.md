@@ -96,12 +96,10 @@ $sudo su
 
 <li><p>Edit network settings to add configuration for two interfaces <code>eth0</code> and <code>eth1</code>. </p>
 
-<table >
-<tr>
-<td>
+<div>
 <img src="/images/network-interfaces.png" alt="network-interfaces"/>
-</td>
-<td>
+</div>
+<div>
 ```bash
 #vi /etc/network/interfaces
 #For Exposing OpenStack API over the internet
@@ -118,9 +116,7 @@ $sudo su
     address 10.10.100.51
     netmask 255.255.255.0
 ```
-</td>
-</tr>
-</table>
+</div>
 
 
 </li>
@@ -942,7 +938,7 @@ Created a new network:
 | tenant_id                 | 2b942273713741b1868eb86b11e08df8     |
 +---------------------------+--------------------------------------+
 ```
- ![import](/images/create_ext_net.png)
+ <img src="/images/create_ext_net.png"/>
 </li>
 
 
@@ -969,7 +965,7 @@ Created a new subnet:
 +------------------+----------------------------------------------+
 ```
  
-![import](/images/create_subnet_ext.png)
+<img src="/images/create_subnet_ext.png"/>
 </li>
 
 <li><p>Allocation of IP's to VM's:</p>
@@ -1005,7 +1001,7 @@ Created a new network:
 +---------------------------+--------------------------------------+
 ```
 
-![import](/images/create_pvt_net.png)
+<img src="/images/create_pvt_net.png"/>
 </li>
 
 
@@ -1032,7 +1028,7 @@ Created a new subnet:
 +------------------+--------------------------------------------+
 ```
  
-![import](/images/create_subnet_pvt.png)
+<img src="/images/create_subnet_pvt.png"/>
 </li>
 
 <li><p>Create router:</p>
@@ -1053,7 +1049,7 @@ Created a new router:
 +-----------------------+--------------------------------------+
 ```
  
-![import](/images/create_router.png)
+<img src="/images/create_router.png"/>
 </li>
 
 <li><p>Uplink router to public network:</p>
@@ -1069,7 +1065,7 @@ Created a new router:
 #quantum router-interface-add router1 private-subnet
 ```
  
-![import](/images/router_add_iface.png)
+<img src="/images/router_add_iface.png"/>
 </li>
 
 <li><p>To show the net list:</p>
@@ -1102,25 +1098,25 @@ qrouter-ca972d3b-788e-4e16-8552-dd335575c5c0
 
 <ul>
 <li><p>Create a Security Group:</p>
-![import](/images/create_security_group.png)
-![import](/images/create_security_group_desc.png)
+<img src="/images/create_security_group.png"/>
+<img src="/images/create_security_group_desc.png"/>
 
 </li>
 
 <li><p>Create Keypairs:<p>
-![import](/images/create_keypair.png)
+<img src="/images/create_keypair.png"/>
 </li>
 
 <li><p>Add Rule:</p>
-![import](/images/add_rule.png)
+<img src="/images/add_rule.png"/>
 </li>
 
 <li><p>Edit Security Group Rules:</p>
-![import](/images/security_group_rules.png)
+<img src="/images/security_group_rules.png"/>
 </li>
 
 <li><p>Access and Security</p>
-![import](/images/access_and_security.png)
+<img src="/images/access_and_security.png"/>
 </li>
 
 
@@ -1128,27 +1124,27 @@ qrouter-ca972d3b-788e-4e16-8552-dd335575c5c0
 
 
 <li><p>Before creating a VM</p>
-![import](/images/empty_instances.png)
+<img src="/images/empty_instances.png"/>
 </li>
 
 <li><p>Launch Instance:</p>
- ![import](/images/launch_instance.png)
+ <img src="/images/launch_instance.png"/>
 </li>
 
 <li><p>Launch Instance Keypair:</p>
- ![import](/images/launch_instance_keypair.png)
+ <img src="/images/launch_instance_keypair.png"/>
 </li>
 
 <li><p>Launch Instance Networking:</p>
- ![import](/images/launch_instance_networking.png)
+ <img src="/images/launch_instance_networking.png"/>
 </li>
 
 <li><p>My first VM</p>
- ![import](/images/first_instance.png)
+ <img src="/images/first_instance.png"/>
 </li>
 
 <li><p>Network Topology</p>
- ![import](/images/network_topology.png)
+ <img src="/images/network_topology.png"/>
 </li>
 
 <li><p>To ping VM:</p>
