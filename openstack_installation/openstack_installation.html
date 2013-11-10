@@ -30,15 +30,17 @@ Please make sure that there are two NICs available on the Machine and assigned A
 <p>For this installation following mapping will be used</p>
 
 <pre>
-eth0 : 10.10.100.51
+eth0 : 192.168.100.51
 eth1 : 10.42.0.51
 </pre>
 
 <a name="getting-started"><h2 id="getting-started">Getting Started</h2></a>
 
-<h3 id="preparing-ubuntu">Preparing Ubuntu</h3>
+<h3 id="preparing-ubuntu">Installing Ubuntu</h3>
 
 <ol>
+
+
 <li>
 <p>Change to super user mode for rest of the document</p>
 
@@ -56,7 +58,7 @@ $sudo su
 </pre>
 
 </li>
-<li>Update and Upgrade the ubuntu OS:
+<li>Update and Upgrade the Ubuntu System:
 <pre class="terminal">
 #apt-get update
 #apt-get upgrade
@@ -69,7 +71,7 @@ $sudo su
 
 <h3 id="networking">Networking</h3>
 <ol>
-<li><p>For OpenStack Single-Node setup you will require 2 NIC's, One NIC <code>10.42.0.51</code> is used for external network connection i.e, Internet access and the other NIC <code>10.10.100.51</code> is used for internal networking (OpenStack management).</p></li>
+<li><p>For OpenStack Single-Node setup you will require 2 NIC's, One NIC <code>10.42.0.51</code> is used for external network connection i.e, Internet access and the other NIC <code>192.168.100.51</code> is used for internal networking (OpenStack management).</p></li>
 
 *Note: The external NIC should have a static IP address.*
 
@@ -88,12 +90,12 @@ $sudo su
     address 10.42.0.51
     netmask 255.255.255.0
     gateway 10.42.0.1
-    dns-nameservers 8.8.8.8
+    dns-nameservers 4.4.4.4
 
     #Not internet connected(used for OpenStack management)
     auto eth0
     iface eth0 inet static
-    address 10.10.100.51
+    address 192.168.100.51
     netmask 255.255.255.0
 </pre>
 
@@ -103,7 +105,7 @@ $sudo su
 </li>
 
 <li>
-<p>Restart the Networking Service:</p>
+<p>Restart Network Services</p>
 
 <pre class="terminal">
 #/etc/init.d/networking restart
@@ -112,10 +114,12 @@ $sudo su
 </li>
 </ol>
 <h3 id="mysql--rabbitmq">MySQL &amp; RabbitMQ</h3>
+<p>MySQL Database is required to store all the information about OpenStack.  OpenStack stores users, tenants, images, networks, routers, vm information and a whole lot</P>
+
 
 <ol>
 <li>
-<p>Install MySQL:</p>
+<p>Install MySQL</p>
 
 <pre class="terminal">
 #apt-get install -y mysql-server python-mysqldb
@@ -125,7 +129,7 @@ $sudo su
 </li>
 
 <li>
-<p>Configure mysql to accept all incoming requests:</p>
+<p>Bind mysql to all IP addresses to accept incoming requests:</p>
 </li>
 
 <pre class="terminal">
@@ -134,7 +138,8 @@ $sudo su
 </pre>
 
 <li>
-<p>Install RabbitMQ (Message Queue):</p>
+<p>Install RabbitMQ (Message Queue)</p>
+Messaging server is the heart of the system. All the commands are first sent to the Messaging Service. OpenStack components picks up these messages and processes the commands</p>
 
 <p>The OpenStack Cloud Controller communicates with other nova components such as <code>`Scheduler`</code>, <code>`Network Controller`</code>, and <code>`Volume Controller`</code> using <code>`AMQP`</code> (Advanced Message Queue Protocol). Nova components use Remote Procedure Calls (RPC) to communicate to one another.</p>
 
@@ -145,7 +150,7 @@ $sudo su
 </li>
 
 <li>
-<p>Install NTP service (Network Time Protocol):</p>
+<p>Install NTP service (Network Time Protocol)</p>
 
 To keep all the services in sync, you need to install NTP, and if you do a multi-node configuration you will configure one server to be the reference server.
 
@@ -154,11 +159,9 @@ To keep all the services in sync, you need to install NTP, and if you do a multi
 </pre>
 
 </li>
-</ol>
-<h3 id="others-services">Others Services</h3>
-<ol>
+
 <li>
-<p>Install vlan and bridge-utility</p> 
+<p>Install VLAN and bridge-utility</p> 
 <pre class="terminal">
 #apt-get install -y vlan bridge-utils
 </pre>
@@ -166,9 +169,9 @@ To keep all the services in sync, you need to install NTP, and if you do a multi
 </li>
 
 <li>
-<p>Enable IP_Forwarding:</p>
+<p>Enable IP Forwarding</p>
 
-<p>Enabling IP Forwarding makes the machine to act as a router or proxy server to share one internet connection to many client machines.</p>
+<p>This is required for GRE tunneling</p>
 
 <pre class="terminal">
 #sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf
@@ -185,21 +188,25 @@ To keep all the services in sync, you need to install NTP, and if you do a multi
 
 </li>
 </ol>
-<a name="keystone"><h2 id="keystone">Keystone</h2></a>
+<a name="keystone"><h2 id="keystone">Identity Service (Keystone) </h2></a>
 <ol>
 
-Keystone is an identity service which supports various protocols for authentication and authorization. 
+<p>The Identity Service performs the following functions:</p>
+
+<ul><li>User management. Tracks users and their permissions.</li>
+
+<li>Service catalog. Provides a catalog of available services with their API endpoints.</li></ul>
 <li>
-<p>Install keystone packages:</p>
+<p>Install from packages </p>
 
 <pre class="terminal">
-#apt-get install -y keystone
+#apt-get install keystone
 </pre>
 
 </li>
 
 <li>
-<p>Verify your keystone is running:</p>
+<p>Check if keystone is running</p>
 
 <pre class="terminal">
 #service keystone status
@@ -208,12 +215,12 @@ Keystone is an identity service which supports various protocols for authenticat
 </li>
 
 <li>
-<p>Create a new MySQL database for keystone:</p>
+<p>Create a new MySQL database for keystone</p>
 
 <pre class="terminal">
     mysql -u root -p
     CREATE DATABASE keystone;
-    GRANT ALL ON keystone.* TO 'keystoneUser'@'%' IDENTIFIED BY 'keystonePass';
+    GRANT ALL ON keystone.* TO 'keystone-user'@'%' IDENTIFIED BY 'keystone-pass';
     quit;
 </pre>
 
@@ -223,13 +230,13 @@ Keystone is an identity service which supports various protocols for authenticat
 <p>Adapt the connection attribute in the <code>/etc/keystone/keystone.conf</code> to the new database:</p>
 
 <pre class="terminal">
-    connection = mysql://keystoneUser:keystonePass@10.10.100.51/keystone
+    connection = mysql://keystone-  :keystone-pass@192.168.100.51/keystone
 </pre>
 
 </li>
 
 <li>
-<p>Restart the identity service then synchronize the database:</p>
+<p>Restart the identity service then synchronize the database</p>
 
 <pre class="terminal">
 #service keystone restart
@@ -239,9 +246,9 @@ Keystone is an identity service which supports various protocols for authenticat
 </li>
 
 <li>
-<p>Fill up the keystone database using the two scripts available in the Scripts folder of this git repository:</p>
+<p>Get the following scripts to create entries into the </p>
 
-<p>Modify the HOST_IP and HOST_IP_EXT variables before executing the scripts <code>HOST_IP(10.10.100.51)</code> and <code>HOST_IP_EXT(10.42.0.51)</code></p>
+<p>Modify the HOST_IP and HOST_IP_EXT variables before executing the scripts <code>HOST_IP(192.168.100.51)</code> and <code>HOST_IP_EXT(10.42.0.51)</code></p>
 
 <pre class="terminal">
 #wget https://raw.github.com/mseknibilel/OpenStack-Grizzly-Install-Guide/OVS_SingleNode/KeystoneScripts/keystone_basic.sh
@@ -255,7 +262,7 @@ Keystone is an identity service which supports various protocols for authenticat
 </li>
 
 <li>
-<p>Create a simple credential file and load it:</p>
+<p>Create a simple script with credentials set and source the same</p>
 
 <pre class="terminal">
 #nano creds
@@ -269,7 +276,7 @@ Keystone is an identity service which supports various protocols for authenticat
 </li>
 
 <li>
-<p>Load it:</p>
+<p>Source the script</p>
 
 <pre class="terminal">
 #source creds
@@ -278,7 +285,7 @@ Keystone is an identity service which supports various protocols for authenticat
 </li>
 
 <li>
-<p>To test Keystone, we use a simple CLI command:</p>
+<p>Use simple CLI command to test Keystone</p>
 
 <pre class="terminal">
 #keystone user-list
@@ -288,14 +295,15 @@ Keystone is an identity service which supports various protocols for authenticat
 </ol>
 <a name=""><h2 id="glance">Glance</h2></a>
 
-<p>Glance provides services for discovering, registering, and retrieving virtual machine images. Stored images can be used as a template. It can also be used to store and catalog an unlimited number of backups.</p>
+<p>The OpenStack Image service provides users the ability to discover, register, and retrieve virtual machine images. Also known as the glance project, the Image service offers a REST API that allows querying of virtual machine image metadata as well as retrieval of the actual image. 
+Virtual machine images made available through the Image service can be stored in a variety of locations from simple filesystems to object-storage systems like the OpenStack Object Storage service.</p>
 <ol>
 <li>
 <p>
-Install Glance packages:</p>
+Install Image Service (Glance)</p>
 
 <pre class="terminal">
-#apt-get install -y glance
+#apt-get install   glance
 </pre>
 
 </li>
@@ -316,7 +324,7 @@ Install Glance packages:</p>
 <pre class="terminal">
     mysql -u root -p
     CREATE DATABASE glance;
-    GRANT ALL ON glance.* TO 'glanceUser'@'%' IDENTIFIED BY 'glancePass';
+    GRANT ALL ON glance.* TO 'glance-user'@'%' IDENTIFIED BY 'glance-pass';
     quit;
 </pre>
 
@@ -329,7 +337,7 @@ Install Glance packages:</p>
     [filter:authtoken]
     paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
     delay_auth_decision = true
-    auth_host = 10.10.100.51
+    auth_host = 192.168.100.51
     auth_port = 35357
     auth_protocol = http
     admin_tenant_name = service
@@ -345,7 +353,7 @@ Install Glance packages:</p>
 <pre class="terminal">
     [filter:authtoken]
     paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
-    auth_host = 10.10.100.51
+    auth_host = 192.168.100.51
     auth_port = 35357
     auth_protocol = http
     admin_tenant_name = service
@@ -359,7 +367,7 @@ Install Glance packages:</p>
 <p>Update <code>/etc/glance/glance-api.conf</code> with:</p>
 
 <pre class="terminal">
-    sql_connection = mysql://glanceUser:glancePass@10.10.100.51/glance
+    sql_connection = mysql://glance-user:glance-pass@192.168.100.51/glance
     And:
     [paste_deploy]
     flavor = keystone
@@ -371,7 +379,7 @@ Install Glance packages:</p>
 <p>Update the <code>/etc/glance/glance-registry.conf</code> with:</p>
 
 <pre class="terminal">
-    sql_connection = mysql://glanceUser:glancePass@10.10.100.51/glance
+    sql_connection = mysql://glance-user:glance-pass@192.168.100.51/glance
     And:
     [paste_deploy]
     flavor = keystone
@@ -389,7 +397,7 @@ Install Glance packages:</p>
 </li>
 
 <li>
-<p>Synchronize the glance database:</p>
+<p>Synchronize the glance database</p>
 
 <pre class="terminal">
 #glance-manage db_sync
@@ -398,7 +406,7 @@ Install Glance packages:</p>
 </li>
 
 <li>
-<p>Restart the services again to take into account the new modifications:</p>
+<p>Restart the services again to take into account the new modifications</p>
 
 <pre class="terminal">
 #service glance-registry restart; service glance-api restart
@@ -407,19 +415,44 @@ Install Glance packages:</p>
 </li>
 
 <li>
-<p>To test Glance, upload the cirros cloud image directly from the internet:</p>
+<p>To verify the image service Glance, upload the cirros cloud image directly from the internet:</p>
 
 <pre class="terminal">
 #glance image-create --name myFirstImage --is-public true --container-format bare --disk-format qcow2 --location https://launchpad.net/    cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-disk.img
++------------------+--------------------------------------+
+| Property         | Value                                |
++------------------+--------------------------------------+
+| checksum         | d972013792949d0d3ba628fbe8685bce     |
+| container_format | bare                                 |
+| created_at       | 2013-10-08T18:59:18                  |
+| deleted          | False                                |
+| deleted_at       | None                                 |
+| disk_format      | qcow2                                |
+| id               | acafc7c0-40aa-4026-9673-b879898e1fc2 |
+| is_public        | True                                 |
+| min_disk         | 0                                    |
+| min_ram          | 0                                    |
+| name             | CirrOS 0.3.1                         |
+| owner            | efa984b0a914450e9a47788ad330699d     |
+| protected        | False                                |
+| size             | 13147648                             |
+| status           | active                               |
+| updated_at       | 2013-05-08T18:59:18                  |
++------------------+--------------------------------------+
 </pre>
 
 </li>
 
 <li>
-<p>Now list the image to see what you have just uploaded:</p>
+<p>List the uploaded image</p>
 
 <pre class="terminal">
 #glance image-list
++--------------------------------------+-----------------+-------------+------------------+----------+--------+
+| ID                                   | Name            | Disk Format | Container Format | Size     | Status |
++--------------------------------------+-----------------+-------------+------------------+----------+--------+
+| acafc7c0-40aa-4026-9673-b879898e1fc2 | CirrOS 0.3.1    | qcow2       | bare             | 13147648 | active |
++--------------------------------------+-----------------+-------------+------------------+----------+--------+
 </pre>
 
 </li>
@@ -513,7 +546,7 @@ Install Glance packages:</p>
 <pre class="terminal">
     mysql -u root -p
     CREATE DATABASE quantum;
-    GRANT ALL ON quantum.* TO 'quantumUser'@'%' IDENTIFIED BY 'quantumPass';
+    GRANT ALL ON quantum.* TO 'quantum-user'@'%' IDENTIFIED BY 'quantum-pass';
     quit;
 </pre>
 
@@ -534,7 +567,7 @@ Install Glance packages:</p>
 <pre class="terminal">
     [filter:authtoken]
     paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
-    auth_host = 10.10.100.51
+    auth_host = 192.168.100.51
     auth_port = 35357
     auth_protocol = http
     admin_tenant_name = service
@@ -551,7 +584,7 @@ Under the database section
 
 <pre class="terminal">
     [DATABASE]
-    sql_connection = mysql://quantumUser:quantumPass@10.10.100.51/quantum
+    sql_connection = mysql://quantum-user:quantum-pass@192.168.100.51/quantum
 </pre>
 
 Under the OVS section
@@ -562,7 +595,7 @@ Under the OVS section
     tunnel_id_ranges = 1:1000
     integration_bridge = br-int
     tunnel_bridge = br-tun
-    local_ip = 10.10.100.51
+    local_ip = 192.168.100.51
     enable_tunneling = True
 
     #Firewall driver for realizing quantum security group function
@@ -577,7 +610,7 @@ Under the OVS section
 
 <pre class="terminal">
 #The Quantum user information for accessing the Quantum API.
-    auth_url = http://10.10.100.51:35357/v2.0
+    auth_url = http://192.168.100.51:35357/v2.0
     auth_region = RegionOne
     admin_tenant_name = service
     admin_user = quantum
@@ -598,7 +631,7 @@ Under the OVS section
 
 <pre class="terminal">
     [keystone_authtoken]
-    auth_host = 10.10.100.51
+    auth_host = 192.168.100.51
     auth_port = 35357
     auth_protocol = http
     admin_tenant_name = service
@@ -644,10 +677,10 @@ KVM acceleration can be used
 </li>
 
 <li>
-<p>Normally you would get a good response. Now, move to install kvm and configure it:</p>
+<p>Install and configure KVM</p>
 
 <pre class="terminal">
-#apt-get install -y kvm libvirt-bin pm-utils
+#apt-get install kvm libvirt-bin pm-utils
 </pre>
 
 </li>
@@ -706,7 +739,7 @@ KVM acceleration can be used
 </li>
 
 <li>
-<p>Restart the libvirt service and dbus to load the new values:</p>
+<p>Restart the libvirt service and dbus to load the new values</p>
 
 <pre class="terminal">
 #service dbus restart &amp;&amp; service libvirt-bin restart
@@ -718,16 +751,16 @@ KVM acceleration can be used
 <p>OpenStack Compute (Nova) is a cloud computing fabric controller (the main part of an IaaS system). </p>
 <ol>
 <li>
-<p>Start by installing nova components:</p>
+<p>Install Nova Components</p>
 
 <pre class="terminal">
-#apt-get install -y nova-api nova-cert novnc nova-consoleauth nova-scheduler nova-novncproxy nova-doc nova-conductor nova-compute-kvm
+#apt-get install  nova-api nova-cert novnc nova-consoleauth nova-scheduler nova-novncproxy nova-doc nova-conductor nova-compute-kvm
 </pre>
 
 </li>
 
 <li>
-<p>Check the status of all nova-services:</p>
+<p>Check the status of all nova-services</p>
 
 <pre class="terminal">
 #cd /etc/init.d/; for i in $( ls nova-* ); do service $i status; cd; done
@@ -736,12 +769,12 @@ KVM acceleration can be used
 </li>
 
 <li>
-<p>Prepare a Mysql database for Nova:</p>
+<p>Prepare a Mysql database for Nova</p>
 
 <pre class="terminal">
     mysql -u root -p
     CREATE DATABASE nova;
-    GRANT ALL ON nova.* TO 'novaUser'@'%' IDENTIFIED BY 'novaPass';
+    GRANT ALL ON nova.* TO 'nova-user'@'%' IDENTIFIED BY 'nova-pass';
     quit;
 </pre>
 
@@ -753,7 +786,7 @@ KVM acceleration can be used
 <pre class="terminal">
     [filter:authtoken]
     paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
-    auth_host = 10.10.100.51
+    auth_host = 192.168.100.51
     auth_port = 35357
     auth_protocol = http
     admin_tenant_name = service
@@ -777,9 +810,9 @@ KVM acceleration can be used
     verbose=True
     api_paste_config=/etc/nova/api-paste.ini
     compute_scheduler_driver=nova.scheduler.simple.SimpleScheduler
-    rabbit_host=10.10.100.51
-    nova_url=http://10.10.100.51:8774/v1.1/
-    sql_connection=mysql://novaUser:novaPass@10.10.100.51/nova
+    rabbit_host=192.168.100.51
+    nova_url=http://192.168.100.51:8774/v1.1/
+    sql_connection=mysql://nova-user:nova-pass@192.168.100.51/nova
     root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
 
     # Auth
@@ -787,24 +820,24 @@ KVM acceleration can be used
     auth_strategy=keystone
 
     # Imaging service
-    glance_api_servers=10.10.100.51:9292
+    glance_api_servers=192.168.100.51:9292
     image_service=nova.image.glance.GlanceImageService
 
     # Vnc configuration
     novnc_enabled=true
     novncproxy_base_url=http://10.42.0.51:6080/vnc_auto.html
     novncproxy_port=6080
-    vncserver_proxyclient_address=10.10.100.51
+    vncserver_proxyclient_address=192.168.100.51
     vncserver_listen=0.0.0.0
 
     # Network settings
     network_api_class=nova.network.quantumv2.api.API
-    quantum_url=http://10.10.100.51:9696
+    quantum_url=http://192.168.100.51:9696
     quantum_auth_strategy=keystone
     quantum_admin_tenant_name=service
     quantum_admin_username=quantum
     quantum_admin_password=service_pass
-    quantum_admin_auth_url=http://10.10.100.51:35357/v2.0
+    quantum_admin_auth_url=http://192.168.100.51:35357/v2.0
     libvirt_vif_driver=nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver
     linuxnet_interface_driver=nova.network.linux_net.LinuxOVSInterfaceDriver
     #If you want Quantum + Nova Security groups
@@ -816,7 +849,7 @@ KVM acceleration can be used
     #Metadata
     service_quantum_metadata_proxy = True
     quantum_metadata_proxy_shared_secret = helloOpenStack
-    metadata_host = 10.10.100.51
+    metadata_host = 192.168.100.51
     metadata_listen = 127.0.0.1
     metadata_listen_port = 8775
 
@@ -922,7 +955,7 @@ KVM acceleration can be used
     service_protocol = http
     service_host = 10.42.0.51
     service_port = 5000
-    auth_host = 10.10.100.51
+    auth_host = 192.168.100.51
     auth_port = 35357
     auth_protocol = http
     admin_tenant_name = service
@@ -938,7 +971,7 @@ KVM acceleration can be used
 <pre class="terminal">
     [DEFAULT]
     rootwrap_config=/etc/cinder/rootwrap.conf
-    sql_connection = mysql://cinderUser:cinderPass@10.10.100.51/cinder
+    sql_connection = mysql://cinderUser:cinderPass@192.168.100.51/cinder
     api_paste_config = /etc/cinder/api-paste.ini
     iscsi_helper=ietadm
     volume_name_template = volume-%s
@@ -959,24 +992,102 @@ KVM acceleration can be used
 
 </li>
 
-<li>
-<p>For intel machines</p>
 
-<p>create a volume-group called "cinder-volumes" using the empty partition</p>
+
+
+<li>
+<p>Creating Cinder Volumes</p>
+Cinder uses volume groups for storage. There are two ways to create the volume group.
+
+    Creating a LVM Volume Group by using a partition
+    At the time of installation of Ubuntu, leave a raw partition. Do not format or install anything in that partition.
+If there is a partition available follow the steps given below.
+
+
+<p>Creating a Volume Group by using a partition</p>
+
+<pre>
+#fdisk /dev/sda
+n
+l
+enter
++20000M
+t
+8e
+w
+</pre>
+    <p>Update the Partition</p>
+    
+    <pre>
+#partprobe
+    </pre>
+    
+    <p>Create Physical Volume</p>
+    
+    <pre>
+#pvcreate /dev/sda13
+    </pre>
+    
+    <p>Create Volume Group</p>
+    
+    <pre>#vgcreate cinder-volumes /dev/sda13</pre>
+
+    <p>The Volume group can also be created using the user interface <code>system-config-lvm</code> as an alternative to command line<p>
+    <p>Assign the empty partition to "cinder-volumes"</p>
+
 
 <pre class="terminal">
-#system--config-lvm
-#Assign the empty partition to "cinder-volumes"
+#sudo apt-get install system-config-lvm
+#system-config-lvm
+#Launches the interface
 </pre>
-
 </li>
+
+<li>
+     <p>
+    Creating a LVM Volume Group by using a container file as loop device
+    </p>
+    If there is no partition available, we can use loop back device to create volume group.
+    
+    
+    <p>Create a container file /dev/zero</p>
+    
+    <pre>#dd if=/dev/zero of=cinder-volumes bs=1 count=0 seek=20G </pre>
+    
+    <p>Create the loop device</p>
+    
+    <pre>#losetup /dev/loop2 cinder-volume</pre>
+     
+    <p>Create the partition</p>
+    
+    <pre>
+#fdisk /dev/loop2
+#Select the following options:
+n
+p
+1
+ENTER
+ENTER
+t
+8e
+w</pre>
+    
+    <p>Create the physical volume<p>
+    
+    <pre>#pvcreate /dev/loop2</pre>
+    
+    <p>Create the volume group</p>
+    
+    <pre>
+#vgcreate cinder-volumes /dev/loop2</pre>
+</li>
+
 
 <li>
 <p>Restart the cinder services:</p>
 
 <pre class="terminal">
-#cd /etc/init.d/; for i in $( ls cinder-* ); do sudo service $i restart; done
-</pre>
+#cd /etc/init.d/; for i in $( ls cinder-* ); do sudo service $i restart; done</pre>
 
 </li>
 
@@ -984,8 +1095,7 @@ KVM acceleration can be used
 <p>Verify if cinder services are running:</p>
 
 <pre class="terminal">
-#cd /etc/init.d/; for i in $( ls cinder-* ); do sudo service $i status; done
-</pre>
+#cd /etc/init.d/; for i in $( ls cinder-* ); do sudo service $i status; done</pre>
 
 </li>
 </ol>
