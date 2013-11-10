@@ -15,29 +15,25 @@ OpenStack Grizzly Installation : Single Node
 
 <h1 id="openstack-grizzly-installation---single-node">OpenStack Grizzly Installation - Single Node</h1>
 
+<a name="introduction"><h2>Introduction</h2></a>
+<p>OpenStack has come a long way from a very basic cloud orchestration platform to a distributed
+set of services which are tied together and work together using a messaging layer. This distributed
+nature of architecture also makes it hard to install and configure OpenStack.</p>
+
+<p> Aim of this book is to explain in detail steps to be followed to install all the basic components
+of <code>OpenStack, Grizzly</code></p>
+
 <a name="requirements"><h2>Requirements</h2></a>
+<p>In this installation you will focus on Grizzly release installation on a Single Node.
+Please make sure that there are two NICs available on the Machine and assigned Appropriate IPs.</p>
 
-<style>
+<p>For this installation following mapping will be used</p>
 
-.dam
+<pre>
+eth0 : 10.10.100.51
+eth1 : 10.42.0.51
+</pre>
 
-{
-width:50%;
-}
-
-</style>
-<table class="dam">
-<tr></tr>
-<tr>
-<th height="30" bgcolor="#bad2e9">Node Role</th>
-<th bgcolor="#bad2e9">NICS</th>
-</tr>
-<tr>
-<td height="30">Single Node</td>
-<td>eth0 (10.10.100.51)<br>
-eth1 (10.42.0.51)</td>
-</tr>
-</table>
 <a name="getting-started"><h2 id="getting-started">Getting Started</h2></a>
 
 <h3 id="preparing-ubuntu">Preparing Ubuntu</h3>
