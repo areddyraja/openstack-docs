@@ -67,16 +67,18 @@ $sudo su
 
 </li>
 </ol>
-<p><em>Note: On AMD machines create a volume-group called “cinder-volumes” while installing Ubuntu12.04 and for Intel machines create an empty partition which can later be used for creating a volume-group</em></p>
+<p><em>Note: On AMD machines create a volume-group called “cinder-volumes” while installing
+ Ubuntu12.04 and for Intel machines create an empty partition which can later be used for 
+ creating a volume-group</em></p>
 
 <h3 id="networking">Networking</h3>
 <ol>
 <li><p>For OpenStack Single-Node setup you will require 2 NIC's, One NIC <code>10.42.0.51</code> is used for external network connection i.e, Internet access and the other NIC <code>192.168.100.51</code> is used for internal networking (OpenStack management).</p></li>
 
-*Note: The external NIC should have a static IP address.*
+<p><em>Note: The external NIC should have a static IP address.</em></p>
 
 <li>
-<p>Edit network settings to add configuration for two interfaces <code>eth0</code> and <code>eth1</code>. </p>
+<p>Edit Network Settings to add configuration for two interfaces <code>eth0</code> and <code>eth1</code>. </p>
 
 <div>
 <img src="./images/network-interfaces.png" alt="network-interfaces">
@@ -113,9 +115,10 @@ $sudo su
 
 </li>
 </ol>
-<h3 id="mysql--rabbitmq">MySQL &amp; RabbitMQ</h3>
-<p>MySQL Database is required to store all the information about OpenStack.  OpenStack stores users, tenants, images, networks, routers, vm information and a whole lot</P>
-
+<h3 id="mysql--rabbitmq">MySQL &amp; RabbitMQ Installation</h3>
+<p>MySQL Database is required to store  information about OpenStack components - 
+Users, Tenants, Images, Networks, Routers, Virtual Machine etc in this 
+database.</P>
 
 <ol>
 <li>
@@ -141,7 +144,8 @@ $sudo su
 <p>Install RabbitMQ (Message Queue)</p>
 Messaging server is the heart of the system. All the commands are first sent to the Messaging Service. OpenStack components picks up these messages and processes the commands</p>
 
-<p>The OpenStack Cloud Controller communicates with other nova components such as <code>`Scheduler`</code>, <code>`Network Controller`</code>, and <code>`Volume Controller`</code> using <code>`AMQP`</code> (Advanced Message Queue Protocol). Nova components use Remote Procedure Calls (RPC) to communicate to one another.</p>
+<p>The OpenStack Cloud Controller communicates with other nova components such as 
+<code>Scheduler</code>, <code>Network Controller</code> and <code>Volume Controller</code> using <code>AMQP</code> (Advanced Message Queue Protocol). Nova components use Remote Procedure Calls (RPC) to communicate to one another.</p>
 
 <pre class="terminal">
 #apt-get install -y rabbitmq-server
@@ -188,16 +192,19 @@ To keep all the services in sync, you need to install NTP, and if you do a multi
 
 </li>
 </ol>
-<a name="keystone"><h2 id="keystone">Identity Service (Keystone) </h2></a>
+<a name="keystone"><h2 id="keystone">Keystone Installation</h2></a>
+<p>Keystone provides Identity, Token, Catalog and Policy services as REST Endpoints which
+are consumed by rest of the components</p>
+
+<ul>
+<li>Identity service : Validates auth credentials about Users, Tenants and Roles </li>
+<li>Token Service : Manages and validates Tokens</li>
+<li>Catalog Service : Endpoint registry for other OpenStack services</li>
+<li>Policy Service : Rule Based authorization engine</li>
+</ul>
 <ol>
-
-<p>The Identity Service performs the following functions:</p>
-
-<ul><li>User management. Tracks users and their permissions.</li>
-
-<li>Service catalog. Provides a catalog of available services with their API endpoints.</li></ul>
 <li>
-<p>Install from packages </p>
+<p>Install keystone from packages </p>
 
 <pre class="terminal">
 #apt-get install keystone
@@ -230,7 +237,7 @@ To keep all the services in sync, you need to install NTP, and if you do a multi
 <p>Adapt the connection attribute in the <code>/etc/keystone/keystone.conf</code> to the new database:</p>
 
 <pre class="terminal">
-    connection = mysql://keystone-  :keystone-pass@192.168.100.51/keystone
+    connection = mysql://keystone-user:keystone-pass@192.168.100.51/keystone
 </pre>
 
 </li>
@@ -246,7 +253,7 @@ To keep all the services in sync, you need to install NTP, and if you do a multi
 </li>
 
 <li>
-<p>Get the following scripts to create entries into the </p>
+<p>Get the following scripts to create entries in the Keystone Database</p>
 
 <p>Modify the HOST_IP and HOST_IP_EXT variables before executing the scripts <code>HOST_IP(192.168.100.51)</code> and <code>HOST_IP_EXT(10.42.0.51)</code></p>
 
@@ -293,10 +300,14 @@ To keep all the services in sync, you need to install NTP, and if you do a multi
 
 </li>
 </ol>
-<a name=""><h2 id="glance">Glance</h2></a>
+<a name=""><h2 id="glance">Glance Installation</h2></a>
 
-<p>The OpenStack Image service provides users the ability to discover, register, and retrieve virtual machine images. Also known as the glance project, the Image service offers a REST API that allows querying of virtual machine image metadata as well as retrieval of the actual image. 
-Virtual machine images made available through the Image service can be stored in a variety of locations from simple filesystems to object-storage systems like the OpenStack Object Storage service.</p>
+<p>OpenStack Image service provides users the ability to discover, register, and retrieve 
+virtual machine images. It is also known as glance project, the Image service offers a 
+REST API that allows querying of virtual machine image metadata as well as retrieval of the actual image.
+ 
+<p>Virtual machine images made available through the Image service can be stored in a variety 
+of locations from simple filesystems to object-storage systems like the OpenStack Object Storage service.</p>
 <ol>
 <li>
 <p>
@@ -457,7 +468,7 @@ Install Image Service (Glance)</p>
 
 </li>
 </ol>
-<a name=""><h2 id="quantum">Quantum</h2></a>
+<a name=""><h2 id="quantum">Quantum Installation</h2></a>
 
 <h3 id="open-vswitch">Open vSwitch</h3>
 <ol>
@@ -904,7 +915,7 @@ KVM acceleration can be used
 
 </li>
 </ol>
-<a name=""><h2 id="cinder">Cinder</h2></a>
+<a name=""><h2 id="cinder">Cinder Installation</h2></a>
 <p>OpenStack Block Storage (Cinder) provides persistent block level storage devices for use with OpenStack compute instances. The block storage system manages the creation, attaching and detaching of the block devices to servers.</p>
 <ol>
 <li>
@@ -1099,7 +1110,7 @@ w</pre>
 
 </li>
 </ol>
-<a name=""><h2 id="horizon">Horizon</h2></a>
+<a name=""><h2 id="horizon">Horizon Installation</h2></a>
 
 <p>OpenStack Dashboard (Horizon) provides administrators and users a graphical interface to access, provision and automate cloud-based resources.
 The dashboard is just one way to interact with OpenStack resources.</p>
@@ -1132,7 +1143,7 @@ The dashboard is just one way to interact with OpenStack resources.</p>
 <p>You can now access your OpenStack <code>10.42.0.51/horizon</code> with credentials <code>admin:admin_pass</code>.</p>
 </li>
 </ol>
-<a name=""><h2 id="vm-creation">VM Creation</h2>
+<a name="first-vm"><h2 id="create-vm">Create a VM</h2></a>
 
 <ol>
 <li>
@@ -1545,9 +1556,6 @@ border:1px solid black;
 </li>
 
 
-
-
-
 <style>
 table,td,th
 {
@@ -1672,27 +1680,271 @@ Enable Portforwarding on Gateway:
     /dev/vda1                23797     13201      9368  58% /
     tmpfs                   252056         0    252056   0% /dev/shm
 </pre>
-
 </li>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </ul>
+<a name="cinder-volume"><h2 id="cinder-volume">Create a Cinder Volume</h2></a>
+<p>Cinder provides an infrastructure for managing volumes in OpenStack. Cinder services gives extra block level storage to your OpenStack Compute instances.</p>
+
+<p>The following are the steps for the exercise:</p>
+
+<ul>
+<li>Create a Volume Type</li>
+  <li>Create Volume</li>
+  <li>Attach Volume to VM</li>
+  <li>List Volumes</li>
+  <li>Test the Volume</li>
+  <li>FAQ's</li>
+</ul><h3 id="create-a-volume-type">Create a Volume Type</h3>
+
+<h6 id="using-cli">Using Cli</h6>
+
+<pre class="terminal">
+root@ubuntu:~# nova volume-type-create Backup
++--------------------------------------+--------+
+| ID                                   | Name   |
++--------------------------------------+--------+
+| 81fb6a1a-d927-40b0-a6ad-54a4241b9b3a | Backup |
++--------------------------------------+--------+
+</pre>
+
+<h6 id="using-dashboard">Using Dashboard</h6>
+
+<p>Select <code>Admin</code>–&gt;<code>volumes</code>–&gt;<code>Create Volume Type</code></p>
+
+<p><img src="./images/create_volume_type.png" alt="import"></p>
+
+<h3 id="create-a-volume">Create a Volume</h3>
+
+<p>Create a 1 GB test volume</p>
+
+<h6 id="using-cli-1">Using Cli</h6>
+
+<pre class="terminal">
+root@ubuntu:~# cinder create --display_name volume1 1 --volume_type Backup
++---------------------+--------------------------------------+
+|       Property      |                Value                 |
++---------------------+--------------------------------------+
+|     attachments     |                  []                  |
+|  availability_zone  |                 nova                 |
+|       bootable      |                false                 |
+|      created_at     |      2013-09-04T13:07:41.306051      |
+| display_description |                 None                 |
+|     display_name    |                volume1               |
+|          id         | 4148fb29-4f38-4d29-9503-ed3f9ca49cf6 |
+|       metadata      |                  {}                  |
+|         size        |                  1                   |
+|     snapshot_id     |                 None                 |
+|     source_volid    |                 None                 |
+|        status       |               creating               |
+|     volume_type     |                Backup                |
++---------------------+--------------------------------------+
+</pre>
+
+<h6 id="using-dashboard-1">Using Dashboard</h6>
+
+<p>Select <code>Project</code>–&gt;<code>volumes</code>–&gt;<code>Create Volume</code></p>
+
+<p><img src="./images/create_volume.png" alt="import"></p>
+
+<h3 id="attach-volume-to-vm">Attach Volume to VM</h3>
+
+<h6 id="using-cli-2">Using Cli</h6>
+
+<pre class="terminal">
+root@ubuntu:~# nova volume-attach vm2 310dadc8-ed30-43f1-a7fd-b474fb762cdd /dev/vdd
++----------+--------------------------------------+
+| Property | Value                                |
++----------+--------------------------------------+
+| device   | /dev/vdd                             |
+| serverId | 73cea228-3c5d-4846-9d71-6ba14a5da374 |
+| id       | 310dadc8-ed30-43f1-a7fd-b474fb762cdd |
+| volumeId | 310dadc8-ed30-43f1-a7fd-b474fb762cdd |
++----------+--------------------------------------+
+</pre>
+
+<h6 id="using-dashboard-2">Using Dashboard</h6>
+
+<p>Select <code>volumes</code>–&gt;<code>Edit Attachments</code></p>
+
+<p><img src="./images/manage_volume_attachments.png" alt="import"></p>
+
+<h3 id="list-volumes">List Volumes</h3>
+
+<h6 id="using-cli-3">Using Cli</h6>
+
+<pre class="terminal">
+root@ubuntu:~# cinder list
++--------------------------------------+-----------+--------------+------+-------------+----------+--------------------------------------+
+|                  ID                  |   Status  | Display Name | Size | Volume Type | Bootable |             Attached to              |
++--------------------------------------+-----------+--------------+------+-------------+----------+--------------------------------------+
+| 20767a0b-95e5-426e-9d22-cfe614e561ca |   in-use  |    volume    |  1   |     SSD     |  false   | 73cea228-3c5d-4846-9d71-6ba14a5da374 |
+| 310dadc8-ed30-43f1-a7fd-b474fb762cdd | available |   volume1    |  1   |     SSD     |  false   |                                      |
+| 4148fb29-4f38-4d29-9503-ed3f9ca49cf6 | available |    test2     |  1   |    Backup   |  false   |                                      |
++--------------------------------------+-----------+--------------+------+-------------+----------+--------------------------------------+
+</pre>
+
+<h6 id="using-dashboard-3">Using Dashboard</h6>
+
+<p><img src="./images/volume_list.png" alt="import"></p>
+
+<h3 id="test-the-volume">Test the Volume</h3>
+
+<p>After attaching the volume, ssh in to the VM and format the volume.</p>
+
+<h5 id="ssh-in-to-vm-using-floating-ip-address">1. SSH in to VM using floating IP address</h5>
+
+<pre class="terminal">
+#ssh cirros@192.168.0.76
+#passwd: cubswin:)
+
+Enter into sudo mode:
+
+#sudo su
+
+check the partiton table:
+
+#fdisk -l
+</pre>
+
+<h5 id="create-a-valid-partition-for-the-volume-devvdd">2. Create a valid partition for the volume ‘/dev/vdd'</h5>
+
+<pre class="terminal">
+$fdisk /dev/vdd
+Device contains neither a valid DOS partition table, nor Sun, SGI or OSF disklabel
+Building a new DOS disklabel with disk identifier 0x69e08462.
+Changes will remain in memory only, until you decide to write them.
+After that, of course, the previous content won't be recoverable.
+
+Warning: invalid flag 0x0000 of partition table 4 will be corrected by w(rite)
+
+Command (m for help): n
+Command action
+   e   extended
+   p   primary partition (1-4)
+p
+Partition number (1-4, default 1): 
+Using default value 1
+First sector (2048-2097151, default 2048): 
+Using default value 2048
+Last sector, +sectors or +size{K,M,G} (2048-2097151, default 2097151): 
+Using default value 2097151
+
+Command (m for help): p
+
+Disk /dev/vdd: 1073 MB, 1073741824 bytes
+16 heads, 63 sectors/track, 2080 cylinders, total 2097152 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x69e08462
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/vdd1            2048     2097151     1047552   83  Linux
+
+Command (m for help): q
+</pre>
+
+<h5 id="create-file-system-for-the-volume">3. Create file system for the Volume</h5>
+
+<pre class="terminal">
+$mkfs.ext3 /dev/vdd1
+</pre>
+
+<h5 id="mount-the-partiton">4. Mount the Partiton</h5>
+
+<pre class="terminal">
+$ mkdir -p /mnt/data
+$ mount /dev/vdd1 /mnt/data/
+$ df -h
+Filesystem                Size      Used Available Use% Mounted on
+/dev                    243.1M         0    243.1M   0% /dev
+/dev/vda1                23.2M     12.9M      9.1M  59% /
+tmpfs                   246.1M         0    246.1M   0% /dev/shm
+tmpfs                   200.0K     20.0K    180.0K  10% /run
+/dev/vdd               1007.9M     33.3M    923.4M   3% /mnt/data
+
+$ cd /mnt/data/
+
+$ cat &gt; file1
+HI THIS IS A TEST FILE
+$ cat file1
+HI THIS IS A TEST FILE
+</pre>
+
+<p>Now, we can also detach <code>/dev/vdd</code> volume and attach it to any other instance and access the data. </p>
+
+<h3 id="faqs">FAQ's</h3>
+
+<h5 id="if-volume-creation-fails">1. If volume creation fails</h5>
+<p>Execute the below commands to fix the issues</p>
+
+<p>If <code>tgt</code> service is running, Stop it by using the command:</p>
+
+<pre class="terminal">
+#service tgt stop
+#service iscsitarget restart 
+#service open-iscsi restart
+</pre>
+
+<p>If you find an error similar to this in <code>cinder-volume.log</code> file:</p>
+
+<pre class="terminal">
+ProcessExecutionError: Unexpected error while running command.
+Command: sudo cinder-rootwrap /etc/cinder/rootwrap.conf ietadm --op new --tid=1 --params Name=iqn.2010-10.org.openstack:volume-19bb7c48-45f5-4034-b30b-c52863d34214
+Exit code: 239
+Stdout: ''
+Stderr: 'File exists.\n'
+</pre>
+
+<p>Then execute the below command:</p>
+
+<pre class="terminal">
+#ietadm --op delete --tid=1
+</pre>
+
+<p><code>Note: For tid check /var/log/cinder/cinder-volume.log file</code></p>
+
+<h5 id="check-if-cinder-is-running-on-the-ports-usually-iscsi-runs-on-these-port">2. Check if cinder is running on the ports; Usually iscsi runs on these port</h5>
+
+<pre class="terminal">
+#ss -tuplen | grep 3260
+
+expected output:
+tcp    LISTEN     0      32                    :::3260                 :::*      users:(("ietd",4800,8)) ino:9045748 sk:ffff880413fb4380
+tcp    LISTEN     0      32                     *:3260                  *:*      users:(("ietd",4800,7)) ino:9045747 sk:ffff880304dea1c0
+</pre>
+
+<p>Note you can also use the following command:</p>
+
+<pre class="terminal">
+#lsof -i -a | grep 3260
+
+Expected output:
+ietd       4800         root    7u  IPv4  9045747      0t0  TCP *:3260 (LISTEN)
+ietd       4800         root    8u  IPv6  9045748      0t0  TCP *:3260 (LISTEN)
+iscsid    19618         root    9u  IPv4  9483329      0t0  TCP ubuntu.root:49065-&gt;ubuntu.root:3260 (ESTABLISHED)
+</pre>
+
+<h5 id="i-can-create-volumes-but-cant-attach-to-an-existing-instance">3. I can create volumes but can't attach to an existing instance.</h5>
+
+<p>The work around that issue was:</p>
+
+<ul>
+<li>In Horizon, delete the volume that was created, because this one used tgt to create</li>
+  <li>Stop tgt service –&gt; tgt stop</li>
+  <li>Restart iscsi –&gt; service iscsitarget restart ; service open-iscsi restart</li>
+  <li>In Horizon, create a new volume</li>
+  <li>Then attach it to an instance</li>
+</ul>
+
+<a name="authors"><h2>About the Authors</h2></a>
+<p><b>Rajdeep Dua</b> : Rajdeep Dua is part VMware team in India working on OpenStack and related projects. He is
+involved in Academic and OpenSource outreach activities. Before joining VMware he lead Developer Relations team in Google India with focus
+on Google Cloud and Android. Rajdeep his Master in Management from IIM Lucknow, India. He can be
+reached at @rajdeepdua on Twitter</p>
+
+<p><b>A ReddyRaja</b> : A ReddyRaja is Founder and CEO of Akrantha Software. His focus areas are provided consulting services on OpenStack and Big Data.
+He worked with Pramati, HP and Tata Institute of Fundamental Research.</p>
 </div>
 </div>
 </div>

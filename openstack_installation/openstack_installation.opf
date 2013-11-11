@@ -4,12 +4,12 @@
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
     <dc:title>OpenStack Installation Grizzly Kindle Book</dc:title>
     <dc:language>en</dc:language>
-    <dc:identifier id="BookId" opf:scheme="ISBN">123456789X</dc:identifier>
-    <dc:creator opf:file-as="Garvin, Perry" opf:role="aut">Perry Garvin</dc:creator>
+    <dc:identifier id="BookId" opf:scheme="ISBN"></dc:identifier>
+    <dc:creator opf:file-as="Rajdeep, ReddyRaja" opf:role="aut">Rajdeep Dua, A ReddyRaja</dc:creator>
     <dc:publisher>Amazon.com</dc:publisher>
     <dc:subject>Reference</dc:subject>
     <dc:date>2013-11-01</dc:date>
-    <dc:description>A short paragraph describing the publication … </dc:description>
+    <dc:description>This book covers details about installing Single Node OpenStack Grizzly release </dc:description>
     <meta name="cover" content="my-cover-image" />
   </metadata>
  
@@ -32,7 +32,7 @@
   type="text" [mandatory]: a link to where the content of the book starts (typically after the front matter) -->
   <guide>
     <reference type="toc" title="Table of Contents" href="toc.html"/>
-    <reference type="text" title="Beginning" href="toc.html"></reference>
+    <reference type="text" title="Introduction" href="openstack_installation.html#introduction"></reference>
   </guide>
  
 </package>

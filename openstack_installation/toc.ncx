@@ -19,10 +19,10 @@ including those conforming to the relaxed constraints of OPS 2.0 -->
   </docTitle>
  
   <docAuthor>
-    <text>Rajdeep Dua, A Raja Reddy</text>
+    <text>Rajdeep Dua, A ReddyRaja</text>
   </docAuthor>
 
-<navMap>
+<!--<navMap>
 	<navPoint class="toc" id="table" playOrder="1">
 		<navLabel><text>Table of Contents</text></navLabel>
 		<content src="toc.html" /> 
@@ -31,10 +31,12 @@ including those conforming to the relaxed constraints of OPS 2.0 -->
 		<navLabel><text>Requirements</text></navLabel>
 		<content src="openstack_installation.html#requirements" /> 
 	</navPoint>
-	<!--<navPoint class="book" id="level1-book1" playOrder="3">
-		<navLabel><text>Getting Started</text></navLabel>
-		<content src="openstack_installation.html#getting-started />
-    </navPoint>-->
-</navMap>
-
+    </navPoint>
+</navMap>-->
+<nav epub:type="toc">
+<ol>
+<li><a href=”openstack_installation.html#introduction">Introduction</a></li>
+<li><a href=”openstack_installation.html#requirements">Requirements</a></li>
+</ol>
+</nav>
 </ncx>
