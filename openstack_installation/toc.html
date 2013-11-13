@@ -4,12 +4,44 @@
 	<title>Table of Contents</title>
 	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
 	<link rel="stylesheet" href="style.css">
+	<style>
+	h1 { 
+	  text-align: left; 
+	  font-size: 150%; 
+	  font-weight: bold; 
+	  font-family: sans-serif; 
+	  margin: 1em 0; } 
+	  
+	/* base for all entries */ 
+	  
+	p, div {
+	  text-align: left; 
+	  font-family: sans-serif; 
+       margin: 0; 
+    } 
+    /* indent for level 2 */
+    p.level2, div.level2 { 
+      margin-left: 2em; 
+      font-size: 80%
+    } 
+    /* indent for level 3 and make font a bit smaller */ 
+    p.level3, div.level3 { 
+      margin-left: 4em; 
+      font-size: 75%;
+    }
+
+ 
+	</style>
 </head>
 <body>
 <div id="toc">
+    <h1>Table of Contents</h1>
     <div><a href="openstack_installation.html#introduction">Introduction</a></div>
 	<div><a href="openstack_installation.html#requirements">Requirements</a></div>
-	<div><a href="openstack_installation.html#getting-started">Getting Started</a></div>
+	<div><a href="openstack_installation.html#ubuntu-config">Ubuntu and Network Configuration</a>
+	  <div class="level2"><a href="openstack_installation.html#conf-ubuntu">Configure Ubuntu</a>
+	  </div>
+	</div>
 	<div><a href="openstack_installation.html#keystone">Keystone Installation</a></div>
 	<div><a href="openstack_installation.html#glance">Glance Installation</a></div>
 	<div><a href="openstack_installation.html#quantum">Quantum Installation</a></div>

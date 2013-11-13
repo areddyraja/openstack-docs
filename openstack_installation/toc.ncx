@@ -33,10 +33,30 @@ including those conforming to the relaxed constraints of OPS 2.0 -->
 	</navPoint>
     </navPoint>
 </navMap>-->
-<nav epub:type="toc">
-<ol>
-<li><a href=”openstack_installation.html#introduction">Introduction</a></li>
-<li><a href=”openstack_installation.html#requirements">Requirements</a></li>
-</ol>
-</nav>
+ <navMap>
+    <navPoint id="navpoint-1" playOrder="1">
+      <navLabel><text>Cover Page</text></navLabel>
+      <content src="cover.html"/>
+    </navPoint>
+ 
+    <navPoint id="navpoint-2" playOrder="2">
+      <navLabel><text>Table of Contents</text></navLabel>
+      <content src="toc.html"/>
+    </navPoint>
+ 
+    <navPoint id="navpoint-3" playOrder="3">
+      <navLabel><text>Introduction</text></navLabel>
+      <content src="openstack_installation.html#introduction"/>
+    </navPoint>
+ 
+    <navPoint id="navpoint-4" playOrder="4">
+      <navLabel><text>Requirements</text></navLabel>
+      <content src="openstack_installation.html#introduction"/>
+    </navPoint>
+ 
+    <navPoint id="navpoint-5" playOrder="5">
+      <navLabel><text>Ubuntu and Network Configuration</text></navLabel>
+      <content src="openstack_installation.html#ubuntu-config"/>
+    </navPoint>
+  </navMap>
 </ncx>

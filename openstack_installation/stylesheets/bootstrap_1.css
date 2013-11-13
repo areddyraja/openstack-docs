@@ -21,7 +21,7 @@ a {
 }
 
 p {
-  margin: 0 0 10px;
+  margin: 0 0 10px 0px;
 }
 
 small {
@@ -43,7 +43,6 @@ h6 {
   margin: 10px 0;
   font-family: inherit;
   font-weight: bold;
-  color: inherit;
   text-rendering: optimizelegibility;
 }
 h1 small,
@@ -53,7 +52,6 @@ h4 small,
 h5 small,
 h6 small {
   font-weight: normal;
-  color: #999999;
 }
 h1,
 h2,
@@ -64,9 +62,11 @@ h1 {
 }
 h2 {
   font-size: 31.5px;
+  color: #9C0A0A;
 }
 h3 {
   font-size: 24.5px;
+  color: #0088cc;
 }
 h4 {
   font-size: 17.5px;

@@ -34,9 +34,14 @@ eth0 : 192.168.100.51
 eth1 : 10.42.0.51
 </pre>
 
-<a name="getting-started"><h2 id="getting-started">Getting Started</h2></a>
-
-<h3 id="preparing-ubuntu">Installing Ubuntu</h3>
+<a name="getting-started"><h2 id="ubuntu-config">Ubuntu and Network Configuration</h2></a>
+In this section you will perform the following tasks
+<ol>
+<li><a href="openstack_installation.html#conf-ubuntu">Configure Ubuntu</a></li>
+<li><a href="openstack_installation.html#network-config">Network Configuration</a></li>
+<li><a href="openstack_installation.html#network-util">Network Utilities Installation and Configuration</a></li>
+</ol>
+<h3 id="conf-ubuntu">Configure Ubuntu</h3>
 
 <ol>
 
@@ -71,9 +76,12 @@ $sudo su
  Ubuntu12.04 and for Intel machines create an empty partition which can later be used for 
  creating a volume-group</em></p>
 
-<h3 id="networking">Networking</h3>
+<h3 id="network-config">Network Configuration</h3>
+<h4>Network Interfaces</h4>
 <ol>
-<li><p>For OpenStack Single-Node setup you will require 2 NIC's, One NIC <code>10.42.0.51</code> is used for external network connection i.e, Internet access and the other NIC <code>192.168.100.51</code> is used for internal networking (OpenStack management).</p></li>
+<li><p>For OpenStack Single-Node setup you will require 2 NIC's, One NIC <code>10.42.0.51
+</code> is used for external network connection i.e, Internet access and the other 
+NIC <code>192.168.100.51</code> is used for internal networking (OpenStack management).</p></li>
 
 <p><em>Note: The external NIC should have a static IP address.</em></p>
 
@@ -112,86 +120,82 @@ $sudo su
 <pre class="terminal">
 #/etc/init.d/networking restart
 </pre>
-
 </li>
 </ol>
-<h3 id="mysql--rabbitmq">MySQL &amp; RabbitMQ Installation</h3>
-<p>MySQL Database is required to store  information about OpenStack components - 
-Users, Tenants, Images, Networks, Routers, Virtual Machine etc in this 
-database.</P>
-
-<ol>
-<li>
-<p>Install MySQL</p>
-
-<pre class="terminal">
-#apt-get install -y mysql-server python-mysqldb
-</pre>
-
-<p>During the install, you'll be prompted for the mysql root password. Enter a password of your choice and verify it.</p>
-</li>
-
-<li>
-<p>Bind mysql to all IP addresses to accept incoming requests:</p>
-</li>
-
-<pre class="terminal">
-#sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mysql/my.cnf
-#service mysql restart
-</pre>
-
-<li>
-<p>Install RabbitMQ (Message Queue)</p>
-Messaging server is the heart of the system. All the commands are first sent to the Messaging Service. OpenStack components picks up these messages and processes the commands</p>
-
-<p>The OpenStack Cloud Controller communicates with other nova components such as 
-<code>Scheduler</code>, <code>Network Controller</code> and <code>Volume Controller</code> using <code>AMQP</code> (Advanced Message Queue Protocol). Nova components use Remote Procedure Calls (RPC) to communicate to one another.</p>
-
-<pre class="terminal">
-#apt-get install -y rabbitmq-server
-</pre>
-
-</li>
-
-<li>
-<p>Install NTP service (Network Time Protocol)</p>
-
-To keep all the services in sync, you need to install NTP, and if you do a multi-node configuration you will configure one server to be the reference server.
-
-<pre class="terminal">
-#apt-get install -y ntp
-</pre>
-
-</li>
-
-<li>
-<p>Install VLAN and bridge-utility</p> 
+<h3 id="network-util">Network Utilities Installation and Configuration</h3>
+<h4>Install VLAN and bridge-utility</h4> 
+<p>VLAN and bridge-utility packages are required for OpenStack Networking</p>
 <pre class="terminal">
 #apt-get install -y vlan bridge-utils
 </pre>
 
-</li>
+<h4>Enable IP Forwarding</h4>
 
-<li>
-<p>Enable IP Forwarding</p>
-
-<p>This is required for GRE tunneling</p>
+<p>This step is required for GRE tunneling</p>
 
 <pre class="terminal">
 #sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf
 </pre>
 
-</li>
-
-<li>
 <p>To save you from rebooting, perform the following</p>
 
 <pre class="terminal">
 #sysctl net.ipv4.ip_forward=1
 </pre>
-
-</li>
+<h3 id="mysql--rabbitmq">MySQL &amp; RabbitMQ Installation</h3>
+<p>MySQL Database is required to store  information about OpenStack components - 
+Users, Tenants, Images, Networks, Routers, Virtual Machine etc in this 
+database.</p>
+<p>Follow the Steps listed below</p>
+<ol>
+<li><a href="openstack_installation.html#install-mysql">Install MySQL</a></li>
+<li><a href="openstack_installation.html#configure-mysql">Configure MySQL</a></li>
+<li><a href="openstack_installation.html#install-rabbitmq">Install RabbitMQ</a></li>
+<li><a href="openstack_installation.html#install-ntp">Install NTP</a></li>
 </ol>
+
+<h4 id="install-mysql">Install MySQL</h4>
+<p>Execute apt-get command to download <code>mysql-server</code> and <code>python-mysql
+</code> 
+packages.</p>
+<pre class="terminal">
+#apt-get install -y mysql-server python-mysqldb
+</pre>
+
+<p>During the install, you'll be prompted for the mysql root password. Enter a password of
+ your choice and verify it.</p>
+
+
+<h4 id="configure-mysql">Configure MySQL</h4>
+<p>Bind mysql to all IP addresses to accept incoming requests:</p>
+<pre class="terminal">
+#sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mysql/my.cnf
+#service mysql restart
+</pre>
+
+<h4 id"install-rabbitmq">Install RabbitMQ</h4>
+<p>Messaging server is the heart of the system. All the commands are first sent to the 
+Messaging Service. OpenStack components picks up these messages and processes the commands
+</p>
+
+<p>The OpenStack Cloud Controller communicates with other nova components such as 
+<code>Scheduler</code>, <code>Network Controller</code> and <code>Volume Controller</code>
+using <code>AMQP</code> (Advanced Message Queue Protocol). Nova components use Remote 
+Procedure Calls (RPC) to communicate to one another.</p>
+
+<pre class="terminal">
+#apt-get install -y rabbitmq-server
+</pre>
+
+<h4 id="install-ntp">Install NTP Service</h4>
+
+<p>To keep all the services in sync, you need to install NTP, and if you do a multi-node 
+configuration you will configure one server to be the reference server.</p>
+<p>Execute apt-get to install <code>ntp</code> package</p>
+<pre class="terminal">
+#apt-get install -y ntp
+</pre>
+
 <a name="keystone"><h2 id="keystone">Keystone Installation</h2></a>
 <p>Keystone provides Identity, Token, Catalog and Policy services as REST Endpoints which
 are consumed by rest of the components</p>
@@ -202,9 +206,16 @@ are consumed by rest of the components</p>
 <li>Catalog Service : Endpoint registry for other OpenStack services</li>
 <li>Policy Service : Rule Based authorization engine</li>
 </ul>
+<p>Keystone will be installed and then configured to work with the MySQL Databas</p>
+<ol>
+<li><a href="openstack_installation.html#install-keystone">Install and Verify keystone</a></li>
+<li><a href="openstack_installation.html#keystone-db">Create and configure Keystone Database</a></li>
+<li><a href="openstack_installation.html#environ-keystone">Configure Keystone Environment Variables</a></li>
+</ol>
+<h3 id="install-keystone">Install and Verify keystone</h3>
 <ol>
 <li>
-<p>Install keystone from packages </p>
+<p>Install keystone from packages using the apt-get command.</p>
 
 <pre class="terminal">
 #apt-get install keystone
@@ -220,7 +231,9 @@ are consumed by rest of the components</p>
 </pre>
 
 </li>
-
+</ol>
+<h3 id="keystone-db">Create and configure Keystone Database</h3>
+<ol>
 <li>
 <p>Create a new MySQL database for keystone</p>
 
@@ -230,18 +243,13 @@ are consumed by rest of the components</p>
     GRANT ALL ON keystone.* TO 'keystone-user'@'%' IDENTIFIED BY 'keystone-pass';
     quit;
 </pre>
-
 </li>
-
 <li>
 <p>Adapt the connection attribute in the <code>/etc/keystone/keystone.conf</code> to the new database:</p>
-
 <pre class="terminal">
     connection = mysql://keystone-user:keystone-pass@192.168.100.51/keystone
 </pre>
-
 </li>
-
 <li>
 <p>Restart the identity service then synchronize the database</p>
 
@@ -265,9 +273,10 @@ are consumed by rest of the components</p>
 #./keystone_basic.sh
 #./keystone_endpoints_basic.sh
 </pre>
-
 </li>
-
+</ol>
+<h3 id="environ-keystone">Configure Keystone Environment Variables</h3>
+<ol>
 <li>
 <p>Create a simple script with credentials set and source the same</p>
 
