@@ -317,19 +317,19 @@ REST API that allows querying of virtual machine image metadata as well as retri
  
 <p>Virtual machine images made available through the Image service can be stored in a variety 
 of locations from simple filesystems to object-storage systems like the OpenStack Object Storage service.</p>
+
+<h3 id="glance-packages">Install Glance Packages</h3>
 <ol>
 <li>
-<p>
-Install Image Service (Glance)</p>
-
+<p>Execute <code>apt-get</code> command to get the <code>glance</code> packages from the 
+repositories</p> 
 <pre class="terminal">
-#apt-get install   glance
+#apt-get install glance
 </pre>
 
 </li>
-
 <li>
-<p>Verify your glance services are running:</p>
+<p>Verify that glance services are running by executing the following commands</p>
 
 <pre class="terminal">
 #service glance-api status
@@ -337,9 +337,13 @@ Install Image Service (Glance)</p>
 </pre>
 
 </li>
-
+</ol>
+<h3 id="glance-db">Configure Glance Database</h3>
+<ol>
 <li>
-<p>Create a new MySQL database for Glance:</p>
+<p>Create a new MySQL database for Glance by executing the <code>CREATE DATABASE</code> command
+on the <code>mysql</code> command prompt. After this <b>GRANT ALL</b> permission for 
+glance tables to <b>glance-user</b></p>
 
 <pre class="terminal">
     mysql -u root -p
@@ -347,12 +351,22 @@ Install Image Service (Glance)</p>
     GRANT ALL ON glance.* TO 'glance-user'@'%' IDENTIFIED BY 'glance-pass';
     quit;
 </pre>
-
 </li>
-
+</ol>
+<h3 id="glance-config-files">Update Glance Configuration Files</h3>
+<ol>
 <li>
-<p>Update <code>/etc/glance/glance-api-paste.ini</code> with:</p>
+<p>Update <code>[filter:authtoken]</code> section in 
+<code>/etc/glance/glance-api-paste.ini</code></p>
 
+<p><b>Original Code Listing:</b></p>
+<pre>
+[filter:authtoken]
+paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
+delay_auth_decision = true
+</pre>
+
+<p><b>Modified Code Listing:</b></p>
 <pre class="terminal">
     [filter:authtoken]
     paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
@@ -364,12 +378,17 @@ Install Image Service (Glance)</p>
     admin_user = glance
     admin_password = service_pass
 </pre>
-
 </li>
 
 <li>
-<p>Update the <code>/etc/glance/glance-registry-paste.ini</code> with:</p>
-
+<p>Update <code>[filter:authtoken]</code> section in 
+<code>/etc/glance/glance-registry-paste.ini</code></p>
+<p><b>Original Code Listing:</b></p>
+<pre>
+[filter:authtoken]
+paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
+</pre>
+<p><b>Modified Code Listing:</b></p>
 <pre class="terminal">
     [filter:authtoken]
     paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory

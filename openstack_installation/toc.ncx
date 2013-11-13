@@ -22,18 +22,8 @@ including those conforming to the relaxed constraints of OPS 2.0 -->
     <text>Rajdeep Dua, A ReddyRaja</text>
   </docAuthor>
 
-<!--<navMap>
-	<navPoint class="toc" id="table" playOrder="1">
-		<navLabel><text>Table of Contents</text></navLabel>
-		<content src="toc.html" /> 
-	</navPoint>
-	<navPoint class="titlepage" id="L1T" playOrder="2">
-		<navLabel><text>Requirements</text></navLabel>
-		<content src="openstack_installation.html#requirements" /> 
-	</navPoint>
-    </navPoint>
-</navMap>-->
- <navMap>
+
+ <!--<navMap>
     <navPoint id="navpoint-1" playOrder="1">
       <navLabel><text>Cover Page</text></navLabel>
       <content src="cover.html"/>
@@ -58,5 +48,5 @@ including those conforming to the relaxed constraints of OPS 2.0 -->
       <navLabel><text>Ubuntu and Network Configuration</text></navLabel>
       <content src="openstack_installation.html#ubuntu-config"/>
     </navPoint>
-  </navMap>
+  </navMap>-->
 </ncx>
