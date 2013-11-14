@@ -317,6 +317,14 @@ REST API that allows querying of virtual machine image metadata as well as retri
  
 <p>Virtual machine images made available through the Image service can be stored in a variety 
 of locations from simple filesystems to object-storage systems like the OpenStack Object Storage service.</p>
+<p>Steps to be following for Glance Installation</p>
+<ol>
+<li><a href="openstack_installation.html#glance-packages">Install Glance Packages/a></li>
+<li><a href="openstack_installation.html#keystone-db">Configure Glance Database</a></li>
+<li><a href="openstack_installation.html#glance-config-files">Update Glance Configuration Files</a></li>
+<li><a href="openstack_installation.html#glance-restart-pop-db">Restart Services and Configure Glance Database</a></li>
+<li><a href="openstack_installation.html#glance-create-image">Create a Glance Image using Command Line</a></li>
+</ol>
 
 <h3 id="glance-packages">Install Glance Packages</h3>
 <ol>
@@ -403,16 +411,35 @@ paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
 </li>
 
 <li>
-<p>Update <code>/etc/glance/glance-api.conf</code> with:</p>
-
-<pre class="terminal">
-    sql_connection = mysql://glance-user:glance-pass@192.168.100.51/glance
-    And:
-    [paste_deploy]
-    flavor = keystone
+<p>Update <code>/etc/glance/glance-api.conf</code> as shown below</p>
+<ol>
+<li>
+<p>sql_connection value is configured to point to MySQL Instance configured above</p>
+<p><b>Original Code Listing:</b></p>
+<pre>
+sql_connection = sqlite:///glance.sqlite
 </pre>
-
+<p><b>Modified Code Listing:</b></p>
+<pre>
+sql_connection = mysql://glance-user:glance-pass@192.168.100.51/glance
+</pre>
 </li>
+<li>
+<p>Paste Flavor in the file <code>glance-api.conf</code> is configured to keystone</p>
+<p><b>Original Code Listing:</b></p>
+<pre>
+#flavor=
+</pre>
+<p><b>Modified Code Listing:</b></p>
+<pre>
+flavor = keystone
+</pre>
+<i>Note : The Python Paste package contains Python modules that help in 
+implementing WSGI middleware. Keystone is configured to be part of the paste pipeline
+for Glance APIs
+</i>
+</li>
+</ol>
 
 <li>
 <p>Update the <code>/etc/glance/glance-registry.conf</code> with:</p>
@@ -425,7 +452,8 @@ paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
 </pre>
 
 </li>
-
+<h3 id="glance-restart-pop-db">Restart Services and Configure Glance Database</h3>
+<ol>
 <li>
 <p>Restart the glance-api and glance-registry services:</p>
 
@@ -436,7 +464,7 @@ paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
 </li>
 
 <li>
-<p>Synchronize the glance database</p>
+<p>Synchronize the glance database using <code>glance-manage</code> command</p>
 
 <pre class="terminal">
 #glance-manage db_sync
@@ -452,12 +480,15 @@ paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
 </pre>
 
 </li>
-
+</ol>
+<h3 id="glance-create-image">Create a Glance Image using Command Line</h3>
+<ol>
 <li>
 <p>To verify the image service Glance, upload the cirros cloud image directly from the internet:</p>
 
 <pre class="terminal">
 #glance image-create --name myFirstImage --is-public true --container-format bare --disk-format qcow2 --location https://launchpad.net/    cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-disk.img
+
 +------------------+--------------------------------------+
 | Property         | Value                                |
 +------------------+--------------------------------------+
