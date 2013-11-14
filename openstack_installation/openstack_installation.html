@@ -497,8 +497,16 @@ paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
 </li>
 </ol>
 <a name=""><h2 id="quantum">Quantum Installation</h2></a>
+Quantum manages software-defined networking for your OpenStack installation. Quantum has the following object abstractions: networks, subnets, and routers. Each has functionality that mimics its physical counterpart: networks contain subnets, and routers route traffic between different subnet and networks. Quantum should have at least one external network. The external network represents the view into a slice of the external network that is accessible outside the OpenStack installation. In addition to external networks, any Neutron set up has one or more internal networks. These software-defined networks connect directly to the VMs. Only the VMs on any given internal network, or those on subnets connected through interfaces to a similar router, can access VMs connected to the same network directly. </p>
 
-<h3 id="open-vswitch">Open vSwitch</h3>
+<p>Follow the Steps listed below</p>
+<ol>
+<li><a href="openstack_installation.html#open-vswitch">Install and Configure Open vSwitch</a></li>
+<li><a href="openstack_installation.html#quantum_components">Install the Quantum components</a></li>
+</ol>
+
+
+<h3 id="open-vswitch">Install and Configure Open vSwitch</h3>
 <ol>
 <li>
 <p>Install the open vSwitch:</p>
@@ -568,11 +576,11 @@ paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
 
 </li>
 </ol>
-<h3 id="quantum-1">Quantum</h3>
+
+<h3 id="quantum_components">Install and Configure Quantum components</h3>
 <ol>
 <li>
-<p>Install the Quantum components:</p>
-
+<p>Quantum components</p>
 <pre class="terminal">
 #apt-get install -y quantum-server quantum-plugin-openvswitch quantum-plugin-openvswitch-agent dnsmasq quantum-dhcp-agent quantum-l3-agent
 </pre>
@@ -580,9 +588,9 @@ paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
 </li>
 
 <li>
-<p>Create a database:</p>
+<p>Create Quantum database:</p>
 
-<pre class="terminal">
+<pre >
     mysql -u root -p
     CREATE DATABASE quantum;
     GRANT ALL ON quantum.* TO 'quantum-user'@'%' IDENTIFIED BY 'quantum-pass';
@@ -592,7 +600,7 @@ paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
 </li>
 
 <li>
-<p>Verify all Quantum components are running:</p>
+<p>Verify all Quantum components are running</p>
 
 <pre class="terminal">
 #cd /etc/init.d/; for i in $( ls quantum-* ); do sudo service $i status; done
@@ -600,7 +608,9 @@ paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
 
 </li>
 
+
 <li>
+<p>Configure api-paste.ini</p>
 <p>Edit <code>/etc/quantum/api-paste.ini</code></p>
 
 <pre class="terminal">
@@ -617,16 +627,17 @@ paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
 </li>
 
 <li>
+
+<p>Configure Quantum Plugin</p>
 <p>Edit the OVS plugin configuration file <code>/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini with</code>:</p>
 
-Under the database section
-
+<p>Under the database section</p>
 <pre class="terminal">
     [DATABASE]
     sql_connection = mysql://quantum-user:quantum-pass@192.168.100.51/quantum
 </pre>
 
-Under the OVS section
+<p>Under the OVS section<p>
 
 <pre class="terminal">
     [OVS]
@@ -664,7 +675,6 @@ Under the OVS section
 </pre>
 
 </li>
-
 <li>
 <p>Edit your <code>/etc/quantum/quantum.conf</code>:</p>
 
@@ -691,6 +701,8 @@ Under the OVS section
 
 </li>
 </ol>
+
+
 <a name=""><h2 id="nova">Nova</h2></a>
 
 <h3 id="kvm">KVM</h3>
