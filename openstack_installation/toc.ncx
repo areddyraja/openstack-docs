@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE ncx PUBLIC "-//NISO//DTD ncx 2005-1//EN"
-"http://www.daisy.org/z3986/2005/ncx-2005-1.dtd">
- 
-<ncx version="2005-1" xml:lang="en" xmlns="http://www.daisy.org/z3986/2005/ncx/">
+  <!DOCTYPE ncx PUBLIC "-//NISO//DTD ncx 2005-1//EN" "http://www.daisy.org/z3986/2005/ncx-2005-1.dtd">
+  
+  <ncx version="2005-1" xml:lang="en" xmlns="http://www.daisy.org/z3986/2005/ncx/">
  
   <head>
 <!-- The following four metadata items are required for all NCX documents,
 including those conforming to the relaxed constraints of OPS 2.0 -->
  
-    <meta name="dtb:uid" content="123456789X"/> <!-- same as in .opf -->
-    <meta name="dtb:depth" content="1"/> <!-- 1 or higher -->
+    <meta name="dtb:uid" content="openStack-installation-grizzly-single-node-12345"/> <!-- same as in .opf -->
+    <meta name="dtb:depth" content="2"/> <!-- 1 or higher -->
     <meta name="dtb:totalPageCount" content="0"/> <!-- must be 0 -->
     <meta name="dtb:maxPageNumber" content="0"/> <!-- must be 0 -->
   </head>
@@ -22,11 +21,10 @@ including those conforming to the relaxed constraints of OPS 2.0 -->
     <text>Rajdeep Dua, A ReddyRaja</text>
   </docAuthor>
 
-
- <!--<navMap>
+ <navMap>
     <navPoint id="navpoint-1" playOrder="1">
       <navLabel><text>Cover Page</text></navLabel>
-      <content src="cover.html"/>
+      <content src="cover_page.html"/>
     </navPoint>
  
     <navPoint id="navpoint-2" playOrder="2">
@@ -41,12 +39,63 @@ including those conforming to the relaxed constraints of OPS 2.0 -->
  
     <navPoint id="navpoint-4" playOrder="4">
       <navLabel><text>Requirements</text></navLabel>
-      <content src="openstack_installation.html#introduction"/>
+      <content src="openstack_installation.html#requirements"/>
     </navPoint>
  
     <navPoint id="navpoint-5" playOrder="5">
       <navLabel><text>Ubuntu and Network Configuration</text></navLabel>
       <content src="openstack_installation.html#ubuntu-config"/>
+
+      <navPoint id="navpoint-6" playOrder="6">
+        <navLabel><text>Configure Ubuntu</text></navLabel>
+        <content src="openstack_installation.html#conf-ubuntu"/>
+      </navPoint>
     </navPoint>
-  </navMap>-->
+
+    <navPoint id="navpoint-7" playOrder="7">
+      <navLabel><text>Keystone Installation</text></navLabel>
+      <content src="openstack_installation.html#keystone"/>
+    </navPoint>
+
+    <navPoint id="navpoint-8" playOrder="8">
+      <navLabel><text>Glance Installation</text></navLabel>
+      <content src="openstack_installation.html#glance"/>
+    </navPoint>
+
+    <navPoint id="navpoint-9" playOrder="9">
+      <navLabel><text>Quantum Installation</text></navLabel>
+      <content src="openstack_installation.html#quantum"/>
+    </navPoint>
+
+    <navPoint id="navpoint-10" playOrder="10">
+      <navLabel><text>Nova Installation</text></navLabel>
+      <content src="openstack_installation.html#nova"/>
+    </navPoint>
+
+    <navPoint id="navpoint-11" playOrder="11">
+      <navLabel><text>Cinder Installation</text></navLabel>
+      <content src="openstack_installation.html#cinder"/>
+    </navPoint>
+
+    <navPoint id="navpoint-12" playOrder="12">
+      <navLabel><text>Horizon Installation</text></navLabel>
+      <content src="openstack_installation.html#horizon"/>
+    </navPoint>
+
+    <navPoint id="navpoint-13" playOrder="13">
+      <navLabel><text>Create a VM</text></navLabel>
+      <content src="openstack_installation.html#create-vm"/>
+    </navPoint>
+
+    <navPoint id="navpoint-14" playOrder="14">
+      <navLabel><text>Create a Cinder Volume</text></navLabel>
+      <content src="openstack_installation.html#cinder-volume"/>
+    </navPoint>
+
+    <navPoint id="navpoint-15" playOrder="15">
+      <navLabel><text>About the Authors</text></navLabel>
+      <content src="openstack_installation.html#authors"/>
+    </navPoint>
+
+  </navMap>
 </ncx>

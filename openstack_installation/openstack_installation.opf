@@ -5,34 +5,38 @@
     <dc:title>OpenStack Installation Grizzly Kindle Book</dc:title>
     <dc:language>en</dc:language>
     <dc:identifier id="BookId" opf:scheme="ISBN"></dc:identifier>
+    <dc:identifier id="BookId" opf:scheme="uuid">openStack-installation-grizzly-single-node-12345</dc:identifier>
     <dc:creator opf:file-as="Rajdeep, ReddyRaja" opf:role="aut">Rajdeep Dua, A ReddyRaja</dc:creator>
     <dc:publisher>Amazon.com</dc:publisher>
     <dc:subject>Reference</dc:subject>
     <dc:date>2013-11-01</dc:date>
     <dc:description>This book covers details about installing Single Node OpenStack Grizzly release </dc:description>
-    <meta name="cover" content="my-cover-image" />
+    <meta name="cover" content="bookCover" />
   </metadata>
  
   <manifest>
-    <item id="tc" href="toc.html" media-type="application/xhtml+xml"/>
+    <item id="bookCover" href="mycover.jpg" media-type="image/jpg"></item>
+    <item id="coverPage" href="cover_page.html" media-type="application/xhtml+xml"></item>
+    <item id="tableOfContent" href="toc.html" media-type="application/xhtml+xml"/>
     <item id="book" href="openstack_installation.html" media-type="application/xhtml+xml"/>
     <item id="stylesheet" href="stylesheets/bootstrap_1.css" media-type="text/css"/>
-    <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>  
-    <item id="my-cover-image" href="mycover.jpg" media-type="image/jpeg" />
+    <item id="guideNcx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>  
   </manifest>
  
   <!-- Each itemref references the id of a document designated in the manifest. The order of the itemref elements organizes the associated content files into the linear reading order of the publication.  -->
-  <spine toc="ncx">
-    <itemref idref="tc" />
-    <itemref idref="book" />
+  <spine toc="guideNcx">
+    <itemref idref="coverPage"/>
+    <itemref idref="tableOfContent"/>
+    <itemref idref="book"/>
   </spine>
  
   <!-- The Kindle reading system supports two special guide items which are both mandatory.
   type="toc" [mandatory]: a link to the HTML table of contents
   type="text" [mandatory]: a link to where the content of the book starts (typically after the front matter) -->
   <guide>
-    <reference type="toc" title="Table of Contents" href="toc.html"/>
-    <reference type="text" title="Introduction" href="openstack_installation.html#introduction"></reference>
+    <reference type="cover" title="Cover" href="cover_page.html"></reference>
+    <reference type="toc" title="Table of Contents" href="toc.html"></reference>
+    <reference type="text" title="Beginning" href="openstack_installation.html#introduction"></reference>
   </guide>
  
 </package>
