@@ -317,7 +317,7 @@ REST API that allows querying of virtual machine image metadata as well as retri
  
 <p>Virtual machine images made available through the Image service can be stored in a variety 
 of locations from simple filesystems to object-storage systems like the OpenStack Object Storage service.</p>
-<p>Steps to be following for Glance Installation</p>
+<p>Steps to be followed for Glance Installation</p>
 <ol>
 <li><a href="openstack_installation.html#glance-packages">Install Glance Packages</a></li>
 <li><a href="openstack_installation.html#glance-db">Configure Glance Database</a></li>
@@ -736,7 +736,7 @@ Quantum manages software-defined networking for your OpenStack installation. Qua
 
 <a name=""><h2 id="nova">Nova Installation</h2></a>
 
-<p>OpenStack Compute (Nova) is a cloud computing fabric controller (the main part of an IaaS system). Nova's architecture is designed to scale horizontally on standard hardware with no proprietary hardware or software requirements and provide the ability to integrate with legacy systems and third party technologies. It is designed to manage and automate pools of computer resources and can work with widely available virtualization technologies, as well as bare metal and high-performance computing (HPC) configurations.
+<p>OpenStack Compute (Nova) is a cloud computing fabric controller (the main part of an IaaS system). Nova's architecture is designed to scale horizontally on standard hardware with no proprietary hardware or software requirements and provide the ability to integrate with legacy systems and third party technologies. It is designed to manage and automate pools of computer resources and can work with widely available virtualization technologies, as well as bare metal and high-performance computing (HPC) configurations.</p>
 
 <h3 id="kvm">KVM Installation</h3>
 
@@ -745,10 +745,10 @@ Quantum manages software-defined networking for your OpenStack installation. Qua
 <p>For production environments the most tested hypervisors are KVM and Xen-based hypervisors. KVM runs through libvirt, Xen runs best through XenAPI calls. KVM is selected by default and requires the least additional configuration.</p>
 
 
-<p>Steps to be following for KVM Installation</p>
+<p>Steps to be followed for KVM Installation</p>
 <ol>
 <li><a href="openstack_installation.html#pre-requisites">Pre-requisites for KVM Installation</a></li>
-<li><a href="openstack_installation.html#Insatll-and-configure-KVM">Install and Configure KVM</a></li>
+<li><a href="openstack_installation.html#install-and-configure-kvm">Install and Configure KVM</a></li>
 </ol>
 
 <h4 id="pre-requisites">Pre-requisites for KVM Installation</h4>
@@ -764,7 +764,7 @@ Quantum manages software-defined networking for your OpenStack installation. Qua
 #kvm-ok
 </pre>
 
-If the VT is enabled, you should see something like:
+If VT is enabled, you will see output similar to the listing below
 
 <pre class="terminal">
 INFO: /dev/kvm exists
@@ -774,7 +774,7 @@ KVM acceleration can be used
 </li>
 </ol>
 
-<h4 id="Insatll-and-configure-KVM">Install and Configure KVM</h4>
+<h4 id="install-and-configure-kvm">Install and Configure KVM</h4>
 <ol>
 <li>
 
@@ -845,9 +845,7 @@ KVM acceleration can be used
     auth_tcp = "none"
 </pre>
 
-
-
-<p>Edit libvirtd_opts variable in <code>/etc/init/libvirt-bin.conf</code> file:</p>
+<p>Edit <code>libvirtd_opts</code> variable in <code>/etc/init/libvirt-bin.conf</code> file:</p>
 
 <p><b>Original Code Listing:</b></p>
 <pre class="terminal">
@@ -875,7 +873,7 @@ KVM acceleration can be used
 </li>
 
 <li>
-<p>Restart the libvirt service and dbus to load the new values</p>
+<p>Restart the <code>libvirt</code> service and <code>dbus</code> to load the new values</p>
 
 <pre class="terminal">
 #service dbus restart &amp;&amp; service libvirt-bin restart
@@ -887,7 +885,7 @@ KVM acceleration can be used
 
 <h3 id="Pre-requsites">Nova Installation</h3>
 
-<p>Steps to be following for Nova Installation</p>
+<p>Steps to be followed for Nova Installation</p>
 <ol>
 <li><a href="openstack_installation.html#nova-packages">Install Nova Packages</a></li>
 <li><a href="openstack_installation.html#nova-db">Configure Nova Database</a></li>
@@ -913,10 +911,10 @@ on the <code>mysql</code> command prompt. After this <b>GRANT ALL</b> permission
 nova tables to <b>nova-user</b></p>
 
 <pre class="terminal">
-    mysql -u root -p
-    CREATE DATABASE nova;
-    GRANT ALL ON nova.* TO 'nova-user'@'%' IDENTIFIED BY 'nova-pass';
-    quit;
+mysql -u root -p
+CREATE DATABASE nova;
+GRANT ALL ON nova.* TO 'nova-user'@'%' IDENTIFIED BY 'nova-pass';
+quit;
 </pre>
 
 <h4 id="configure-nova-files">Update Nova Configuration Files</h4>
@@ -925,28 +923,29 @@ nova tables to <b>nova-user</b></p>
 <p>Update <code>[filter:authtoken]</code> section in the <code>/etc/nova/api-paste.ini</code> file to this:</p>
 
 <pre class="terminal">
-    [filter:authtoken]
-    paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
-    auth_host = 192.168.100.51
-    auth_port = 35357
-    auth_protocol = http
-    admin_tenant_name = service
-    admin_user = nova
-    admin_password = service_pass
-    signing_dirname = /tmp/keystone-signing-nova
-    # Workaround for https://bugs.launchpad.net/nova/+bug/1154809
-    auth_version = v2.0
+[filter:authtoken]
+paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
+auth_host = 192.168.100.51
+auth_port = 35357
+auth_protocol = http
+admin_tenant_name = service
+admin_user = nova
+admin_password = service_pass
+signing_dirname = /tmp/keystone-signing-nova
+# Workaround for https://bugs.launchpad.net/nova/+bug/1154809
+auth_version = v2.0
 </pre>
 
 </li>
 
 <li>
-<p>The Compute service supports a large number of configuration options. These options are specified in a configuration file whose default location is /etc/nova/nova.conf.</p>
-
-<p>Almost all of the configuration options are in the DEFAULT section.</p>
+<p>The Compute service supports a large number of configuration options. These options are specified
+in a configuration file whose default location is /etc/nova/nova.conf.</p>
 
 <p>Update <code>/etc/nova/nova.conf</code> like this:</p>
-
+<ul>
+<li>
+<p>Almost all of the configuration options are in the DEFAULT section.</p>
 <pre class="terminal">
 [DEFAULT]
 logdir=/var/log/nova (The base directory used for relative --log-file paths)
@@ -957,43 +956,55 @@ api_paste_config=/etc/nova/api-paste.ini (File name for the paste.deploy config 
 compute_scheduler_driver=nova.scheduler.simple.SimpleScheduler (Default driver to use for the scheduler)
 rabbit_host=192.168.100.51 (The RabbitMQ broker address where a single node is used)
 nova_url=http://192.168.100.51:8774/v1.1/
-sql_connection=mysql://nova-user:nova-pass@192.168.100.51/nova (The SQLAlchemy connection string used to connect to the database)
+sql_connection=mysql://nova-user:nova-pass@192.168.100.51/nova (The SQLAlchemy connection string
+used to connect to the database)
 root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
 </pre>
+</li>
 
-<p>Configuring Authentication and Authorization</p>
-<p>There are different methods of authentication for the OpenStack Compute project, including no authentication. The preferred system is the OpenStack Identity Service, code-named Keystone.</p>
+<li>
+<p>Configure Authentication and Authorization</p>
+<p>There are different methods of authentication for the OpenStack Compute project, including no
+authentication. The preferred system is the OpenStack Identity Service, code-named Keystone.</p>
 <pre class="terminal">
 # Auth 
 use_deprecated_auth=false
 auth_strategy=keystone (The strategy to use for auth: noauth or keystone)
 </pre>
+</li>
 
-<p>Description of configuration options for glance</p>
+<li>
+<p>Glance interaction with Nova</p>
 <pre class="terminal">
 # Imaging service 
-glance_api_servers=192.168.100.51:9292 (A list of the glance api servers available to nova. Prefix with https:// for ssl-based glance api servers. ([hostname|ip]:port))
-image_service=nova.image.glance.GlanceImageService
+glance_api_servers=192.168.100.51:9292 (A list of the glance api servers available to nova. Prefix with
+https:// for ssl-based glance api servers. ([hostname|ip]:port)) image_service=nova.image.glance.GlanceImageService
 </pre>
+</li>
 
-<p>The VNC Proxy is an OpenStack component that allows users of the Compute service to access their instances through VNC clients.</p>
-<p>To enable vncproxy in your cloud, in addition to running one or both of the proxies and nova-consoleauth, you need to configure the following options in nova.conf on your compute hosts. </p>
+<li>
+<p>The VNC Proxy is an OpenStack component that allows users of the Compute service to access their
+ instances through VNC clients.</p>
+<p>To enable <code>vncproxy</code> in your cloud, in addition to running one or both of the proxies and nova-consoleauth, you need to configure the following options in <code>nova.conf</code> on your compute hosts. </p>
 <pre class="terminal">
 # Vnc configuration
 
 novnc_enabled=true (Defaults to enabled. If this option is disabled your instances will launch without VNC support)
-novncproxy_base_url=http://10.42.0.51:6080/vnc_auto.html (location of vnc console proxy, in the form "http://127.0.0.1:6080/vnc_auto.html")
+novncproxy_base_url=http://10.42.0.51:6080/vnc_auto.html (location of vnc console proxy, Modify IP address according to your external IP address)
 novncproxy_port=6080 (Port that the novncproxy should bind to)
 vncserver_proxyclient_address=192.168.100.51 (This is the address of the compute host that nova will instruct proxies to use when connecting to instance vncservers)
 vncserver_listen=0.0.0.0 (This is the address that vncservers will bind, and should be overridden in production deployments as a private address. Applies to libvirt only.
                               For multi-host libvirt deployments this should be set to a host management IP on the same as the proxies)
 </pre>
+</li>
 
-<p>Running Nova with Quantum</p>
-<p>Unlike traditional Nova deployments, when Quantum is in use, Nova should not run a nova-network. Instead, Nova delegates almost all of the network-related decisions to Quantum.</p>
-<p>This means many of the network-related CLI command and configuration options you are familiar with from using Nova do not work with Quantum.</p>
+<li>
+<p>Configure Nova with Quantum</p>
+<p>Unlike traditional Nova deployments, when Quantum is in use, Nova should not run a nova-network.
+Instead, Nova delegates almost all of the network-related decisions to Quantum. This means many of
+the network-related CLI command and configuration options you are familiar with from using Nova do not work with Quantum.</p>
 <pre class="terminal">
-# Network settings (Description of configuration options for network)
+# Network settings
     
 network_api_class=nova.network.quantumv2.api.API (The full class name of the network API class to use)
 quantum_url=http://192.168.100.51:9696  (URL for connecting to quantum)
@@ -1010,11 +1021,15 @@ security_group_api=quantum (The full class name of the security API class)
 #If you want Nova Security groups only, comment the two lines above and uncomment line -1-.
 #-1-firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
 </pre>
+</li>
 
-<p>The Compute service uses a special metadata service to enable virtual machine instances to retrieve instance-specific data.</p>
-<p>Instances access the metadata service at http://169.254.169.254. The metadata service supports two sets of APIs: an OpenStack metadata API and an EC2-compatible API. Each of the APIs is versioned by date.</p>
+<li>
+<p>Description of configuration options for metadata</p>
+<p>The Compute service uses a special metadata service to enable virtual machine instances to retrieve instance-specific data.
+Instances access the metadata service at http://169.254.169.254. The metadata service supports 
+two sets of APIs: an OpenStack metadata API and an EC2-compatible API. Each of the APIs is versioned by date.</p>
 <pre class="terminal">
-#Metadata (Description of configuration options for metadata)
+#Metadata 
 
 service_quantum_metadata_proxy = True (All compute hosts share the same dhcp address.)
 quantum_metadata_proxy_shared_secret = helloOpenStack 
@@ -1022,32 +1037,38 @@ metadata_host = 192.168.100.51 (the ip for the metadata api server)
 metadata_listen = 127.0.0.1 (IP address for metadata api to listen)
 metadata_listen_port = 8775 (port for metadata api to listen)
 </pre>
+</li>
 
-<p>Connection to a hypervisor through libvirt</p>
+<li>
+<p>Connect to a hypervisor through <code>libvirt</code></p>
 <pre class="terminal">
 # Compute 
 
-compute_driver=libvirt.LibvirtDriver (Driver to use for controlling virtualization. Options include: libvirt.LibvirtDriver, xenapi.XenAPIDriver, fake.FakeDriver, baremetal.BareMetalDriver, vmwareapi.VMwareESXDriver, vmwareapi.VMwareVCDriver)
+compute_driver=libvirt.LibvirtDriver (Driver to use for controlling virtualization. 
+Options include: libvirt.LibvirtDriver, xenapi.XenAPIDriver, fake.FakeDriver, baremetal.BareMetalDriver, vmwareapi.VMwareESXDriver, vmwareapi.VMwareVCDriver)
 </pre>
+</li>
 
-<p>The volume_api_class setting is the default setting for grizzly.</p>
+<li>
+<p>The <code>volume_api_class</code> setting is the default setting for grizzly.</p>
 <pre class="terminal">
 # Cinder 
 
 volume_api_class=nova.volume.cinder.API (The full class name of the volume API class to use)
 osapi_volume_listen_port=5900 (port for os volume api to listen )
 </pre>
-
+</li>
+</ul>
 </li>
 
 <li>
 <p>Update <code>/etc/nova/nova-compute.conf</code></p>
 
 <p>KVM is configured as the default hypervisor for Compute.</p>
-
-<pre class="terminal">
 <p>Description of configuration options for hypervisor
-The nova.conf used by the nova-compute service should contain the following flags to ensure correct vif-plugging.  If your integration bridge name is something other than “br-int”, change the first flag listed below:</p>
+The nova.conf used by the nova-compute service should contain the following flags to ensure correct vif-plugging. 
+If your integration bridge name is something other than “br-int”, change the first flag listed below:</p>
+<pre class="terminal">
 [DEFAULT]
 libvirt_type=kvm (Libvirt domain type (valid options are: kvm, lxc, qemu, uml, xen))
 libvirt_ovs_bridge=br-int (Internal Bridge)
@@ -1091,6 +1112,22 @@ libvirt_use_virtio_for_bridges=True (Update an existing OpenStack instance after
 
 <a name=""><h2 id="cinder">Cinder Installation</h2></a>
 <p>OpenStack Block Storage (Cinder) provides persistent block level storage devices for use with OpenStack compute instances. The block storage system manages the creation, attaching and detaching of the block devices to servers.</p>
+<p>The OpenStack Block Storage service works though the interaction of a series of daemon processes named cinder-* that reside persistently on the host machine or machines. The binaries can all be run from a single node, or spread across multiple nodes. They can also be run on the same node as other OpenStack services.</p>
+<p>OpenStack Block Storage provides persistent High Performance Block Storage resources that can be consumed by OpenStack Compute instances. This includes secondary attached storage similar to Amazon's Elastic Block Storage (EBS). In addition images can be written to a Block Storage device and specified for OpenStack Compute to use a bootable persistent instance.
+OpenStack Block Storage requires some form of back-end storage that the service is built on. The default implementation is to use LVM on a local Volume Group named "cinder-volumes".</p>
+<p>Steps to be followed for Cinder Installation</p>
+<ol>
+<li><a href="openstack_installation.html#cinder-packages">Install Cinder Packages</a></li>
+<li><a href="openstack_installation.html#cinder-db">Create Cinder Database</a></li>
+<li><a href="openstack_installation.html#configure-cinder-files">Update Cinder Configuration Files</a></li>
+<li><a href="openstack_installation.html#cinder-dbsync">Configure Cinder Database</a></li>
+<li><a href="openstack_installation.html#cinder-volume">Create Cinder Volume</a></li>
+<li><a href="openstack_installation.html#create-lvm">Create LVM Volume Group</a></li>
+<li><a href="openstack_installation.html#restart-cinder">Restart Cinder Services</a></li>
+</ol>
+
+<h3 id="cinder-packages">Install Cinder Packages</h3>
+
 <ol>
 <li>
 <p>Install the required packages:</p>
@@ -1118,10 +1155,10 @@ libvirt_use_virtio_for_bridges=True (Update an existing OpenStack instance after
 </pre>
 
 </li>
+</ol>
 
-<li>
+<h3 id="cinder-db">Create Cinder Database</h3>
 <p>Prepare a Mysql database for Cinder:</p>
-
 <pre class="terminal">
     mysql -u root -p
     CREATE DATABASE cinder;
@@ -1129,8 +1166,8 @@ libvirt_use_virtio_for_bridges=True (Update an existing OpenStack instance after
     quit;
 </pre>
 
-</li>
-
+<h3 id="configure-cinder-files">Update Cinder Configuration Files</h3>
+<ol>
 <li>
 <p>Configure <code>/etc/cinder/api-paste.ini</code> like the following:</p>
 
@@ -1167,66 +1204,49 @@ libvirt_use_virtio_for_bridges=True (Update an existing OpenStack instance after
 </pre>
 
 </li>
+</ol>
 
-<li>
+<h3 id="cinder-dbsync">Configure Cinder Database</h3>
+
 <p>Then, synchronize your database:</p>
-
 <pre class="terminal">
 #cinder-manage db sync
 </pre>
 
-</li>
-
-
-
-
-<li>
+<h3 id="cinder-volume">Create Cinder Volume</h3>
+<ol><li>
 <p>Creating Cinder Volumes</p>
 Cinder uses volume groups for storage. There are two ways to create the volume group.
+<ul>
+<li>Create a LVM Volume Group by using a partition</li>
+<li>Create a LVM Volume Group by using a container file as loop device</li>
+</ul>
 
-    Creating a LVM Volume Group by using a partition
-    At the time of installation of Ubuntu, leave a raw partition. Do not format or install anything in that partition.
-If there is a partition available follow the steps given below.
+<p><b>Create a Volume Group by using a partition</b></p>
+<p>At the time of installation of Ubuntu, leave a raw partition. Do not format or install anything in that partition.</p>
 
-
-<p>Creating a Volume Group by using a partition</p>
-
-<pre>
-#fdisk /dev/sda
-n
-l
-enter
-+20000M
-t
-8e
-w
-</pre>
-    <p>Update the Partition</p>
-    
-    <pre>
-#partprobe
-    </pre>
-    
-    <p>Create Physical Volume</p>
-    
-    <pre>
+</li>
+<p>Follow below steps to use the empty partiton for creating cinder volme group. Assume <code>/dev/sda13</code> is your empty partition.</p>
+<li><p>Create Physical Volume</p>
+<pre class="terminal">
 #pvcreate /dev/sda13
-    </pre>
-    
-    <p>Create Volume Group</p>
-    
-    <pre>#vgcreate cinder-volumes /dev/sda13</pre>
+</pre>
+</li>
 
-    <p>The Volume group can also be created using the user interface <code>system-config-lvm</code> as an alternative to command line<p>
-    <p>Assign the empty partition to "cinder-volumes"</p>
-
+<li>
+<p>Create Volume Group</p>
+<pre class="terminal">#vgcreate cinder-volumes /dev/sda13</pre>
+<p>The Volume group can also be created using the user interface <code>system-config-lvm</code> as an alternative to command line<p>
+<p>Allocate the empty partition to "cinder-volumes"</p>
 
 <pre class="terminal">
 #sudo apt-get install system-config-lvm
 #system-config-lvm
-#Launches the interface
+#Select the partition and name it as "cinder-volumes"
 </pre>
 </li>
+
+<h3 id="create-lvm">Create LVM Volume Group</h3>
 
 <li>
      <p>
