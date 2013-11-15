@@ -533,14 +533,18 @@ Quantum manages software-defined networking for your OpenStack installation. Qua
 <p>Follow the Steps listed below</p>
 <ol>
 <li><a href="openstack_installation.html#open-vswitch">Install and Configure Open vSwitch</a></li>
-<li><a href="openstack_installation.html#quantum_components">Install the Quantum components</a></li>
+<li><a href="openstack_installation.html#quantum_components">Install Quantum components</a></li>
+<li><a href="openstack_installation.html#create-db">Create Quantum Database</a></li>
+<li><a href="openstack_installation.html#verify-services">Verify Quantum Services</a></li>
+<li><a href="openstack_installation.html#update-config-files">Update Quantum Configuration Files</a></li>
+<li><a href="openstack_installation.html#restart-services">Restart Quantum Services</a></li>
 </ol>
 
 
 <h3 id="open-vswitch">Install and Configure Open vSwitch</h3>
 <ol>
 <li>
-<p>Install the open vSwitch:</p>
+<p>Install Open vSwitch Packages:</p>
 
 <pre class="terminal">
 #apt-get install -y openvswitch-switch openvswitch-datapath-dkms
@@ -550,15 +554,13 @@ Quantum manages software-defined networking for your OpenStack installation. Qua
 
 <li>
 <p>Create the bridges:</p>
-
+<p><code>br-int</code> will be used for VM integration</p>
 <pre class="terminal">
 #br-int will be used for VM integration
 #ovs-vsctl add-br br-int
 </pre>
 
-</li>
 
-<li>
 <p><code>br-ex</code> is used to access the external network.</p>
 
 <pre class="terminal">
@@ -568,22 +570,22 @@ Quantum manages software-defined networking for your OpenStack installation. Qua
 </li>
 
 <li>
-<p>This will guide you to setting up the br-ex interface. Edit eth1 in <code>/etc/network/interfaces</code>:</p>
+<p>This will guide you to setting up the <code>br-ex</code> interface. Edit eth1 in <code>/etc/network/interfaces</code>:</p>
 
 <pre class="terminal">
 # VM internet Access
-    auto eth1
-    iface eth1 inet manual
-    up ifconfig $IFACE 0.0.0.0 up
-    up ip link set $IFACE promisc on
-    down ip link set $IFACE promisc off
-    down ifconfig $IFACE down
+auto eth1
+iface eth1 inet manual
+up ifconfig $IFACE 0.0.0.0 up
+up ip link set $IFACE promisc on
+down ip link set $IFACE promisc off
+down ifconfig $IFACE down
 </pre>
 
 </li>
 
 <li>
-<p>Add the <code>eth1</code> interface to <code>br-ex</code>:</p>
+<p>Add <code>eth1</code> interface to <code>br-ex</code></p>
 
 <p>Internet connectivity will be lost after this step but this won't affect OpenStack's work</p>
 
@@ -594,145 +596,118 @@ Quantum manages software-defined networking for your OpenStack installation. Qua
 </li>
 
 <li>
-<p>Optional, If you want to get internet connection back, you can assign the <code>eth1's</code> IP address to the <code>br-ex</code> in the <code>/etc/network/interfaces</code> file:</p>
-
+<p>Optional, If you want to get internet connection back, you can assign the <code>eth1's</code> IP address to the <code>br-ex</code> in the <code>/etc/network/interfaces</code> file</p>
 <pre class="terminal">
-    auto br-ex
-    iface br-ex inet static
-    address 10.42.0.51
-    netmask 255.255.255.0
-    gateway 10.42.0.1
-    dns-nameservers 8.8.8.8
+auto br-ex
+iface br-ex inet static
+address 10.42.0.51
+netmask 255.255.255.0
+gateway 10.42.0.1
+dns-nameservers 8.8.8.8
 </pre>
-
 </li>
 </ol>
 
-<h3 id="quantum_components">Install and Configure Quantum components</h3>
-<ol>
-<li>
-<p>Quantum components</p>
+<h3 id="quantum_components">Install Quantum components</h3>
+<p>Install Quantum Components</p>
 <pre class="terminal">
 #apt-get install -y quantum-server quantum-plugin-openvswitch quantum-plugin-openvswitch-agent dnsmasq quantum-dhcp-agent quantum-l3-agent
 </pre>
 
-</li>
-
-<li>
-<p>Create Quantum database:</p>
-
-<pre >
-    mysql -u root -p
-    CREATE DATABASE quantum;
-    GRANT ALL ON quantum.* TO 'quantum-user'@'%' IDENTIFIED BY 'quantum-pass';
-    quit;
+<h3 id="create-db">Create Quantum Database</h3>
+<pre class="terminal">
+mysql -u root -p
+CREATE DATABASE quantum;
+GRANT ALL ON quantum.* TO 'quantum-user'@'%' IDENTIFIED BY 'quantum-pass';
+quit;
 </pre>
 
-</li>
-
-<li>
-<p>Verify all Quantum components are running</p>
-
+<h3 id="verify-services">Verify Quantum Services</h3>
 <pre class="terminal">
 #cd /etc/init.d/; for i in $( ls quantum-* ); do sudo service $i status; done
 </pre>
 
-</li>
-
-
-<li>
-<p>Configure api-paste.ini</p>
-<p>Edit <code>/etc/quantum/api-paste.ini</code></p>
-
+<h3 id="update-config-files">Update Quantum Configuration Files</h3>
+<ol><li>
+<p>Configure <code>/etc/quantum/api-paste.ini</code></p>
 <pre class="terminal">
-    [filter:authtoken]
-    paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
-    auth_host = 192.168.100.51
-    auth_port = 35357
-    auth_protocol = http
-    admin_tenant_name = service
-    admin_user = quantum
-    admin_password = service_pass
+[filter:authtoken]
+paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
+auth_host = 192.168.100.51
+auth_port = 35357
+auth_protocol = http
+admin_tenant_name = service
+admin_user = quantum
+admin_password = service_pass
 </pre>
-
 </li>
 
 <li>
-
 <p>Configure Quantum Plugin</p>
 <p>Edit the OVS plugin configuration file <code>/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini with</code>:</p>
-
 <p>Under the database section</p>
 <pre class="terminal">
-    [DATABASE]
-    sql_connection = mysql://quantum-user:quantum-pass@192.168.100.51/quantum
+[DATABASE]
+sql_connection = mysql://quantum-user:quantum-pass@192.168.100.51/quantum
 </pre>
 
 <p>Under the OVS section<p>
-
 <pre class="terminal">
-    [OVS]
-    tenant_network_type = gre
-    tunnel_id_ranges = 1:1000
-    integration_bridge = br-int
-    tunnel_bridge = br-tun
-    local_ip = 192.168.100.51
-    enable_tunneling = True
+[OVS]
+tenant_network_type = gre
+tunnel_id_ranges = 1:1000
+integration_bridge = br-int
+tunnel_bridge = br-tun
+local_ip = 192.168.100.51
+enable_tunneling = True
 
-    #Firewall driver for realizing quantum security group function
-    [SECURITYGROUP]
-    firewall_driver = quantum.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
+#Firewall driver for realizing quantum security group function
+[SECURITYGROUP]
+firewall_driver = quantum.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
 </pre>
-
 </li>
 
 <li>
-<p>Update  <code>/etc/quantum/metadata_agent.ini</code>:</p>
+<p>Update  <code>/etc/quantum/metadata_agent.ini</code></p>
 
 <pre class="terminal">
 #The Quantum user information for accessing the Quantum API.
-    auth_url = http://192.168.100.51:35357/v2.0
-    auth_region = RegionOne
-    admin_tenant_name = service
-    admin_user = quantum
-    admin_password = service_pass
+auth_url = http://192.168.100.51:35357/v2.0
+auth_region = RegionOne
+admin_tenant_name = service
+admin_user = quantum
+admin_password = service_pass
 
 #IP address used by Nova metadata server
-    nova_metadata_ip = 127.0.0.1
+nova_metadata_ip = 127.0.0.1
 
 #TCP Port used by Nova metadata server
-    nova_metadata_port = 8775
-    metadata_proxy_shared_secret = helloOpenStack
+nova_metadata_port = 8775
+metadata_proxy_shared_secret = helloOpenStack
 </pre>
 
 </li>
 <li>
-<p>Edit your <code>/etc/quantum/quantum.conf</code>:</p>
+<p>Edit your <code>/etc/quantum/quantum.conf</code></p>
 
 <pre class="terminal">
-    [keystone_authtoken]
-    auth_host = 192.168.100.51
-    auth_port = 35357
-    auth_protocol = http
-    admin_tenant_name = service
-    admin_user = quantum
-    admin_password = service_pass
-    signing_dir = /var/lib/quantum/keystone-signing
+[keystone_authtoken]
+auth_host = 192.168.100.51
+auth_port = 35357
+auth_protocol = http
+admin_tenant_name = service
+admin_user = quantum
+admin_password = service_pass
+signing_dir = /var/lib/quantum/keystone-signing
 </pre>
-
 </li>
+</ol>
 
-<li>
-<p>Restart all quantum services:</p>
-
+<h3 id="restart-services">Restart Quantum Services</h3>
 <pre class="terminal">
 #cd /etc/init.d/; for i in $( ls quantum-* ); do sudo service $i restart; done
 #service dnsmasq restart
 </pre>
-
-</li>
-</ol>
-
 
 <a name=""><h2 id="nova">Nova Installation</h2></a>
 
@@ -1159,10 +1134,10 @@ OpenStack Block Storage requires some form of back-end storage that the service 
 <h3 id="cinder-db">Create Cinder Database</h3>
 <p>Prepare a Mysql database for Cinder:</p>
 <pre class="terminal">
-    mysql -u root -p
-    CREATE DATABASE cinder;
-    GRANT ALL ON cinder.* TO 'cinderUser'@'%' IDENTIFIED BY 'cinderPass';
-    quit;
+mysql -u root -p
+CREATE DATABASE cinder;
+GRANT ALL ON cinder.* TO 'cinderUser'@'%' IDENTIFIED BY 'cinderPass';
+quit;
 </pre>
 
 <h3 id="configure-cinder-files">Update Cinder Configuration Files</h3>
@@ -1171,17 +1146,17 @@ OpenStack Block Storage requires some form of back-end storage that the service 
 <p>Configure <code>/etc/cinder/api-paste.ini</code> like the following:</p>
 
 <pre class="terminal">
-    [filter:authtoken]
-    paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
-    service_protocol = http
-    service_host = 10.42.0.51
-    service_port = 5000
-    auth_host = 192.168.100.51
-    auth_port = 35357
-    auth_protocol = http
-    admin_tenant_name = service
-    admin_user = cinder
-    admin_password = service_pass
+[filter:authtoken]
+paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
+service_protocol = http
+service_host = 10.42.0.51
+service_port = 5000
+auth_host = 192.168.100.51
+auth_port = 35357
+auth_protocol = http
+admin_tenant_name = service
+admin_user = cinder
+admin_password = service_pass
 </pre>
 
 </li>
@@ -1190,16 +1165,16 @@ OpenStack Block Storage requires some form of back-end storage that the service 
 <p>Edit the <code>/etc/cinder/cinder.conf</code> to:</p>
 
 <pre class="terminal">
-    [DEFAULT]
-    rootwrap_config=/etc/cinder/rootwrap.conf
-    sql_connection = mysql://cinderUser:cinderPass@192.168.100.51/cinder
-    api_paste_config = /etc/cinder/api-paste.ini
-    iscsi_helper=ietadm
-    volume_name_template = volume-%s
-    volume_group = cinder-volumes
-    verbose = True
-    auth_strategy = keystone
-    #osapi_volume_listen_port=5900
+[DEFAULT]
+rootwrap_config=/etc/cinder/rootwrap.conf
+sql_connection = mysql://cinderUser:cinderPass@192.168.100.51/cinder
+api_paste_config = /etc/cinder/api-paste.ini
+iscsi_helper=ietadm
+volume_name_template = volume-%s
+volume_group = cinder-volumes
+verbose = True
+auth_strategy = keystone
+#osapi_volume_listen_port=5900
 </pre>
 
 </li>
