@@ -60,12 +60,28 @@ including those conforming to the relaxed constraints of OPS 2.0 -->
     <navPoint id="navpoint-8" playOrder="8">
       <navLabel><text>Glance Installation</text></navLabel>
       <content src="openstack_installation.html#glance"/>
-       <navPoint id="navpoint-9" playOrder="9">
-        <navLabel><text>Install Glance Packages</text></navLabel>
-        <content src="openstack_installation.html#glance-packages"/>
-       </navPoint>
+     
     </navPoint>
-
+    <navPoint id="navpoint-9" playOrder="9">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Install Glance Packages</text></navLabel>
+        <content src="openstack_installation.html#glance-packages"/>
+    </navPoint>
+    <navPoint id="navpoint-9" playOrder="9">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Configure Glance Database</text></navLabel>
+        <content src="openstack_installation.html#glance-db"/>
+    </navPoint>
+    <navPoint id="navpoint-9" playOrder="9">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Update Glance Configuration Files</text></navLabel>
+        <content src="openstack_installation.html#glance-config-files"/>
+    </navPoint>
+    <navPoint id="navpoint-9" playOrder="9">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Restart Services and Configure Glance Database</text></navLabel>
+        <content src="openstack_installation.html#glance-restart-pop-db"/>
+    </navPoint>
+    <navPoint id="navpoint-9" playOrder="9">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a Glance Image using Command Line</text></navLabel>
+        <content src="openstack_installation.html#glance-create-image"/>
+    </navPoint>
     <navPoint id="navpoint-10" playOrder="10">
       <navLabel><text>Quantum Installation</text></navLabel>
       <content src="openstack_installation.html#quantum"/>
