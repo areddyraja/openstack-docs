@@ -948,69 +948,94 @@ nova tables to <b>nova-user</b></p>
 <p>Update <code>/etc/nova/nova.conf</code> like this:</p>
 
 <pre class="terminal">
-    [DEFAULT]
-    logdir=/var/log/nova (The base directory used for relative --log-file paths)
-    state_path=/var/lib/nova (Top-level directory for maintaining nova's state)
-    lock_path=/run/lock/nova (Directory to use for lock files. Default to a temp directory)
-    verbose=True (if FALSE, Print more verbose output (set logging level to INFO instead of default WARNING level))
-    api_paste_config=/etc/nova/api-paste.ini (File name for the paste.deploy config for nova-api)
-    compute_scheduler_driver=nova.scheduler.simple.SimpleScheduler (Default driver to use for the scheduler)
-    rabbit_host=192.168.100.51 (The RabbitMQ broker address where a single node is used)
-    nova_url=http://192.168.100.51:8774/v1.1/
-    sql_connection=mysql://nova-user:nova-pass@192.168.100.51/nova (The SQLAlchemy connection string used to connect to the database)
-    root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
+[DEFAULT]
+logdir=/var/log/nova (The base directory used for relative --log-file paths)
+state_path=/var/lib/nova (Top-level directory for maintaining nova's state)
+lock_path=/run/lock/nova (Directory to use for lock files. Default to a temp directory)
+verbose=True (if FALSE, Print more verbose output (set logging level to INFO instead of default WARNING level))
+api_paste_config=/etc/nova/api-paste.ini (File name for the paste.deploy config for nova-api)
+compute_scheduler_driver=nova.scheduler.simple.SimpleScheduler (Default driver to use for the scheduler)
+rabbit_host=192.168.100.51 (The RabbitMQ broker address where a single node is used)
+nova_url=http://192.168.100.51:8774/v1.1/
+sql_connection=mysql://nova-user:nova-pass@192.168.100.51/nova (The SQLAlchemy connection string used to connect to the database)
+root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
+</pre>
 
-    # Auth (Description of configuration options for authentication)
+<p>Configuring Authentication and Authorization</p>
+<p>There are different methods of authentication for the OpenStack Compute project, including no authentication. The preferred system is the OpenStack Identity Service, code-named Keystone.</p>
+<pre class="terminal">
+# Auth 
+use_deprecated_auth=false
+auth_strategy=keystone (The strategy to use for auth: noauth or keystone)
+</pre>
 
-    use_deprecated_auth=false
-    auth_strategy=keystone (The strategy to use for auth: noauth or keystone)
+<p>Description of configuration options for glance</p>
+<pre class="terminal">
+# Imaging service 
+glance_api_servers=192.168.100.51:9292 (A list of the glance api servers available to nova. Prefix with https:// for ssl-based glance api servers. ([hostname|ip]:port))
+image_service=nova.image.glance.GlanceImageService
+</pre>
 
-    # Imaging service (Description of configuration options for glance)
+<p>The VNC Proxy is an OpenStack component that allows users of the Compute service to access their instances through VNC clients.</p>
+<p>To enable vncproxy in your cloud, in addition to running one or both of the proxies and nova-consoleauth, you need to configure the following options in nova.conf on your compute hosts. </p>
+<pre class="terminal">
+# Vnc configuration
 
-    glance_api_servers=192.168.100.51:9292 (A list of the glance api servers available to nova. Prefix with https:// for ssl-based glance api servers. ([hostname|ip]:port))
-    image_service=nova.image.glance.GlanceImageService
+novnc_enabled=true (Defaults to enabled. If this option is disabled your instances will launch without VNC support)
+novncproxy_base_url=http://10.42.0.51:6080/vnc_auto.html (location of vnc console proxy, in the form "http://127.0.0.1:6080/vnc_auto.html")
+novncproxy_port=6080 (Port that the novncproxy should bind to)
+vncserver_proxyclient_address=192.168.100.51 (This is the address of the compute host that nova will instruct proxies to use when connecting to instance vncservers)
+vncserver_listen=0.0.0.0 (This is the address that vncservers will bind, and should be overridden in production deployments as a private address. Applies to libvirt only.
+                              For multi-host libvirt deployments this should be set to a host management IP on the same as the proxies)
+</pre>
 
-    # Vnc configuration
+<p>Running Nova with Quantum</p>
+<p>Unlike traditional Nova deployments, when Quantum is in use, Nova should not run a nova-network. Instead, Nova delegates almost all of the network-related decisions to Quantum.</p>
+<p>This means many of the network-related CLI command and configuration options you are familiar with from using Nova do not work with Quantum.</p>
+<pre class="terminal">
+# Network settings (Description of configuration options for network)
+    
+network_api_class=nova.network.quantumv2.api.API (The full class name of the network API class to use)
+quantum_url=http://192.168.100.51:9696  (URL for connecting to quantum)
+quantum_auth_strategy=keystone (auth strategy for connecting to quantum in admin context)
+quantum_admin_tenant_name=service (tenant name for connecting to quantum in admin context)
+quantum_admin_username=quantum (username for connecting to quantum in admin context)
+quantum_admin_password=service_pass (auth url for connecting to quantum in admin context)
+quantum_admin_auth_url=http://192.168.100.51:35357/v2.0 (auth url for connecting to quantum in admin context)
+libvirt_vif_driver=nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver (The libvirt VIF driver to configure the VIFs)
+linuxnet_interface_driver=nova.network.linux_net.LinuxOVSInterfaceDriver
+#If you want Quantum + Nova Security groups
+firewall_driver=nova.virt.firewall.NoopFirewallDriver (Firewall driver (defaults to hypervisor specific iptables driver))
+security_group_api=quantum (The full class name of the security API class)
+#If you want Nova Security groups only, comment the two lines above and uncomment line -1-.
+#-1-firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
+</pre>
 
-    novnc_enabled=true
-    novncproxy_base_url=http://10.42.0.51:6080/vnc_auto.html (location of vnc console proxy, in the form "http://127.0.0.1:6080/vnc_auto.html")
-    novncproxy_port=6080 (Port that the novncproxy should bind to)
-    vncserver_proxyclient_address=192.168.100.51 (the address to which proxy clients (like nova-xvpvncproxy) should connect)
-    vncserver_listen=0.0.0.0 (IP address on which instance vncservers should listen)
+<p>The Compute service uses a special metadata service to enable virtual machine instances to retrieve instance-specific data.</p>
+<p>Instances access the metadata service at http://169.254.169.254. The metadata service supports two sets of APIs: an OpenStack metadata API and an EC2-compatible API. Each of the APIs is versioned by date.</p>
+<pre class="terminal">
+#Metadata (Description of configuration options for metadata)
 
-    # Network settings (Description of configuration options for network)
+service_quantum_metadata_proxy = True (All compute hosts share the same dhcp address.)
+quantum_metadata_proxy_shared_secret = helloOpenStack 
+metadata_host = 192.168.100.51 (the ip for the metadata api server)
+metadata_listen = 127.0.0.1 (IP address for metadata api to listen)
+metadata_listen_port = 8775 (port for metadata api to listen)
+</pre>
 
-    network_api_class=nova.network.quantumv2.api.API (The full class name of the network API class to use)
-    quantum_url=http://192.168.100.51:9696  (URL for connecting to quantum)
-    quantum_auth_strategy=keystone (auth strategy for connecting to quantum in admin context)
-    quantum_admin_tenant_name=service (tenant name for connecting to quantum in admin context)
-    quantum_admin_username=quantum (username for connecting to quantum in admin context)
-    quantum_admin_password=service_pass (auth url for connecting to quantum in admin context)
-    quantum_admin_auth_url=http://192.168.100.51:35357/v2.0 (auth url for connecting to quantum in admin context)
-    libvirt_vif_driver=nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver (The libvirt VIF driver to configure the VIFs)
-    linuxnet_interface_driver=nova.network.linux_net.LinuxOVSInterfaceDriver
-    #If you want Quantum + Nova Security groups
-    firewall_driver=nova.virt.firewall.NoopFirewallDriver (Firewall driver (defaults to hypervisor specific iptables driver))
-    security_group_api=quantum (The full class name of the security API class)
-    #If you want Nova Security groups only, comment the two lines above and uncomment line -1-.
-    #-1-firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
+<p>Connection to a hypervisor through libvirt</p>
+<pre class="terminal">
+# Compute 
 
-    #Metadata (Description of configuration options for metadata)
+compute_driver=libvirt.LibvirtDriver (Driver to use for controlling virtualization. Options include: libvirt.LibvirtDriver, xenapi.XenAPIDriver, fake.FakeDriver, baremetal.BareMetalDriver, vmwareapi.VMwareESXDriver, vmwareapi.VMwareVCDriver)
+</pre>
 
-    service_quantum_metadata_proxy = True (All compute hosts share the same dhcp address.)
-    quantum_metadata_proxy_shared_secret = helloOpenStack 
-    metadata_host = 192.168.100.51 (the ip for the metadata api server)
-    metadata_listen = 127.0.0.1 (IP address for metadata api to listen)
-    metadata_listen_port = 8775 (port for metadata api to listen)
+<p>The volume_api_class setting is the default setting for grizzly.</p>
+<pre class="terminal">
+# Cinder 
 
-    # Compute #
-
-    compute_driver=libvirt.LibvirtDriver (Driver to use for controlling virtualization. Options include: libvirt.LibvirtDriver, xenapi.XenAPIDriver, fake.FakeDriver, baremetal.BareMetalDriver, vmwareapi.VMwareESXDriver, vmwareapi.VMwareVCDriver)
-
-    # Cinder #
-
-    volume_api_class=nova.volume.cinder.API (The full class name of the volume API class to use)
-    osapi_volume_listen_port=5900 () (list port for osapi volume)
+volume_api_class=nova.volume.cinder.API (The full class name of the volume API class to use)
+osapi_volume_listen_port=5900 (port for os volume api to listen )
 </pre>
 
 </li>
@@ -1018,15 +1043,17 @@ nova tables to <b>nova-user</b></p>
 <li>
 <p>Update <code>/etc/nova/nova-compute.conf</code></p>
 
-<p> Description of configuration options for hypervisor</p>
+<p>KVM is configured as the default hypervisor for Compute.</p>
 
 <pre class="terminal">
-    [DEFAULT]
-    libvirt_type=kvm (Libvirt domain type (valid options are: kvm, lxc, qemu, uml, xen))
-    libvirt_ovs_bridge=br-int (Internal Bridge)
-    libvirt_vif_type=ethernet 
-    libvirt_vif_driver=nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver (The libvirt VIF driver to configure the VIFs)
-    libvirt_use_virtio_for_bridges=True
+<p>Description of configuration options for hypervisor
+The nova.conf used by the nova-compute service should contain the following flags to ensure correct vif-plugging.  If your integration bridge name is something other than “br-int”, change the first flag listed below:</p>
+[DEFAULT]
+libvirt_type=kvm (Libvirt domain type (valid options are: kvm, lxc, qemu, uml, xen))
+libvirt_ovs_bridge=br-int (Internal Bridge)
+libvirt_vif_type=ethernet 
+libvirt_vif_driver=nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver (The libvirt VIF driver to configure the VIFs)
+libvirt_use_virtio_for_bridges=True (Update an existing OpenStack instance after a global flag change)
 </pre>
 
 </li>
