@@ -60,39 +60,43 @@ including those conforming to the relaxed constraints of OPS 2.0 -->
     <navPoint id="navpoint-8" playOrder="8">
       <navLabel><text>Glance Installation</text></navLabel>
       <content src="openstack_installation.html#glance"/>
+       <navPoint id="navpoint-9" playOrder="9">
+        <navLabel><text>Install Glance Packages</text></navLabel>
+        <content src="openstack_installation.html#glance-packages"/>
+       </navPoint>
     </navPoint>
 
-    <navPoint id="navpoint-9" playOrder="9">
+    <navPoint id="navpoint-10" playOrder="10">
       <navLabel><text>Quantum Installation</text></navLabel>
       <content src="openstack_installation.html#quantum"/>
     </navPoint>
 
-    <navPoint id="navpoint-10" playOrder="10">
+    <navPoint id="navpoint-11" playOrder="11">
       <navLabel><text>Nova Installation</text></navLabel>
       <content src="openstack_installation.html#nova"/>
     </navPoint>
 
-    <navPoint id="navpoint-11" playOrder="11">
+    <navPoint id="navpoint-12" playOrder="12">
       <navLabel><text>Cinder Installation</text></navLabel>
       <content src="openstack_installation.html#cinder"/>
     </navPoint>
 
-    <navPoint id="navpoint-12" playOrder="12">
+    <navPoint id="navpoint-13" playOrder="13">
       <navLabel><text>Horizon Installation</text></navLabel>
       <content src="openstack_installation.html#horizon"/>
     </navPoint>
 
-    <navPoint id="navpoint-13" playOrder="13">
+    <navPoint id="navpoint-14" playOrder="14">
       <navLabel><text>Create a VM</text></navLabel>
       <content src="openstack_installation.html#create-vm"/>
     </navPoint>
 
-    <navPoint id="navpoint-14" playOrder="14">
+    <navPoint id="navpoint-15" playOrder="15">
       <navLabel><text>Create a Cinder Volume</text></navLabel>
       <content src="openstack_installation.html#cinder-volume"/>
     </navPoint>
 
-    <navPoint id="navpoint-15" playOrder="15">
+    <navPoint id="navpoint-16" playOrder="16">
       <navLabel><text>About the Authors</text></navLabel>
       <content src="openstack_installation.html#authors"/>
     </navPoint>
