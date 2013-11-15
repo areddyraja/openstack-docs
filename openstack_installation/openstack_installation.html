@@ -1122,7 +1122,6 @@ OpenStack Block Storage requires some form of back-end storage that the service 
 <li><a href="openstack_installation.html#configure-cinder-files">Update Cinder Configuration Files</a></li>
 <li><a href="openstack_installation.html#cinder-dbsync">Configure Cinder Database</a></li>
 <li><a href="openstack_installation.html#cinder-volume">Create Cinder Volume</a></li>
-<li><a href="openstack_installation.html#create-lvm">Create LVM Volume Group</a></li>
 <li><a href="openstack_installation.html#restart-cinder">Restart Cinder Services</a></li>
 </ol>
 
@@ -1214,9 +1213,8 @@ OpenStack Block Storage requires some form of back-end storage that the service 
 </pre>
 
 <h3 id="cinder-volume">Create Cinder Volume</h3>
-<ol><li>
-<p>Creating Cinder Volumes</p>
-Cinder uses volume groups for storage. There are two ways to create the volume group.
+<p>Cinder uses volume groups for storage. There are two ways to create the volume group.</p>
+
 <ul>
 <li>Create a LVM Volume Group by using a partition</li>
 <li>Create a LVM Volume Group by using a container file as loop device</li>
@@ -1224,10 +1222,10 @@ Cinder uses volume groups for storage. There are two ways to create the volume g
 
 <p><b>Create a Volume Group by using a partition</b></p>
 <p>At the time of installation of Ubuntu, leave a raw partition. Do not format or install anything in that partition.</p>
-
-</li>
 <p>Follow below steps to use the empty partiton for creating cinder volme group. Assume <code>/dev/sda13</code> is your empty partition.</p>
-<li><p>Create Physical Volume</p>
+
+<ol><li>
+<p>Create Physical Volume</p>
 <pre class="terminal">
 #pvcreate /dev/sda13
 </pre>
@@ -1237,7 +1235,7 @@ Cinder uses volume groups for storage. There are two ways to create the volume g
 <p>Create Volume Group</p>
 <pre class="terminal">#vgcreate cinder-volumes /dev/sda13</pre>
 <p>The Volume group can also be created using the user interface <code>system-config-lvm</code> as an alternative to command line<p>
-<p>Allocate the empty partition to "cinder-volumes"</p>
+<p>Alllocate the empty partition to "cinder-volumes"</p>
 
 <pre class="terminal">
 #sudo apt-get install system-config-lvm
@@ -1245,27 +1243,23 @@ Cinder uses volume groups for storage. There are two ways to create the volume g
 #Select the partition and name it as "cinder-volumes"
 </pre>
 </li>
+</ol>
 
-<h3 id="create-lvm">Create LVM Volume Group</h3>
+<p><b>Creating a LVM Volume Group by using a container file as loop device</b></p>
+<p>If there is no partition available, we can use loop back device to create volume group.</p>
+<ol><li>
+<p>Create a container file /dev/zero</p>
+<pre class="terminal">
+#dd if=/dev/zero of=cinder-volumes bs=1 count=0 seek=20G </pre>
+</li>
 
-<li>
-     <p>
-    Creating a LVM Volume Group by using a container file as loop device
-    </p>
-    If there is no partition available, we can use loop back device to create volume group.
-    
-    
-    <p>Create a container file /dev/zero</p>
-    
-    <pre>#dd if=/dev/zero of=cinder-volumes bs=1 count=0 seek=20G </pre>
-    
-    <p>Create the loop device</p>
-    
-    <pre>#losetup /dev/loop2 cinder-volume</pre>
-     
-    <p>Create the partition</p>
-    
-    <pre>
+<li>    
+<p>Create the loop device</p>
+<pre class="terminal">#losetup /dev/loop2 cinder-volume</pre>
+</li>
+
+<li><p>Create the partition</p>
+<pre class="terminal">
 #fdisk /dev/loop2
 #Select the following options:
 n
@@ -1276,19 +1270,20 @@ ENTER
 t
 8e
 w</pre>
-    
-    <p>Create the physical volume<p>
-    
-    <pre>#pvcreate /dev/loop2</pre>
-    
-    <p>Create the volume group</p>
-    
-    <pre>
-#vgcreate cinder-volumes /dev/loop2</pre>
 </li>
 
+<li><p>Create the physical volume<p>
+<pre class="terminal">#pvcreate /dev/loop2</pre>
+</li>
 
-<li>
+<li><p>Create the volume group</p>
+<pre class="terminal">
+#vgcreate cinder-volumes /dev/loop2</pre>
+</li>
+</ol>
+
+<h3 id="restart-cinder">Restart Cinder Services</h3>
+<ol><li>
 <p>Restart the cinder services:</p>
 
 <pre class="terminal">
@@ -1304,6 +1299,7 @@ w</pre>
 
 </li>
 </ol>
+
 <a name=""><h2 id="horizon">Horizon Installation</h2></a>
 
 <p>OpenStack Dashboard (Horizon) provides administrators and users a graphical interface to access, provision and automate cloud-based resources.
