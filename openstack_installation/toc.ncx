@@ -82,20 +82,95 @@ including those conforming to the relaxed constraints of OPS 2.0 -->
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a Glance Image using Command Line</text></navLabel>
         <content src="openstack_installation.html#glance-create-image"/>
     </navPoint>
+
     <navPoint id="navpoint-10" playOrder="10">
       <navLabel><text>Quantum Installation</text></navLabel>
       <content src="openstack_installation.html#quantum"/>
     </navPoint>
+    <navPoint id="navpoint-10" playOrder="10">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Install and Configure Open vSwitch</text></navLabel>
+        <content src="openstack_installation.html#open-vswitch"/>
+    </navPoint>
+    <navPoint id="navpoint-10" playOrder="10">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Install Quantum components</text></navLabel>
+        <content src="openstack_installation.html#quantum_components"/>
+    </navPoint>
+    <navPoint id="navpoint-10" playOrder="10">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create Quantum Database</text></navLabel>
+        <content src="openstack_installation.html#create-db"/>
+    </navPoint>
+    <navPoint id="navpoint-10" playOrder="10">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verify Quantum Services</text></navLabel>
+        <content src="openstack_installation.html#verify-services"/>
+    </navPoint>
+    <navPoint id="navpoint-10" playOrder="10">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Update Quantum Configuration Files</text></navLabel>
+        <content src="openstack_installation.html#update-config-files"/>
+    </navPoint>
+    <navPoint id="navpoint-10" playOrder="10">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Restart Quantum Services</text></navLabel>
+        <content src="openstack_installation.html#restart-services"/>
+    </navPoint>
+        
 
     <navPoint id="navpoint-11" playOrder="11">
       <navLabel><text>Nova Installation</text></navLabel>
       <content src="openstack_installation.html#nova"/>
     </navPoint>
-
+    <navPoint id="navpoint-11" playOrder="11">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pre-requisites for KVM Installation</text></navLabel>
+        <content src="openstack_installation.html#pre-requisites"/>
+    </navPoint>
+    <navPoint id="navpoint-11" playOrder="11">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Install and Configure KVM</text></navLabel>
+        <content src="openstack_installation.html#install-and-configure-kvm"/>
+    </navPoint>
+    <navPoint id="navpoint-11" playOrder="11">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Install Nova Packages</text></navLabel>
+        <content src="openstack_installation.html#nova-packages"/>
+    </navPoint>
+    <navPoint id="navpoint-11" playOrder="11">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Configure Nova Database</text></navLabel>
+        <content src="openstack_installation.html#nova-db"/>
+    </navPoint>
+    <navPoint id="navpoint-11" playOrder="11">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Update Nova Configuration Files</text></navLabel>
+        <content src="openstack_installation.html#configure-nova-files"/>
+    </navPoint>
+    <navPoint id="navpoint-11" playOrder="11">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Configure Nova Database and Restart Services</text></navLabel>
+        <content src="openstack_installation.html#restart-dbsync-nova"/>
+    </navPoint>
+    
     <navPoint id="navpoint-12" playOrder="12">
       <navLabel><text>Cinder Installation</text></navLabel>
       <content src="openstack_installation.html#cinder"/>
     </navPoint>
+    <navPoint id="navpoint-12" playOrder="12">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Install Cinder Packages</text></navLabel>
+        <content src="openstack_installation.html#cinder-packages"/>
+    </navPoint>
+    <navPoint id="navpoint-12" playOrder="12">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create Cinder Database</text></navLabel>
+        <content src="openstack_installation.html#cinder-db"/>
+    </navPoint>
+    <navPoint id="navpoint-12" playOrder="12">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Update Cinder Configuration Files</text></navLabel>
+        <content src="openstack_installation.html#configure-cinder-files"/>
+    </navPoint>
+    <navPoint id="navpoint-12" playOrder="12">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Configure Cinder Database</text></navLabel>
+        <content src="openstack_installation.html#cinder-dbsync"/>
+    </navPoint>
+    <navPoint id="navpoint-12" playOrder="12">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create Cinder Volume</text></navLabel>
+        <content src="openstack_installation.html#cinder-volume"/>
+    </navPoint>
+    <navPoint id="navpoint-12" playOrder="12">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Restart Cinder Services</text></navLabel>
+        <content src="openstack_installation.html#restart-cinder"/>
+    </navPoint>
+    
 
     <navPoint id="navpoint-13" playOrder="13">
       <navLabel><text>Horizon Installation</text></navLabel>

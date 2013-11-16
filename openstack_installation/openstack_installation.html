@@ -173,7 +173,7 @@ packages.</p>
 #service mysql restart
 </pre>
 
-<h4 id"install-rabbitmq">Install RabbitMQ</h4>
+<h4 id="install-rabbitmq">Install RabbitMQ</h4>
 <p>Messaging server is the heart of the system. All the commands are first sent to the 
 Messaging Service. OpenStack components picks up these messages and processes the commands
 </p>
@@ -440,9 +440,8 @@ for Glance APIs
 </i>
 </li>
 </ol>
-
 <li>
-<p>Update the <code>/etc/glance/glance-registry.conf</code> with:</p>
+<p>Update <code>/etc/glance/glance-registry.conf</code> with:</p>
 
 <pre class="terminal">
     sql_connection = mysql://glance-user:glance-pass@192.168.100.51/glance
@@ -451,6 +450,7 @@ for Glance APIs
     flavor = keystone
 </pre>
 </li>
+</ol>
 
 <h3 id="glance-restart-pop-db">Restart Services and Configure Glance Database</h3>
 <ol>
