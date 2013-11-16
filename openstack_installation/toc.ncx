@@ -21,11 +21,11 @@ including those conforming to the relaxed constraints of OPS 2.0 -->
     <text>Rajdeep Dua, A ReddyRaja</text>
   </docAuthor>
 
- <navMap>
-    <navPoint id="navpoint-1" playOrder="1">
+    <navMap>
+    <!--<navPoint id="navpoint-1" playOrder="1">
       <navLabel><text>Cover Page</text></navLabel>
       <content src="cover_page.html"/>
-    </navPoint>
+    </navPoint>-->
  
     <navPoint id="navpoint-2" playOrder="2">
       <navLabel><text>Table of Contents</text></navLabel>
