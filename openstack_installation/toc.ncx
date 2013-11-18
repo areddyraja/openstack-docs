@@ -176,15 +176,91 @@ including those conforming to the relaxed constraints of OPS 2.0 -->
       <navLabel><text>Horizon Installation</text></navLabel>
       <content src="openstack_installation.html#horizon"/>
     </navPoint>
+    <navPoint id="navpoint-13" playOrder="13">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Install Horizon Packages</text></navLabel>
+        <content src="openstack_installation.html#horizon-packages"/>
+    </navPoint>
+    <navPoint id="navpoint-13" playOrder="13">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Restart Horizon Services</text></navLabel>
+        <content src="openstack_installation.html#restart-dashboard-services"/>
+    </navPoint>
 
     <navPoint id="navpoint-14" playOrder="14">
       <navLabel><text>Create a VM</text></navLabel>
       <content src="openstack_installation.html#create-vm"/>
     </navPoint>
+    <navPoint id="navpoint-14" playOrder="14">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create External Network</text></navLabel>
+        <content src="openstack_installation.html#pub-net"/>
+    </navPoint>
+    <navPoint id="navpoint-14" playOrder="14">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create Subnet and Allocate Floating IP</text></navLabel>
+        <content src="openstack_installation.html#pub-subnet-floatingip"/>
+    </navPoint>
+    <navPoint id="navpoint-14" playOrder="14">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create Private Network</text></navLabel>
+        <content src="openstack_installation.html#pvt-net"/>
+    </navPoint>
+    <navPoint id="navpoint-14" playOrder="14">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create Private Subnet</text></navLabel>
+        <content src="openstack_installation.html#pvt-subnet"/>
+    </navPoint>
+    <navPoint id="navpoint-14" playOrder="14">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create Router</text></navLabel>
+        <content src="openstack_installation.html#create-router"/>
+    </navPoint>
+    <navPoint id="navpoint-14" playOrder="14">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Attach Public and Private Interfaces</text></navLabel>
+        <content src="openstack_installation.html#attach-interfaces"/>
+    </navPoint>
+    <navPoint id="navpoint-14" playOrder="14">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create Security Group</text></navLabel>
+        <content src="openstack_installation.html#security-group"/>
+    </navPoint>
+    <navPoint id="navpoint-14" playOrder="14">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create Keypair</text></navLabel>
+        <content src="openstack_installation.html#key-pair"/>
+    </navPoint>
+    <navPoint id="navpoint-14" playOrder="14">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Launch Instance</text></navLabel>
+        <content src="openstack_installation.html#launch-instance"/>
+    </navPoint>
+    <navPoint id="navpoint-14" playOrder="14">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ping and SSH into the Instance</text></navLabel>
+        <content src="openstack_installation.html#ping-ssh-vm"/>
+    </navPoint>
+    <navPoint id="navpoint-14" playOrder="14">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Configure Floating IP to Virtual Machine</text></navLabel>
+        <content src="openstack_installation.html#floatingip"/>
+    </navPoint>
 
     <navPoint id="navpoint-15" playOrder="15">
       <navLabel><text>Create a Cinder Volume</text></navLabel>
       <content src="openstack_installation.html#cinder-volume"/>
+    </navPoint>
+    <navPoint id="navpoint-15" playOrder="15">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a Volume Type</text></navLabel>
+        <content src="openstack_installation.html#create-vol-type"/>
+    </navPoint>
+    <navPoint id="navpoint-15" playOrder="15">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a Volume</text></navLabel>
+        <content src="openstack_installation.html#create-vol"/>
+    </navPoint>
+    <navPoint id="navpoint-15" playOrder="15">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Attach Volume to VM</text></navLabel>
+        <content src="openstack_installation.html#attach-vol-to-vm"/>
+    </navPoint>
+    <navPoint id="navpoint-15" playOrder="15">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;List Volumes</text></navLabel>
+        <content src="openstack_installation.html#list-vol"/>
+    </navPoint>
+    <navPoint id="navpoint-15" playOrder="15">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Test the Volume</text></navLabel>
+        <content src="openstack_installation.html#test-vol"/>
+    </navPoint>
+    <navPoint id="navpoint-15" playOrder="15">
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FAQ's</text></navLabel>
+        <content src="openstack_installation.html#faqs"/>
     </navPoint>
 
     <navPoint id="navpoint-16" playOrder="16">

@@ -1280,16 +1280,19 @@ w</pre>
 <p>OpenStack Dashboard (Horizon) provides administrators and users a graphical interface to access, provision and automate cloud-based resources.
 The dashboard is just one way to interact with OpenStack resources.</p>
 <ol>
+<li><a href="openstack_installation.html#horizon-packages">Install Horizon Packages</a></li>
+<li><a href="openstack_installation.html#restart-dashboard-services">Restart Horizon Services</a></li>
+</ol>
+
+<ol>
 <li>
+<h3 id="horizon-packages">Install Horizon Packages</h3>
 <p>To install horizon, proceed like this</p>
 
 <pre class="terminal">
 #apt-get -y install openstack-dashboard memcached
 </pre>
 
-</li>
-
-<li>
 <p>Optional:If you don't like the OpenStack ubuntu theme, you can remove the package to disable it:</p>
 
 <pre class="terminal">
@@ -1299,6 +1302,7 @@ The dashboard is just one way to interact with OpenStack resources.</p>
 </li>
 
 <li>
+<h3 id="restart-dashboard-services">Restart Horizon Services</h3>
 <p>Reload Apache and memcached:</p>
 
 <pre class="terminal">
@@ -1308,11 +1312,24 @@ The dashboard is just one way to interact with OpenStack resources.</p>
 <p>You can now access your OpenStack <code>10.42.0.51/horizon</code> with credentials <code>admin:admin_pass</code>.</p>
 </li>
 </ol>
-<a name="first-vm"><h2 id="create-vm">Create a VM</h2></a>
 
+<a name="first-vm"><h2 id="create-vm">Create a VM</h2></a>
+<p>These are the following steps to create a VM</p>
 <ol>
-<li>
-<p>Create a external network:</p>
+<li><a href="openstack_installation.html#pub-net">Create External Network</a></li>
+<li><a href="openstack_installation.html#pub-subnet-floatingip">Create Subnet and Allocate Floating IP</a></li>
+<li><a href="openstack_installation.html#pvt-net">Create Private Network</a></li>
+<li><a href="openstack_installation.html#pvt-subnet">Create Private Subnet</a></li>
+<li><a href="openstack_installation.html#create-router">Create Router</a></li>
+<li><a href="openstack_installation.html#attach-interfaces">Attach Public and Private Interfaces</a></li>
+<li><a href="openstack_installation.html#security-group">Create Security Group</a></li>
+<li><a href="openstack_installation.html#key-pair">Create Keypair</a></li>
+<li><a href="openstack_installation.html#launch-instance">Launch Instance</a></li>
+<li><a href="openstack_installation.html#ping-ssh-vm">Ping and SSH into the Instance</a></li>
+<li><a href="openstack_installation.html#floatingip">Configure Floating IP to Virtual Machine</a></li>
+</ol>
+
+<h3 id="pub-net">Create External Network</h3>
 
 <pre class="terminal">
 #quantum net-create public-net --router:external=True
@@ -1336,14 +1353,13 @@ Created a new network:
 </pre>
 
  <img src="./images/create_ext_net.png">
-</li>
 
-
-<li>
-<p>Create a subnet:</p>
+<h3 id="pub-subnet-floatingip">Create Subnet and Allocate Floating IP</h3>
+<p>Create subnet and allocate floating ip range for public-network:</p>
+<p>Floating IP network (Publicly routable IP Range): This network is utilized for providing Public IP accessibility to selected cloud instances. <code>tenant-id</code> can be obtained by using the command <code>keystone tenant-list</code>.</p>
 
 <pre class="terminal">
-#quantum subnet-create --tenant-id 2b942273713741b1868eb86b11e08df8 --name public-net-subnet01 --gateway 10.42.0.1 public-net 10.42.0.0/24 --enable_dhcp False
+#quantum subnet-create --tenant-id 2b942273713741b1868eb86b11e08df8 --name public-net-subnet01 --gateway 10.42.0.1 public-net 10.42.0.0/24 --enable_dhcp False --allocation-pool start=10.42.0.74,end=10.42.0.254
 
 Created a new subnet:
 +------------------+----------------------------------------------+
@@ -1364,23 +1380,9 @@ Created a new subnet:
 </pre>
 
 <img src="./images/create_subnet_ext.png">
-</li>
-
-<li>
-<p>Allocation of IP's to VM's:</p>
 
 
-<p>This is not tried but, we can try allocation pool also - this command not tried , pls verify before trying.</p>
-
-<pre class="terminal">
-#quantum subnet-create --tenant-id 6973efb023c748d6b8a4fff747faad92 --name public-net-subnet01 --gateway 10.42.0.1 public-net 10.42.0.0/24 --enable_dhcp False --allocation-pool start=10.42.0.75,end=10.42.0.254
-</pre>
-
-</li>
-
-<li>
-<p>Create a private-network:</p>
-
+<h3 id="pvt-net">Create Private Network</h3>
 <pre class="terminal">
 #quantum net-create private-net
 
@@ -1403,10 +1405,8 @@ Created a new network:
 </pre>
 
 <img src="./images/create_pvt_net.png">
-</li>
 
-
-<li>
+<h3 id="pvt-subnet">Create Private Subnet</h3>
 <p>Attach subnet to private network:</p>
 
 <pre class="terminal">
@@ -1431,10 +1431,9 @@ Created a new subnet:
 </pre>
 
 <img src="./images/create_subnet_pvt.png">
-</li>
 
-<li>
-<p>Create router:</p>
+
+<h3 id="create-router">Create Router</h3>
 
 <pre class="terminal">
 #quantum router-create router1
@@ -1453,17 +1452,15 @@ Created a new router:
 </pre>
 
 <img src="./images/create_router.png">
-</li>
 
-<li>
+<h3 id="attach-interfaces">Attach Public and Private Interfaces</h3>
+<ol><li>
 <p>Uplink router to public network:</p>
 
 <pre class="terminal">
 #quantum router-gateway-set router1 public-net
 </pre>
-
 </li>
-
 <li>
 <p>Attach private network to router:</p>
 
@@ -1473,10 +1470,68 @@ Created a new router:
 
 <img src="./images/router_add_iface.png">
 </li>
+</ol>
+
+<h3 id="security-group">Create Security Group</h3>
+
+<img src="./images/create_security_group_desc.png">
+
+<ol>
+<li>
+<p>Access and Security</p>
+<img src="./images/access_and_security.png">
+</li>
 
 <li>
-<p>To show the net list:</p>
+<p>Edit Security Group Rules</p>
+<p>Add TCP and ICMP Rules:</p>
+<img src="./images/add_rule.png">
+</li>
+</ol>
 
+<h3 id="key-pair">Create Keypair</h3>
+<p>
+<img src="./images/create_keypair.png"></p>
+
+
+<h3 id="launch-instance">Launch Instance</h3>
+
+<code>Note: Create a VM using the Horizon dashboard</code>
+
+<ol>
+<li>
+<h5 id="before-vm-creation">Before Creating VM</h5>
+<img src="./images/empty_instances.png">
+</li>
+
+<li>
+<h5 id="enter-instance-details">Enter Instance Details</h5>
+ <img src="./images/launch_instance.png">
+</li>
+
+<li>
+<h5 id="select-keypair-sec-group">Select Keypair and Security Group</h5>
+ <img src="./images/launch_instance_keypair.png">
+</li>
+
+<li><h5 id="select-network">Select Instance Network</h5>
+ <img src="./images/launch_instance_networking.png">
+</li>
+After selecting a network click-on <code>Launch</code> to create a VM.
+
+
+<li>
+<p><h5 id="first-vm">My first VM</h5>
+ <img src="./images/first_instance.png">
+</li>
+
+<li><h5 id="network-topology">Network Topology</h5>
+ <img src="./images/network_topology.png">
+</li>
+
+<h3 id="ping-ssh-vm">Ping and SSH into the Instance</h3>
+<ol><li>
+<h5 id="show-netlist">To Show net-list</h5>
 <pre class="terminal">
 #ip netns list
 qrouter-ca972d3b-788e-4e16-8552-dd335575c5c0
@@ -1501,365 +1556,74 @@ qrouter-ca972d3b-788e-4e16-8552-dd335575c5c0
        valid_lft forever preferred_lft forever
 </pre>
 
-</li>
-</ol>
-<ul>
-<li>
-<p>Create a Security Group:</p>
-<img src="./images/create_security_group_desc.png">
-</li>
-
-<li>
-<p>Create Keypairs:</p>
-<p>
-<img src="./images/create_keypair.png"></p>
-</li>
-<li>
-<p>Add Rule:</p>
-<img src="./images/add_rule.png">
-</li>
-
-<li>
-<p>Edit Security Group Rules:</p>
-<!--<img src="./images/security_group_rules.png">-->
-</li>
-
-<li>
-<p>Access and Security</p>
-<img src="./images/access_and_security.png">
-</li>
-
-
-<code>Note: Create a VM using the Horizon dashboard</code>
-
-
-<li>
-<p>Before creating a VM</p>
-<img src="./images/empty_instances.png">
-</li>
-
-<li>
-<p>Launch Instance:</p>
- <img src="./images/launch_instance.png">
-</li>
-
-<li>
-<p>Launch Instance Keypair:</p>
- <img src="./images/launch_instance_keypair.png">
-</li>
-
-<li>
-<p>Launch Instance Networking:</p>
- <img src="./images/launch_instance_networking.png">
-</li>
-
-<li>
-<p>My first VM</p>
- <img src="./images/first_instance.png">
-</li>
-
-<li>
-<p>Network Topology</p>
- <img src="./images/network_topology.png">
-</li>
-
-<li>
-<p>To ping VM:</p>
-
 <pre class="terminal">
 #ip netns exec qrouter-ca972d3b-788e-4e16-8552-dd335575c5c0 ping 10.0.0.2
 </pre>
-
 </li>
 
 <li>
-<p>To do ssh into VM, do the follwing:</p>
+<h5 id="ssh-vm">To do ssh into VM, do the follwing</h5>
 
 <pre class="terminal">
-#ip netns exec qrouter-36f5ccde-1876-4554-be59-032af24c419c ssh 10.0.0.2 -l cirros
+#ip netns exec qrouter-ca972d3b-788e-4e16-8552-dd335575c5c0 ssh 10.0.0.2 -l cirros
     userid: cirros
     password: cubswin:)
-</pre>
 
-</li>
+or
 
-<li>
-<p>To get all the ports listed:</p>
-
-<pre class="terminal">
-#quantum port-list
-</pre>
-
-</li>
-
-<li>
-<p>Getting the VM Port-id for assigning Floating IP:</p>
-
-<pre class="terminal">
-#quantum port-list -c id -c fixed_ips -c device_owner 
-</pre>
-
-<table>
-<tr bgcolor="#bad2e9">
-<th>id</th>
-<th>fixed-ips </th>
-<th>device-owner</th>
-</tr>
-<tr>
-<td>848d2e3a-ab3f-4e92-ad6d-269d793dde54</td>
-<td>{"subnet_id": "6bfd8ae6-a2b9-4259-b813-4581a15c8d0f", "ip_address": "10.0.0.2"}</td>
-<td> compute:None</td>
-</tr>
-<tr>
-<td>9e069dc1-4af7-4c5f-a527-3c53d64affc6</td>
-<td>{"subnet_id": "55cbc646-6271-4148-b426-a7e90619e28d", "ip_address": "10.42.0.2"}</td>
-<td>network:router_gateway </td>
-</tr>
-<tr>
-<td>b36a8a56-84db-4b2e-ab0e-2adf2cef88a4</td>
-<td>{"subnet_id": "6bfd8ae6-a2b9-4259-b813-4581a15c8d0f", "ip_address": "10.0.0.3"}</td>
-<td>network:dhcp </td>
-</tr>
-<tr>
-<td>e40639e1-5986-4787-9f6c-452f608b24ff</td>
-<td> {"subnet_id": "6bfd8ae6-a2b9-4259-b813-4581a15c8d0f", "ip_address": "10.0.0.1"}</td>
-<td>network:router_interface </td>
-</tr>
-</table>
-<p>The compute port-id is 848d2e3a-ab3f-4e92-ad6d-269d793dde54 , which has IP 10.0.0.2 in the private subnet id.</p>
-
-<p>We will use this port id to create a floating IP in the Public network.</p>
-<pre class="terminal">
-848d2e3a-ab3f-4e92-ad6d-269d793dde54
-</pre>
-
-</li>
-
-<li>
-<p>Alternate way to get the VM port ID:</p>
-
-<pre class="terminal">
-#nova list
-</pre>
-
-</li>
-
-
-
-
-<style>
-table,td,th
-{
-border:1px solid black;
-}
-</style>
-<table width="600">
-<tr bgcolor="#bad2e9">
-<th>ID</th>
-<th>Name</th>
-<th>Status</th>
-<th>Networks</th>
-</tr>
-<tr>
-<td>2b23d81b-b6db-4dfc-9440-ddf2ed4ef144</td>
-<td>firstinstance</td>
-<td>ACTIVE</td>
-<td> private-net=10.0.0.2</td>
-</tr>
-</table>
-<li>
-<p>Now use the Device id to get the VM port ID:</p>
-
-<pre class="terminal">
-#quantum port-list -- --device_id  2b23d81b-b6db-4dfc-9440-ddf2ed4ef144
-</pre>
-
-</li>
-
-
-
-
-<style>
-table,td,th
-{
-border:1px solid black;
-}
-</style>
-<table width="800">
-<tr bgcolor="#bad2e9">
-<th>ID</th>
-<th>Name</th>
-<th>mac_address</th>
-<th>fixed_ips</th>
-</tr>
-<tr>
-<td>848d2e3a-ab3f-4e92-ad6d-269d793dde54</td>
-<td></td>
-<td>fa:16:3e:79:9e:c4</td>
-<td>{"subnet_id": "6bfd8ae6-a2b9-4259-b813-4581a15c8d0f", "ip_address": "10.0.0.2"}</td>
-</tr>
-</table>
-<p>You can see that we got the VM PORT ID,  848d2e3a-ab3f-4e92-ad6d-269d793dde54 which is same as in the previous case.</p>
-
-<li>
-<p>Now create a floating IP for the VM with port_id as given above:</p>
-
-<pre class="terminal">
-#quantum floatingip-list
-#should return empty list, since we have not created any ip
-</pre>
-
-</li>
-
-<li>
-<p>You can see subnet information with the following command:</p>
-
-<pre class="terminal">
-#quantum subnet-list
-</pre>
-
-</li>
-
-
-<style>
-table,td,th
-{
-border:1px solid black;
-}
-</style>
-<table>
-<tr bgcolor="#bad2e9">
-<th>ID</th>
-<th>Name</th>
-<th>cidr</th>
-<th>allocation_pools</th>
-</tr>
-<tr>
-<td>55cbc646-6271-4148-b426-a7e90619e28d</td>
-<td>public-net-subnet01</td>
-<td>10.42.0.0/24</td>
-<td>{"start": "10.42.0.2", "end": "10.42.0.254"}</td>
-</tr>
-<tr>
-<td> 6bfd8ae6-a2b9-4259-b813-4581a15c8d0f</td>
-<td> private-subnet </td>
-<td>10.0.0.0/24</td>
-<td> {"start": "10.0.0.2", "end": "10.0.0.254"}</td>
-</tr>
-</table>
-<li>
-<p>Command to see specific subnet information:</p>
-
-<pre class="terminal">
-#quantum subnet-show  55cbc646-6271-4148-b426-a7e90619e28d
-</pre>
-
-</li>
-
-<li>
-<p>Since we have not created allocation pool initially we need to update the subnet with an allocation pool:</p>
-<p>But the below command is not working.</p>
-
-<pre class="terminal">
-#quantum subnet-update 55cbc646-6271-4148-b426-a7e90619e28d --allocation-pool start=10.42.0.75,end=10.42.0.254 public-net 10.42.0.0/24
-</pre>
-
-</li>
-
-<li>
-<p>Hence we will create floating point which is already there.</p>
-
-<pre class="terminal">
-#quantum floatingip-list
-#quantum floatingip-create --port-id 848d2e3a-ab3f-4e92-ad6d-269d793dde54 public-net
-
-   
-    Created a new floatingip:
-    +---------------------+--------------------------------------+
-    | Field               | Value                                |
-    +---------------------+--------------------------------------+
-    | fixed_ip_address    | 10.0.0.2                             |
-    | floating_ip_address | 10.42.0.3                            |
-    | floating_network_id | 91cc9a4d-5c5f-4da5-8baf-7fe32f270cdb |
-    | id                  | dad364f9-21eb-47c9-a29c-0489536b47eb |
-    | port_id             | 848d2e3a-ab3f-4e92-ad6d-269d793dde54 |
-    | router_id           | 36f5ccde-1876-4554-be59-032af24c419c |
-    | tenant_id           | 6973efb023c748d6b8a4fff747faad92     |
-    +---------------------+--------------------------------------+
-</pre>
-
-</li>
-
-<li>
-<p>ssh the virtual machine:</p>
-
-<pre class="terminal">
-#ssh 10.42.0.3 -l cirros 
-    The authenticity of host '10.42.0.3 (10.42.0.3)' can't be established.
+#ssh 10.0.0.2 -l cirros 
+    The authenticity of host '10.0.0.2 (10.0.0.2)' can't be established.
     RSA key fingerprint is da:f6:87:1a:3f:b6:e9:a4:92:8b:ca:a8:b8:d5:28:0d.
     Are you sure you want to continue connecting (yes/no)? yes
-    Warning: Permanently added '10.42.0.3' (RSA) to the list of known hosts.
-    #cirros@10.42.0.3's password: 
+    Warning: Permanently added '10.0.0.2' (RSA) to the list of known hosts.
+    #cirros@10.0.0.2's password: 
     cubswin:)
     $ 
 </pre>
+</li>
+</ol>
+
+<h3 id="floatingip">Configure Floating IP to Virtual Machine</h3>
+<ol>
+<li>
+
+<h5 id="allocate-floatingip">Allocate Floating IP </h5>
 
 </li>
 
 <li>
-<p>Portforwarding:</p>
-
-Enable Portforwarding on Gateway:
-
-<pre class="terminal">
-#eth1 src = TCP/IP port=25920   dest ip=10.42.0.3  dest port =  22 
-</pre>
-
+<h5 id="associate-floatingip">Associate Floating IP to Instance</h5>
 </li>
 
 <li>
-<p>Logging in to the VM from external network:</p>
+<h5 id="allocate-floatingip">VM1 is assigned with floating ip 10.42.0.75</h5>
+</li>
+
+<li><h5 id="allocate-floatingip">Ping the virtual machine vm1 from outside network using the assigned floating ip.</h5>
 
 <pre class="terminal">
-#ssh 183.83.27.73 -p 25920 -l cirros
-    The authenticity of host '10.42.0.3 (10.42.0.3)' can't be established.
-    RSA key fingerprint is da:f6:87:1a:3f:b6:e9:a4:92:8b:ca:a8:b8:d5:28:0d.
-    Are you sure you want to continue connecting (yes/no)? yes
-    Warning: Permanently added '10.42.0.3' (RSA) to the list of known hosts.
-    #cirros@10.42.0.3's password:
-    cubswin:)
-    $ $ 
-    $ 
-    $ pwd
-    /home/cirros
-    $ ls -al
-    total 5
-    drwxr-xr-x    2 cirros   cirros        1024 Jun 21 06:31 .
-    drwxrwxr-x    4 root     root          1024 Oct 20  2011 ..
-    -rw-------    1 cirros   cirros         119 Jun 21 07:22 .ash_history
-    -rwxr-xr-x    1 cirros   cirros          43 Oct 20  2011 .profile
-    -rwxr-xr-x    1 cirros   cirros          66 Oct 20  2011 .shrc
-    #df -k
-    Filesystem           1K-blocks      Used Available Use% Mounted on
-    /dev                    248936         0    248936   0% /dev
-    /dev/vda1                23797     13201      9368  58% /
-    tmpfs                   252056         0    252056   0% /dev/shm
+#ping 10.42.0.75
+#ssh cirros@192.168.0.75
 </pre>
+
 </li>
-</ul>
+</ol>
+
+
 <a name="cinder-volume"><h2 id="cinder-volume">Create a Cinder Volume</h2></a>
 <p>Cinder provides an infrastructure for managing volumes in OpenStack. Cinder services gives extra block level storage to your OpenStack Compute instances.</p>
 
 <p>The following are the steps for the exercise:</p>
+<ol>
+<li><a href="openstack_installation.html#create-vol-type">Create a Volume Type</a></li>
+<li><a href="openstack_installation.html#create-vol">Create a Volume</a></li>
+<li><a href="openstack_installation.html#attach-vol-to-vm">Attach Volume to VM</a></li>
+<li><a href="openstack_installation.html#list-vol">List Volumes</a></li>
+<li><a href="openstack_installation.html#test-vol">Test the Volume</a></li>
+<li><a href="openstack_installation.html#faqs">FAQ's</a></li>
+</ol>
 
-<ul>
-<li>Create a Volume Type</li>
-  <li>Create Volume</li>
-  <li>Attach Volume to VM</li>
-  <li>List Volumes</li>
-  <li>Test the Volume</li>
-  <li>FAQ's</li>
-</ul><h3 id="create-a-volume-type">Create a Volume Type</h3>
+<h3 id="create-vol-type">Create a Volume Type</h3>
 
 <h6 id="using-cli">Using Cli</h6>
 
@@ -1878,7 +1642,7 @@ root@ubuntu:~# nova volume-type-create Backup
 
 <p><img src="./images/create_volume_type.png" alt="import"></p>
 
-<h3 id="create-a-volume">Create a Volume</h3>
+<h3 id="create-vol">Create a Volume</h3>
 
 <p>Create a 1 GB test volume</p>
 
@@ -1911,7 +1675,7 @@ root@ubuntu:~# cinder create --display_name volume1 1 --volume_type Backup
 
 <p><img src="./images/create_volume.png" alt="import"></p>
 
-<h3 id="attach-volume-to-vm">Attach Volume to VM</h3>
+<h3 id="attach-vol-to-vm">Attach Volume to VM</h3>
 
 <h6 id="using-cli-2">Using Cli</h6>
 
@@ -1933,7 +1697,7 @@ root@ubuntu:~# nova volume-attach vm2 310dadc8-ed30-43f1-a7fd-b474fb762cdd /dev/
 
 <p><img src="./images/manage_volume_attachments.png" alt="import"></p>
 
-<h3 id="list-volumes">List Volumes</h3>
+<h3 id="list-vol">List Volumes</h3>
 
 <h6 id="using-cli-3">Using Cli</h6>
 
@@ -1952,7 +1716,7 @@ root@ubuntu:~# cinder list
 
 <p><img src="./images/volume_list.png" alt="import"></p>
 
-<h3 id="test-the-volume">Test the Volume</h3>
+<h3 id="test-vol">Test the Volume</h3>
 
 <p>After attaching the volume, ssh in to the VM and format the volume.</p>
 
