@@ -190,23 +190,23 @@ including those conforming to the relaxed constraints of OPS 2.0 -->
       <content src="openstack_installation.html#create-vm"/>
     </navPoint>
     <navPoint id="navpoint-14" playOrder="14">
-        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create External Network</text></navLabel>
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a External Network</text></navLabel>
         <content src="openstack_installation.html#pub-net"/>
     </navPoint>
     <navPoint id="navpoint-14" playOrder="14">
-        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create Subnet and Allocate Floating IP</text></navLabel>
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a Subnet and Allocate Floating IP</text></navLabel>
         <content src="openstack_installation.html#pub-subnet-floatingip"/>
     </navPoint>
     <navPoint id="navpoint-14" playOrder="14">
-        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create Private Network</text></navLabel>
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a Private Network</text></navLabel>
         <content src="openstack_installation.html#pvt-net"/>
     </navPoint>
     <navPoint id="navpoint-14" playOrder="14">
-        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create Private Subnet</text></navLabel>
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a Private Subnet</text></navLabel>
         <content src="openstack_installation.html#pvt-subnet"/>
     </navPoint>
     <navPoint id="navpoint-14" playOrder="14">
-        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create Router</text></navLabel>
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a Router</text></navLabel>
         <content src="openstack_installation.html#create-router"/>
     </navPoint>
     <navPoint id="navpoint-14" playOrder="14">
@@ -214,23 +214,23 @@ including those conforming to the relaxed constraints of OPS 2.0 -->
         <content src="openstack_installation.html#attach-interfaces"/>
     </navPoint>
     <navPoint id="navpoint-14" playOrder="14">
-        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create Security Group</text></navLabel>
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a Security Group</text></navLabel>
         <content src="openstack_installation.html#security-group"/>
     </navPoint>
     <navPoint id="navpoint-14" playOrder="14">
-        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create Keypair</text></navLabel>
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a Keypair</text></navLabel>
         <content src="openstack_installation.html#key-pair"/>
     </navPoint>
     <navPoint id="navpoint-14" playOrder="14">
-        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Launch Instance</text></navLabel>
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Launch an Instance</text></navLabel>
         <content src="openstack_installation.html#launch-instance"/>
     </navPoint>
     <navPoint id="navpoint-14" playOrder="14">
-        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ping and SSH into the Instance</text></navLabel>
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ping and SSH to an Instance</text></navLabel>
         <content src="openstack_installation.html#ping-ssh-vm"/>
     </navPoint>
     <navPoint id="navpoint-14" playOrder="14">
-        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Configure Floating IP to Virtual Machine</text></navLabel>
+        <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Configure Floatings IP to Virtual Machines</text></navLabel>
         <content src="openstack_installation.html#floatingip"/>
     </navPoint>
 
