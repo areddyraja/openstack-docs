@@ -34,233 +34,233 @@ including those conforming to the relaxed constraints of OPS 2.0 -->
  
     <navPoint id="navpoint-3" playOrder="3">
       <navLabel><text>Introduction</text></navLabel>
-      <content src="openstack_installation.html#introduction"/>
+      <content src="openstack_installation_grizzly/introduction.html#introduction"/>
     </navPoint>
  
     <navPoint id="navpoint-4" playOrder="4">
       <navLabel><text>Requirements</text></navLabel>
-      <content src="openstack_installation.html#requirements"/>
+      <content src="openstack_installation_grizzly/pre-requisites.html#requirements"/>
     </navPoint>
  
     <navPoint id="navpoint-5" playOrder="5">
       <navLabel><text>Ubuntu and Network Configuration</text></navLabel>
-      <content src="openstack_installation.html#ubuntu-config"/>
+      <content src="openstack_installation_grizzly/network_configuration.html#ubuntu-config"/>
 
       <navPoint id="navpoint-6" playOrder="6">
         <navLabel><text>Configure Ubuntu</text></navLabel>
-        <content src="openstack_installation.html#conf-ubuntu"/>
+        <content src="openstack_installation_grizzly/network_configuration.html#conf-ubuntu"/>
       </navPoint>
     </navPoint>
 
     <navPoint id="navpoint-7" playOrder="7">
       <navLabel><text>Keystone Installation</text></navLabel>
-      <content src="openstack_installation.html#keystone"/>
+      <content src="openstack_installation_grizzly/keystone.html#keystone"/>
     </navPoint>
 
     <navPoint id="navpoint-8" playOrder="8">
       <navLabel><text>Glance Installation</text></navLabel>
-      <content src="openstack_installation.html#glance"/>
+      <content src="openstack_installation_grizzly/glance.html#glance"/>
      
     </navPoint>
     <navPoint id="navpoint-9" playOrder="9">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Install Glance Packages</text></navLabel>
-        <content src="openstack_installation.html#glance-packages"/>
+        <content src="openstack_installation_grizzly/glance.html#glance-packages"/>
     </navPoint>
     <navPoint id="navpoint-9" playOrder="9">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Configure Glance Database</text></navLabel>
-        <content src="openstack_installation.html#glance-db"/>
+        <content src="openstack_installation_grizzly/glance.html#glance-db"/>
     </navPoint>
     <navPoint id="navpoint-9" playOrder="9">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Update Glance Configuration Files</text></navLabel>
-        <content src="openstack_installation.html#glance-config-files"/>
+        <content src="openstack_installation_grizzly/glance.html#glance-config-files"/>
     </navPoint>
     <navPoint id="navpoint-9" playOrder="9">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Restart Services and Configure Glance Database</text></navLabel>
-        <content src="openstack_installation.html#glance-restart-pop-db"/>
+        <content src="openstack_installation_grizzly/glance.html#glance-restart-pop-db"/>
     </navPoint>
     <navPoint id="navpoint-9" playOrder="9">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a Glance Image using Command Line</text></navLabel>
-        <content src="openstack_installation.html#glance-create-image"/>
+        <content src="openstack_installation_grizzly/glance.html#glance-create-image"/>
     </navPoint>
 
     <navPoint id="navpoint-10" playOrder="10">
       <navLabel><text>Quantum Installation</text></navLabel>
-      <content src="openstack_installation.html#quantum"/>
+      <content src="openstack_installation_grizzly/quantum.html#quantum"/>
     </navPoint>
     <navPoint id="navpoint-10" playOrder="10">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Install and Configure Open vSwitch</text></navLabel>
-        <content src="openstack_installation.html#open-vswitch"/>
+        <content src="openstack_installation_grizzly/quantum.html#open-vswitch"/>
     </navPoint>
     <navPoint id="navpoint-10" playOrder="10">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Install Quantum components</text></navLabel>
-        <content src="openstack_installation.html#quantum_components"/>
+        <content src="openstack_installation_grizzly/quantum.html#quantum_components"/>
     </navPoint>
     <navPoint id="navpoint-10" playOrder="10">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create Quantum Database</text></navLabel>
-        <content src="openstack_installation.html#create-db"/>
+        <content src="openstack_installation_grizzly/quantum.html#create-db"/>
     </navPoint>
     <navPoint id="navpoint-10" playOrder="10">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verify Quantum Services</text></navLabel>
-        <content src="openstack_installation.html#verify-services"/>
+        <content src="openstack_installation_grizzly/quantum.html#verify-services"/>
     </navPoint>
     <navPoint id="navpoint-10" playOrder="10">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Update Quantum Configuration Files</text></navLabel>
-        <content src="openstack_installation.html#update-config-files"/>
+        <content src="openstack_installation_grizzly/quantum.html#update-config-files"/>
     </navPoint>
     <navPoint id="navpoint-10" playOrder="10">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Restart Quantum Services</text></navLabel>
-        <content src="openstack_installation.html#restart-services"/>
+        <content src="openstack_installation_grizzly/quantum.html#restart-services"/>
     </navPoint>
         
 
     <navPoint id="navpoint-11" playOrder="11">
       <navLabel><text>Nova Installation</text></navLabel>
-      <content src="openstack_installation.html#nova"/>
+      <content src="openstack_installation_grizzly/nova.html#nova"/>
     </navPoint>
     <navPoint id="navpoint-11" playOrder="11">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pre-requisites for KVM Installation</text></navLabel>
-        <content src="openstack_installation.html#pre-requisites"/>
+        <content src="openstack_installation_grizzly/nova.html#pre-requisites"/>
     </navPoint>
     <navPoint id="navpoint-11" playOrder="11">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Install and Configure KVM</text></navLabel>
-        <content src="openstack_installation.html#install-and-configure-kvm"/>
+        <content src="openstack_installation_grizzly/nova.html#install-and-configure-kvm"/>
     </navPoint>
     <navPoint id="navpoint-11" playOrder="11">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Install Nova Packages</text></navLabel>
-        <content src="openstack_installation.html#nova-packages"/>
+        <content src="openstack_installation_grizzly/nova.html#nova-packages"/>
     </navPoint>
     <navPoint id="navpoint-11" playOrder="11">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Configure Nova Database</text></navLabel>
-        <content src="openstack_installation.html#nova-db"/>
+        <content src="openstack_installation_grizzly/nova.html#nova-db"/>
     </navPoint>
     <navPoint id="navpoint-11" playOrder="11">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Update Nova Configuration Files</text></navLabel>
-        <content src="openstack_installation.html#configure-nova-files"/>
+        <content src="openstack_installation_grizzly/nova.html#configure-nova-files"/>
     </navPoint>
     <navPoint id="navpoint-11" playOrder="11">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Configure Nova Database and Restart Services</text></navLabel>
-        <content src="openstack_installation.html#restart-dbsync-nova"/>
+        <content src="openstack_installation_grizzly/nova.html#restart-dbsync-nova"/>
     </navPoint>
     
     <navPoint id="navpoint-12" playOrder="12">
       <navLabel><text>Cinder Installation</text></navLabel>
-      <content src="openstack_installation.html#cinder"/>
+      <content src="openstack_installation_grizzly/cinder.html#cinder"/>
     </navPoint>
     <navPoint id="navpoint-12" playOrder="12">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Install Cinder Packages</text></navLabel>
-        <content src="openstack_installation.html#cinder-packages"/>
+        <content src="openstack_installation_grizzly/cinder.html#cinder-packages"/>
     </navPoint>
     <navPoint id="navpoint-12" playOrder="12">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create Cinder Database</text></navLabel>
-        <content src="openstack_installation.html#cinder-db"/>
+        <content src="openstack_installation_grizzly/cinder.html#cinder-db"/>
     </navPoint>
     <navPoint id="navpoint-12" playOrder="12">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Update Cinder Configuration Files</text></navLabel>
-        <content src="openstack_installation.html#configure-cinder-files"/>
+        <content src="openstack_installation_grizzly/cinder.html#configure-cinder-files"/>
     </navPoint>
     <navPoint id="navpoint-12" playOrder="12">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Configure Cinder Database</text></navLabel>
-        <content src="openstack_installation.html#cinder-dbsync"/>
+        <content src="openstack_installation_grizzly/cinder.html#cinder-dbsync"/>
     </navPoint>
     <navPoint id="navpoint-12" playOrder="12">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create Cinder Volume</text></navLabel>
-        <content src="openstack_installation.html#cinder-volume"/>
+        <content src="openstack_installation_grizzly/cinder.html#cinder-volume"/>
     </navPoint>
     <navPoint id="navpoint-12" playOrder="12">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Restart Cinder Services</text></navLabel>
-        <content src="openstack_installation.html#restart-cinder"/>
+        <content src="openstack_installation_grizzly/cinder.html#restart-cinder"/>
     </navPoint>
     
 
     <navPoint id="navpoint-13" playOrder="13">
       <navLabel><text>Horizon Installation</text></navLabel>
-      <content src="openstack_installation.html#horizon"/>
+      <content src="openstack_installation_grizzly/horizon.html#horizon"/>
     </navPoint>
     <navPoint id="navpoint-13" playOrder="13">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Install Horizon Packages</text></navLabel>
-        <content src="openstack_installation.html#horizon-packages"/>
+        <content src="openstack_installation_grizzly/horizon.html#horizon-packages"/>
     </navPoint>
     <navPoint id="navpoint-13" playOrder="13">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Restart Horizon Services</text></navLabel>
-        <content src="openstack_installation.html#restart-dashboard-services"/>
+        <content src="openstack_installation_grizzly/horizon.html#restart-dashboard-services"/>
     </navPoint>
 
     <navPoint id="navpoint-14" playOrder="14">
       <navLabel><text>Create a VM</text></navLabel>
-      <content src="openstack_installation.html#create-vm"/>
+      <content src="openstack_installation_grizzly/create_vm.html#create-vm"/>
     </navPoint>
     <navPoint id="navpoint-14" playOrder="14">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a External Network</text></navLabel>
-        <content src="openstack_installation.html#pub-net"/>
+        <content src="openstack_installation_grizzly/create_vm.html#pub-net"/>
     </navPoint>
     <navPoint id="navpoint-14" playOrder="14">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a Subnet and Allocate Floating IP</text></navLabel>
-        <content src="openstack_installation.html#pub-subnet-floatingip"/>
+        <content src="openstack_installation_grizzly/create_vm.html#pub-subnet-floatingip"/>
     </navPoint>
     <navPoint id="navpoint-14" playOrder="14">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a Private Network</text></navLabel>
-        <content src="openstack_installation.html#pvt-net"/>
+        <content src="openstack_installation_grizzly/create_vm.html#pvt-net"/>
     </navPoint>
     <navPoint id="navpoint-14" playOrder="14">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a Private Subnet</text></navLabel>
-        <content src="openstack_installation.html#pvt-subnet"/>
+        <content src="openstack_installation_grizzly/create_vm.html#pvt-subnet"/>
     </navPoint>
     <navPoint id="navpoint-14" playOrder="14">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a Router</text></navLabel>
-        <content src="openstack_installation.html#create-router"/>
+        <content src="openstack_installation_grizzly/create_vm.html#create-router"/>
     </navPoint>
     <navPoint id="navpoint-14" playOrder="14">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Attach Public and Private Interfaces</text></navLabel>
-        <content src="openstack_installation.html#attach-interfaces"/>
+        <content src="openstack_installation_grizzly/create_vm.html#attach-interfaces"/>
     </navPoint>
     <navPoint id="navpoint-14" playOrder="14">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a Security Group</text></navLabel>
-        <content src="openstack_installation.html#security-group"/>
+        <content src="openstack_installation_grizzly/create_vm.html#security-group"/>
     </navPoint>
     <navPoint id="navpoint-14" playOrder="14">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a Keypair</text></navLabel>
-        <content src="openstack_installation.html#key-pair"/>
+        <content src="openstack_installation_grizzly/create_vm.html#key-pair"/>
     </navPoint>
     <navPoint id="navpoint-14" playOrder="14">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Launch an Instance</text></navLabel>
-        <content src="openstack_installation.html#launch-instance"/>
+        <content src="openstack_installation_grizzly/create_vm.html#launch-instance"/>
     </navPoint>
     <navPoint id="navpoint-14" playOrder="14">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ping and SSH to an Instance</text></navLabel>
-        <content src="openstack_installation.html#ping-ssh-vm"/>
+        <content src="openstack_installation_grizzly/create_vm.html#ping-ssh-vm"/>
     </navPoint>
     <navPoint id="navpoint-14" playOrder="14">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Configure Floatings IP to Virtual Machines</text></navLabel>
-        <content src="openstack_installation.html#floatingip"/>
+        <content src="openstack_installation_grizzly/create_vm.html#floatingip"/>
     </navPoint>
 
     <navPoint id="navpoint-15" playOrder="15">
       <navLabel><text>Create a Cinder Volume</text></navLabel>
-      <content src="openstack_installation.html#cinder-volume"/>
+      <content src="openstack_installation_grizzly/cinder_volumes.html#cinder-volume"/>
     </navPoint>
     <navPoint id="navpoint-15" playOrder="15">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a Volume Type</text></navLabel>
-        <content src="openstack_installation.html#create-vol-type"/>
+        <content src="openstack_installation_grizzly/cinder_volumes.html#create-vol-type"/>
     </navPoint>
     <navPoint id="navpoint-15" playOrder="15">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a Volume</text></navLabel>
-        <content src="openstack_installation.html#create-vol"/>
+        <content src="openstack_installation_grizzly/cinder_volumes.html#create-vol"/>
     </navPoint>
     <navPoint id="navpoint-15" playOrder="15">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Attach Volume to VM</text></navLabel>
-        <content src="openstack_installation.html#attach-vol-to-vm"/>
+        <content src="openstack_installation_grizzly/cinder_volumes.html#attach-vol-to-vm"/>
     </navPoint>
     <navPoint id="navpoint-15" playOrder="15">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;List Volumes</text></navLabel>
-        <content src="openstack_installation.html#list-vol"/>
+        <content src="openstack_installation_grizzly/cinder_volumes.html#list-vol"/>
     </navPoint>
     <navPoint id="navpoint-15" playOrder="15">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Test the Volume</text></navLabel>
-        <content src="openstack_installation.html#test-vol"/>
+        <content src="openstack_installation_grizzly/cinder_volumes.html#test-vol"/>
     </navPoint>
     <navPoint id="navpoint-15" playOrder="15">
         <navLabel><text>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FAQ's</text></navLabel>
-        <content src="openstack_installation.html#faqs"/>
+        <content src="openstack_installation_grizzly/cinder_volumes.html#faqs"/>
     </navPoint>
 
     <navPoint id="navpoint-16" playOrder="16">
