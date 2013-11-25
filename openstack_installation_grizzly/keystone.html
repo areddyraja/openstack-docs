@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+<title>
+OpenStack Grizzly Installation : Single Node
+</title>
+<link href='./stylesheets/bootstrap_1.css' rel='stylesheet' type='text/css'>
+<meta content='nanoc 3.6.3' name='generator'>
+</head>
+<body>
+<div class='container-fluid'>
+<div class='row-fluid'>
+<div class='span13' id='main'>
+
+<h1 id="openstack-grizzly-installation---single-node">OpenStack Grizzly Installation - Single Node</h1>
+
+<a name="keystone"><h2 id="keystone">Keystone Installation</h2></a>
+<p>Keystone provides Identity, Token, Catalog and Policy services as REST Endpoints which
+are consumed by rest of the components</p>
+
+<ul>
+<li>Identity service : Validates auth credentials about Users, Tenants and Roles </li>
+<li>Token Service : Manages and validates Tokens</li>
+<li>Catalog Service : Endpoint registry for other OpenStack services</li>
+<li>Policy Service : Rule Based authorization engine</li>
+</ul>
+<p>Keystone will be installed and then configured to work with the MySQL Databas</p>
+<ol>
+<li><a href="openstack_installation.html#install-keystone">Install and Verify keystone</a></li>
+<li><a href="openstack_installation.html#keystone-db">Create and configure Keystone Database</a></li>
+<li><a href="openstack_installation.html#environ-keystone">Configure Keystone Environment Variables</a></li>
+</ol>
+<h3 id="install-keystone">Install and Verify keystone</h3>
+<ol>
+<li>
+<p>Install keystone from packages using the apt-get command.</p>
+
+<pre class="terminal">
+#apt-get install keystone
+</pre>
+
+</li>
+
+<li>
+<p>Check if keystone is running</p>
+
+<pre class="terminal">
+#service keystone status
+</pre>
+
+</li>
+</ol>
+<h3 id="keystone-db">Create and configure Keystone Database</h3>
+<ol>
+<li>
+<p>Create a new MySQL database for keystone</p>
+
+<pre class="terminal">
+    mysql -u root -p
+    CREATE DATABASE keystone;
+    GRANT ALL ON keystone.* TO 'keystone-user'@'%' IDENTIFIED BY 'keystone-pass';
+    quit;
+</pre>
+</li>
+<li>
+<p>Adapt the connection attribute in the <code>/etc/keystone/keystone.conf</code> to the new database:</p>
+<pre class="terminal">
+    connection = mysql://keystone-user:keystone-pass@192.168.100.51/keystone
+</pre>
+</li>
+<li>
+<p>Restart the identity service then synchronize the database</p>
+
+<pre class="terminal">
+#service keystone restart
+#keystone-manage db_sync
+</pre>
+
+</li>
+
+<li>
+<p>Get the following scripts to create entries in the Keystone Database</p>
+
+<p>Modify the HOST_IP and HOST_IP_EXT variables before executing the scripts <code>HOST_IP(192.168.100.51)</code> and <code>HOST_IP_EXT(10.42.0.51)</code></p>
+
+<pre class="terminal">
+#wget https://raw.github.com/mseknibilel/OpenStack-Grizzly-Install-Guide/OVS_SingleNode/KeystoneScripts/keystone_basic.sh
+#wget https://raw.github.com/mseknibilel/OpenStack-Grizzly-Install-Guide/OVS_SingleNode/KeystoneScripts/keystone_endpoints_basic.sh
+#chmod +x keystone_basic.sh
+#chmod +x keystone_endpoints_basic.sh
+#./keystone_basic.sh
+#./keystone_endpoints_basic.sh
+</pre>
+</li>
+</ol>
+<h3 id="environ-keystone">Configure Keystone Environment Variables</h3>
+<ol>
+<li>
+<p>Create a simple script with credentials set and source the same</p>
+
+<pre class="terminal">
+#nano creds
+#Paste the following:
+    export OS_TENANT_NAME=admin
+    export OS_USERNAME=admin
+    export OS_PASSWORD=admin_pass
+    export OS_AUTH_URL="http://10.42.0.51:5000/v2.0/"
+</pre>
+
+</li>
+
+<li>
+<p>Source the script</p>
+
+<pre class="terminal">
+#source creds
+</pre>
+
+</li>
+
+<li>
+<p>Use simple CLI command to test Keystone</p>
+
+<pre class="terminal">
+#keystone user-list
+</pre>
+
+</li>
+</ol>
+
+</div>
+</div>
+</div>
+</body>
+</html>
+
+

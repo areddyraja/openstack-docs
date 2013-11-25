@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+<title>
+OpenStack Grizzly Installation : Single Node
+</title>
+<link href='./stylesheets/bootstrap_1.css' rel='stylesheet' type='text/css'>
+<meta content='nanoc 3.6.3' name='generator'>
+</head>
+<body>
+<div class='container-fluid'>
+<div class='row-fluid'>
+<div class='span13' id='main'>
+
+<h1 id="openstack-grizzly-installation---single-node">OpenStack Grizzly Installation - Single Node</h1>
+
+<a name=""><h2 id="nova">Nova Installation</h2></a>
+
+<p>OpenStack Compute (Nova) is a cloud computing fabric controller (the main part of an IaaS system). Nova's architecture is designed to scale horizontally on standard hardware with no proprietary hardware or software requirements and provide the ability to integrate with legacy systems and third party technologies. It is designed to manage and automate pools of computer resources and can work with widely available virtualization technologies, as well as bare metal and high-performance computing (HPC) configurations.</p>
+
+<h3 id="kvm">KVM Installation</h3>
+
+<p>Kernel-based Virtual Machine (KVM) is a virtualization infrastructure for the Linux kernel which turns it into a hypervisor. KVM requires a processor with hardware virtualization extension.</p>
+
+<p>For production environments the most tested hypervisors are KVM and Xen-based hypervisors. KVM runs through libvirt, Xen runs best through XenAPI calls. KVM is selected by default and requires the least additional configuration.</p>
+
+
+<p>Steps to be followed for KVM Installation</p>
+<ol>
+<li><a href="openstack_installation.html#pre-requisites">Pre-requisites for KVM Installation</a></li>
+<li><a href="openstack_installation.html#install-and-configure-kvm">Install and Configure KVM</a></li>
+</ol>
+
+<h4 id="pre-requisites">Pre-requisites for KVM Installation</h4>
+<ol>
+<li>
+<p>Checking for hardware virtualization support:</p>
+
+<p>The processors of your compute host need to support virtualization technology (VT) to use KVM.</p>
+<p>Install the cpu package and use the kvm-ok command to check if your processor has VT support.</p>
+
+<pre class="terminal">
+#apt-get install cpu-checker
+#kvm-ok
+</pre>
+
+If VT is enabled, you will see output similar to the listing below
+
+<pre class="terminal">
+INFO: /dev/kvm exists
+KVM acceleration can be used
+</pre>
+
+</li>
+</ol>
+
+<h4 id="install-and-configure-kvm">Install and Configure KVM</h4>
+<ol>
+<li>
+
+<pre class="terminal">
+#apt-get install kvm libvirt-bin pm-utils
+</pre>
+
+</li>
+
+<li>
+<p>Edit the <code>cgroup_device_acl</code> array in the <code>/etc/libvirt/qemu.conf</code> file to:</p>
+
+
+<p><b>Original Code Listing:</b></p>
+<pre class="terminal">
+    #cgroup_device_acl = [
+    #"/dev/null", "/dev/full", "/dev/zero",
+    #"/dev/random", "/dev/urandom",
+    #"/dev/ptmx", "/dev/kvm", "/dev/kqemu",
+    #"/dev/rtc", "/dev/hpet","/dev/net/tun"
+    #]
+</pre>
+
+<p><b>Modified Code Listing:</b></p>
+<pre class="terminal">
+    cgroup_device_acl = [
+    "/dev/null", "/dev/full", "/dev/zero",
+    "/dev/random", "/dev/urandom",
+    "/dev/ptmx", "/dev/kvm", "/dev/kqemu",
+    "/dev/rtc", "/dev/hpet","/dev/net/tun"
+    ]
+</pre>
+
+</li>
+
+<li>
+<p>Delete default virtual bridge to avoid any confusion</p>
+
+<pre class="terminal">
+#virsh net-destroy default
+#virsh net-undefine default
+</pre>
+
+</li>
+
+<li>
+<p>Enable live migration by updating <code>/etc/libvirt/libvirtd.conf</code> file:</p>
+
+<p><b>Original Code Listing:</b></p>
+<pre class="terminal">
+    #listen_tls = 0
+    .
+    .
+    #listen_tcp = 1
+    .
+    .
+    #auth_tcp = "none"
+</pre>
+
+<p><b>Modified Code Listing:</b></p>
+<pre class="terminal">
+    listen_tls = 0
+    .
+    .
+    listen_tcp = 1
+    .
+    .
+    auth_tcp = "none"
+</pre>
+
+<p>Edit <code>libvirtd_opts</code> variable in <code>/etc/init/libvirt-bin.conf</code> file:</p>
+
+<p><b>Original Code Listing:</b></p>
+<pre class="terminal">
+    env libvirtd_opts="-d"
+</pre>
+
+<p><b>Modified Code Listing:</b></p>
+<pre class="terminal">
+    env libvirtd_opts="-d -l"
+</pre>
+
+
+<p>Edit <code>/etc/default/libvirt-bin</code> file</p>
+
+<p><b>Modified Code Listing:</b></p>
+<pre class="terminal">
+    libvirtd_opts="-d -l"
+</pre>
+
+<p><b>Modified Code Listing:</b></p>
+<pre class="terminal">
+    libvirtd_opts="-d -l"
+</pre>
+
+</li>
+
+<li>
+<p>Restart the <code>libvirt</code> service and <code>dbus</code> to load the new values</p>
+
+<pre class="terminal">
+#service dbus restart &amp;&amp; service libvirt-bin restart
+</pre>
+
+
+</li>
+</ol>
+
+<h3 id="Pre-requsites">Nova Installation</h3>
+
+<p>Steps to be followed for Nova Installation</p>
+<ol>
+<li><a href="openstack_installation.html#nova-packages">Install Nova Packages</a></li>
+<li><a href="openstack_installation.html#nova-db">Configure Nova Database</a></li>
+<li><a href="openstack_installation.html#configure-nova-files">Update Nova Configuration Files</a></li>
+<li><a href="openstack_installation.html#restart-dbsync-nova">Configure Nova Database and Restart Services</a></li>
+</ol>
+
+<h4 id="nova-packages">Install Nova Packages</h4>
+
+<pre class="terminal">
+#apt-get install  nova-api nova-cert novnc nova-consoleauth nova-scheduler nova-novncproxy nova-doc nova-conductor nova-compute-kvm
+</pre>
+
+<p>Check the status of all nova-services</p>
+
+<pre class="terminal">
+#cd /etc/init.d/; for i in $( ls nova-* ); do service $i status; cd; done
+</pre>
+
+<h4 id="nova-db">Configure Nova Database</h4>
+<p>Create a new MySQL database for Nova by executing the <code>CREATE DATABASE</code> command
+on the <code>mysql</code> command prompt. After this <b>GRANT ALL</b> permission for 
+nova tables to <b>nova-user</b></p>
+
+<pre class="terminal">
+mysql -u root -p
+CREATE DATABASE nova;
+GRANT ALL ON nova.* TO 'nova-user'@'%' IDENTIFIED BY 'nova-pass';
+quit;
+</pre>
+
+<h4 id="configure-nova-files">Update Nova Configuration Files</h4>
+<ol>
+<li>
+<p>Update <code>[filter:authtoken]</code> section in the <code>/etc/nova/api-paste.ini</code> file to this:</p>
+
+<pre class="terminal">
+[filter:authtoken]
+paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
+auth_host = 192.168.100.51
+auth_port = 35357
+auth_protocol = http
+admin_tenant_name = service
+admin_user = nova
+admin_password = service_pass
+signing_dirname = /tmp/keystone-signing-nova
+# Workaround for https://bugs.launchpad.net/nova/+bug/1154809
+auth_version = v2.0
+</pre>
+
+</li>
+
+<li>
+<p>The Compute service supports a large number of configuration options. These options are specified
+in a configuration file whose default location is /etc/nova/nova.conf.</p>
+
+<p>Update <code>/etc/nova/nova.conf</code> like this:</p>
+<ul>
+<li>
+<p>Almost all of the configuration options are in the DEFAULT section.</p>
+<pre class="terminal">
+[DEFAULT]
+logdir=/var/log/nova (The base directory used for relative --log-file paths)
+state_path=/var/lib/nova (Top-level directory for maintaining nova's state)
+lock_path=/run/lock/nova (Directory to use for lock files. Default to a temp directory)
+verbose=True (if FALSE, Print more verbose output (set logging level to INFO instead of default WARNING level))
+api_paste_config=/etc/nova/api-paste.ini (File name for the paste.deploy config for nova-api)
+compute_scheduler_driver=nova.scheduler.simple.SimpleScheduler (Default driver to use for the scheduler)
+rabbit_host=192.168.100.51 (The RabbitMQ broker address where a single node is used)
+nova_url=http://192.168.100.51:8774/v1.1/
+sql_connection=mysql://nova-user:nova-pass@192.168.100.51/nova (The SQLAlchemy connection string
+used to connect to the database)
+root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
+</pre>
+</li>
+
+<li>
+<p>Configure Authentication and Authorization</p>
+<p>There are different methods of authentication for the OpenStack Compute project, including no
+authentication. The preferred system is the OpenStack Identity Service, code-named Keystone.</p>
+<pre class="terminal">
+# Auth 
+use_deprecated_auth=false
+auth_strategy=keystone (The strategy to use for auth: noauth or keystone)
+</pre>
+</li>
+
+<li>
+<p>Glance interaction with Nova</p>
+<pre class="terminal">
+# Imaging service 
+glance_api_servers=192.168.100.51:9292 (A list of the glance api servers available to nova. Prefix with
+https:// for ssl-based glance api servers. ([hostname|ip]:port)) image_service=nova.image.glance.GlanceImageService
+</pre>
+</li>
+
+<li>
+<p>The VNC Proxy is an OpenStack component that allows users of the Compute service to access their
+ instances through VNC clients.</p>
+<p>To enable <code>vncproxy</code> in your cloud, in addition to running one or both of the proxies and nova-consoleauth, you need to configure the following options in <code>nova.conf</code> on your compute hosts. </p>
+<pre class="terminal">
+# Vnc configuration
+
+novnc_enabled=true (Defaults to enabled. If this option is disabled your instances will launch without VNC support)
+novncproxy_base_url=http://10.42.0.51:6080/vnc_auto.html (location of vnc console proxy, Modify IP address according to your external IP address)
+novncproxy_port=6080 (Port that the novncproxy should bind to)
+vncserver_proxyclient_address=192.168.100.51 (This is the address of the compute host that nova will instruct proxies to use when connecting to instance vncservers)
+vncserver_listen=0.0.0.0 (This is the address that vncservers will bind, and should be overridden in production deployments as a private address. Applies to libvirt only.
+                              For multi-host libvirt deployments this should be set to a host management IP on the same as the proxies)
+</pre>
+</li>
+
+<li>
+<p>Configure Nova with Quantum</p>
+<p>Unlike traditional Nova deployments, when Quantum is in use, Nova should not run a nova-network.
+Instead, Nova delegates almost all of the network-related decisions to Quantum. This means many of
+the network-related CLI command and configuration options you are familiar with from using Nova do not work with Quantum.</p>
+<pre class="terminal">
+# Network settings
+    
+network_api_class=nova.network.quantumv2.api.API (The full class name of the network API class to use)
+quantum_url=http://192.168.100.51:9696  (URL for connecting to quantum)
+quantum_auth_strategy=keystone (auth strategy for connecting to quantum in admin context)
+quantum_admin_tenant_name=service (tenant name for connecting to quantum in admin context)
+quantum_admin_username=quantum (username for connecting to quantum in admin context)
+quantum_admin_password=service_pass (auth url for connecting to quantum in admin context)
+quantum_admin_auth_url=http://192.168.100.51:35357/v2.0 (auth url for connecting to quantum in admin context)
+libvirt_vif_driver=nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver (The libvirt VIF driver to configure the VIFs)
+linuxnet_interface_driver=nova.network.linux_net.LinuxOVSInterfaceDriver
+#If you want Quantum + Nova Security groups
+firewall_driver=nova.virt.firewall.NoopFirewallDriver (Firewall driver (defaults to hypervisor specific iptables driver))
+security_group_api=quantum (The full class name of the security API class)
+#If you want Nova Security groups only, comment the two lines above and uncomment line -1-.
+#-1-firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
+</pre>
+</li>
+
+<li>
+<p>Description of configuration options for metadata</p>
+<p>The Compute service uses a special metadata service to enable virtual machine instances to retrieve instance-specific data.
+Instances access the metadata service at http://169.254.169.254. The metadata service supports 
+two sets of APIs: an OpenStack metadata API and an EC2-compatible API. Each of the APIs is versioned by date.</p>
+<pre class="terminal">
+#Metadata 
+
+service_quantum_metadata_proxy = True (All compute hosts share the same dhcp address.)
+quantum_metadata_proxy_shared_secret = helloOpenStack 
+metadata_host = 192.168.100.51 (the ip for the metadata api server)
+metadata_listen = 127.0.0.1 (IP address for metadata api to listen)
+metadata_listen_port = 8775 (port for metadata api to listen)
+</pre>
+</li>
+
+<li>
+<p>Connect to a hypervisor through <code>libvirt</code></p>
+<pre class="terminal">
+# Compute 
+
+compute_driver=libvirt.LibvirtDriver (Driver to use for controlling virtualization. 
+Options include: libvirt.LibvirtDriver, xenapi.XenAPIDriver, fake.FakeDriver, baremetal.BareMetalDriver, vmwareapi.VMwareESXDriver, vmwareapi.VMwareVCDriver)
+</pre>
+</li>
+
+<li>
+<p>The <code>volume_api_class</code> setting is the default setting for grizzly.</p>
+<pre class="terminal">
+# Cinder 
+
+volume_api_class=nova.volume.cinder.API (The full class name of the volume API class to use)
+osapi_volume_listen_port=5900 (port for os volume api to listen )
+</pre>
+</li>
+</ul>
+</li>
+
+<li>
+<p>Update <code>/etc/nova/nova-compute.conf</code></p>
+
+<p>KVM is configured as the default hypervisor for Compute.</p>
+<p>Description of configuration options for hypervisor
+The nova.conf used by the nova-compute service should contain the following flags to ensure correct vif-plugging. 
+If your integration bridge name is something other than “br-int”, change the first flag listed below:</p>
+<pre class="terminal">
+[DEFAULT]
+libvirt_type=kvm (Libvirt domain type (valid options are: kvm, lxc, qemu, uml, xen))
+libvirt_ovs_bridge=br-int (Internal Bridge)
+libvirt_vif_type=ethernet 
+libvirt_vif_driver=nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver (The libvirt VIF driver to configure the VIFs)
+libvirt_use_virtio_for_bridges=True (Update an existing OpenStack instance after a global flag change)
+</pre>
+
+</li>
+</ol>
+
+<h4 id="restart-dbsync-nova">Configure Nova Database and Restart Services</h4>
+<ol>
+<li>
+<p>Synchronize the nova database using nova-manage command</p>
+
+<pre class="terminal">
+#nova-manage db sync
+</pre>
+
+</li>
+    
+<li>
+<p>Restart nova-* services</p>
+
+<pre class="terminal">
+#cd /etc/init.d/; for i in $( ls nova-* ); do sudo service $i restart; done
+</pre>
+
+</li>
+
+<li>
+<p>Check for the smiling faces on nova-* services to confirm your installation</p>
+
+<pre class="terminal">
+#nova-manage service list
+</pre>
+
+</li>
+</ol>
+
+
+</div>
+</div>
+</div>
+</body>
+</html>

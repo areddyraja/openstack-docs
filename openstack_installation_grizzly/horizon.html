@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+<title>
+OpenStack Grizzly Installation : Single Node
+</title>
+<link href='./stylesheets/bootstrap_1.css' rel='stylesheet' type='text/css'>
+<meta content='nanoc 3.6.3' name='generator'>
+</head>
+<body>
+<div class='container-fluid'>
+<div class='row-fluid'>
+<div class='span13' id='main'>
+
+<h1 id="openstack-grizzly-installation---single-node">OpenStack Grizzly Installation - Single Node</h1>
+
+<a name=""><h2 id="horizon">Horizon Installation</h2></a>
+
+<p>OpenStack Dashboard (Horizon) provides administrators and users a graphical interface to access, provision and automate cloud-based resources.
+The dashboard is just one way to interact with OpenStack resources.</p>
+<ol>
+<li><a href="openstack_installation.html#horizon-packages">Install Horizon Packages</a></li>
+<li><a href="openstack_installation.html#restart-dashboard-services">Restart Horizon Services</a></li>
+</ol>
+
+<ol>
+<li>
+<h3 id="horizon-packages">Install Horizon Packages</h3>
+<p>To install horizon, proceed like this</p>
+
+<pre class="terminal">
+#apt-get -y install openstack-dashboard memcached
+</pre>
+
+<p>Optional:If you don't like the OpenStack ubuntu theme, you can remove the package to disable it:</p>
+
+<pre class="terminal">
+#dpkg --purge openstack-dashboard-ubuntu-theme
+</pre>
+
+</li>
+
+<li>
+<h3 id="restart-dashboard-services">Restart Horizon Services</h3>
+<p>Reload Apache and memcached:</p>
+
+<pre class="terminal">
+#service apache2 restart; service memcached restart
+</pre>
+
+<p>You can now access your OpenStack <code>10.42.0.51/horizon</code> with credentials <code>admin:admin_pass</code>.</p>
+</li>
+</ol>
+
+</div>
+</div>
+</div>
+</body>
+</html>

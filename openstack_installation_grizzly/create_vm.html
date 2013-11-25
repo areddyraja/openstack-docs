@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+<title>
+OpenStack Grizzly Installation : Single Node
+</title>
+<link href='./stylesheets/bootstrap_1.css' rel='stylesheet' type='text/css'>
+<meta content='nanoc 3.6.3' name='generator'>
+</head>
+<body>
+<div class='container-fluid'>
+<div class='row-fluid'>
+<div class='span13' id='main'>
+
+<h1 id="openstack-grizzly-installation---single-node">OpenStack Grizzly Installation - Single Node</h1>
+
+<a name="first-vm"><h2 id="create-vm">Create a VM</h2></a>
+<p>These are the following steps to create a VM</p>
+<ol>
+<li><a href="openstack_installation.html#pub-net">Create a External Network</a></li>
+<li><a href="openstack_installation.html#pub-subnet-floatingip">Create a Subnet and Allocate Floating IP</a></li>
+<li><a href="openstack_installation.html#pvt-net">Create a Private Network</a></li>
+<li><a href="openstack_installation.html#pvt-subnet">Create a Private Subnet</a></li>
+<li><a href="openstack_installation.html#create-router">Create a Router</a></li>
+<li><a href="openstack_installation.html#attach-interfaces">Attach Public and Private Interfaces</a></li>
+<li><a href="openstack_installation.html#security-group">Create a Security Group</a></li>
+<li><a href="openstack_installation.html#key-pair">Create a Keypair</a></li>
+<li><a href="openstack_installation.html#launch-instance">Launch an Instance</a></li>
+<li><a href="openstack_installation.html#ping-ssh-vm">Ping and SSH to an Instance</a></li>
+<li><a href="openstack_installation.html#floatingip">Configure Floating IPs to Virtual Machines</a></li>
+</ol>
+
+<h3 id="pub-net">Create a External Network</h3>
+
+<pre class="terminal">
+#quantum net-create public-net --router:external=True
+
+Created a new network:
++---------------------------+--------------------------------------+
+| Field                     | Value                                |
++---------------------------+--------------------------------------+
+| admin_state_up            | True                                 |
+| id                        | 21ea48fb-ee1e-46a4-b589-b3c2b359291d |
+| name                      | public-net                           |
+| provider:network_type     | gre                                  |
+| provider:physical_network |                                      |
+| provider:segmentation_id  | 1                                    |
+| router:external           | True                                 |
+| shared                    | False                                |
+| status                    | ACTIVE                               |
+| subnets                   |                                      |
+| tenant_id                 | 2b942273713741b1868eb86b11e08df8     |
++---------------------------+--------------------------------------+
+</pre>
+
+ <img src="./images/create_ext_net.png">
+
+<h3 id="pub-subnet-floatingip">Create a Subnet and Allocate Floating IP</h3>
+<p>Create subnet and allocate floating ip range for public-network:</p>
+<p>Floating IP network (Publicly routable IP Range): This network is utilized for providing Public IP accessibility to selected cloud instances. <code>tenant-id</code> can be obtained by using the command <code>keystone tenant-list</code>.</p>
+
+<pre class="terminal">
+#quantum subnet-create --tenant-id 2b942273713741b1868eb86b11e08df8 --name public-net-subnet01 --gateway 10.42.0.1 public-net 10.42.0.0/24 --enable_dhcp False --allocation-pool start=10.42.0.74,end=10.42.0.254
+
+Created a new subnet:
++------------------+----------------------------------------------+
+| Field            | Value                                        |
++------------------+----------------------------------------------+
+| allocation_pools | {"start": "10.42.0.2", "end": "10.42.0.254"} |
+| cidr             | 10.42.0.0/24                                 |
+| dns_nameservers  |                                              |
+| enable_dhcp      | False                                        |
+| gateway_ip       | 10.42.0.1                                    |
+| host_routes      |                                              |
+| id               | d5b8d223-c2b2-4b87-ae7c-187d37f8b762         |
+| ip_version       | 4                                            |
+| name             | public-net-subnet01                          |
+| network_id       | 21ea48fb-ee1e-46a4-b589-b3c2b359291d         |
+| tenant_id        | 2b942273713741b1868eb86b11e08df8             |
++------------------+----------------------------------------------+
+</pre>
+
+<img src="./images/create_subnet_ext.png">
+
+
+<h3 id="pvt-net">Create a Private Network</h3>
+<pre class="terminal">
+#quantum net-create private-net
+
+Created a new network:
++---------------------------+--------------------------------------+
+| Field                     | Value                                |
++---------------------------+--------------------------------------+
+| admin_state_up            | True                                 |
+| id                        | 428dbfc9-73e1-4e8d-88e2-471a3e91f6a6 |
+| name                      | private-net                          |
+| provider:network_type     | gre                                  |
+| provider:physical_network |                                      |
+| provider:segmentation_id  | 2                                    |
+| router:external           | False                                |
+| shared                    | False                                |
+| status                    | ACTIVE                               |
+| subnets                   |                                      |
+| tenant_id                 | 2b942273713741b1868eb86b11e08df8     |
++---------------------------+--------------------------------------+
+</pre>
+
+<img src="./images/create_pvt_net.png">
+
+<h3 id="pvt-subnet">Create a Private Subnet</h3>
+<p>Attach subnet to private network:</p>
+
+<pre class="terminal">
+#quantum subnet-create --name private-subnet private-net 10.0.0.0/24
+
+Created a new subnet:
++------------------+--------------------------------------------+
+| Field            | Value                                      |
++------------------+--------------------------------------------+
+| allocation_pools | {"start": "10.0.0.2", "end": "10.0.0.254"} |
+| cidr             | 10.0.0.0/24                                |
+| dns_nameservers  |                                            |
+| enable_dhcp      | True                                       |
+| gateway_ip       | 10.0.0.1                                   |
+| host_routes      |                                            |
+| id               | 5421a4eb-5b4b-4c3e-9b56-6bb721f99653       |
+| ip_version       | 4                                          |
+| name             | private-subnet                             |
+| network_id       | 428dbfc9-73e1-4e8d-88e2-471a3e91f6a6       |
+| tenant_id        | 2b942273713741b1868eb86b11e08df8           |
++------------------+--------------------------------------------+
+</pre>
+
+<img src="./images/create_subnet_pvt.png">
+
+
+<h3 id="create-router">Create a Router</h3>
+
+<pre class="terminal">
+#quantum router-create router1
+
+Created a new router:
++-----------------------+--------------------------------------+
+| Field                 | Value                                |
++-----------------------+--------------------------------------+
+| admin_state_up        | True                                 |
+| external_gateway_info |                                      |
+| id                    | ca972d3b-788e-4e16-8552-dd335575c5c0 |
+| name                  | router1                              |
+| status                | ACTIVE                               |
+| tenant_id             | 2b942273713741b1868eb86b11e08df8     |
++-----------------------+--------------------------------------+
+</pre>
+
+<img src="./images/create_router.png">
+
+<h3 id="attach-interfaces">Attach Public and Private Interfaces</h3>
+<ol><li>
+<p>Uplink router to public network:</p>
+
+<pre class="terminal">
+#quantum router-gateway-set router1 public-net
+</pre>
+</li>
+<li>
+<p>Attach private network to router:</p>
+
+<pre class="terminal">
+#quantum router-interface-add router1 private-subnet
+</pre>
+
+<img src="./images/router_add_iface.png">
+</li>
+</ol>
+
+<h3 id="security-group">Create a Security Group</h3>
+
+<img src="./images/create_security_group_desc.png">
+
+<ol>
+<li>
+<p>Access and Security</p>
+<img src="./images/access_and_security.png">
+</li>
+
+<li>
+<p>Edit Security Group Rules</p>
+<p>Add TCP and ICMP Rules:</p>
+<img src="./images/add_rule.png">
+</li>
+</ol>
+
+<h3 id="key-pair">Create a Keypair</h3>
+<p>
+<img src="./images/create_keypair.png"></p>
+
+
+<h3 id="launch-instance">Launch an Instance</h3>
+
+<code>Note: Create a VM using the Horizon dashboard</code>
+
+<ol>
+<li>
+<h5 id="before-vm-creation">Before Creating VM</h5>
+<img src="./images/empty_instances.png">
+</li>
+
+<li>
+<h5 id="enter-instance-details">Enter Instance Details</h5>
+ <img src="./images/launch_instance.png">
+</li>
+
+<li>
+<h5 id="select-keypair-sec-group">Select Keypair and Security Group</h5>
+ <img src="./images/launch_instance_keypair.png">
+</li>
+
+<li><h5 id="select-network">Select Instance Network</h5>
+ <img src="./images/launch_instance_networking.png">
+</li>
+After selecting a network click-on <code>Launch</code> to create a VM.
+
+
+<li>
+<p><h5 id="first-vm">My first VM</h5>
+ <img src="./images/first_instance.png">
+</li>
+
+<li><h5 id="network-topology">Network Topology</h5>
+ <img src="./images/network_topology.png">
+</li>
+
+<h3 id="ping-ssh-vm">Ping and SSH to an Instance</h3>
+<ol><li>
+<h5 id="show-netlist">To Show net-list</h5>
+<pre class="terminal">
+#ip netns list
+qrouter-ca972d3b-788e-4e16-8552-dd335575c5c0
+</pre>
+
+<pre class="terminal">
+#ip netns exec qrouter-ca972d3b-788e-4e16-8552-dd335575c5c0 ip addr list
+10: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 16436 qdisc noqueue state UNKNOWN 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+11: qg-e045e129-e0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UNKNOWN 
+    link/ether fa:16:3e:23:30:ef brd ff:ff:ff:ff:ff:ff
+    inet 10.42.0.2/24 brd 10.42.0.255 scope global qg-e045e129-e0
+    inet6 fe80::f816:3eff:fe23:30ef/64 scope link 
+       valid_lft forever preferred_lft forever
+12: qr-696c2816-7e: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UNKNOWN 
+    link/ether fa:16:3e:c8:2f:1a brd ff:ff:ff:ff:ff:ff
+    inet 10.0.0.1/24 brd 10.0.0.255 scope global qr-696c2816-7e
+    inet6 fe80::f816:3eff:fec8:2f1a/64 scope link 
+       valid_lft forever preferred_lft forever
+</pre>
+
+<pre class="terminal">
+#ip netns exec qrouter-ca972d3b-788e-4e16-8552-dd335575c5c0 ping 10.0.0.2
+</pre>
+</li>
+
+<li>
+<h5 id="ssh-vm">To do ssh into VM, do the follwing</h5>
+
+<pre class="terminal">
+#ip netns exec qrouter-ca972d3b-788e-4e16-8552-dd335575c5c0 ssh 10.0.0.2 -l cirros
+    userid: cirros
+    password: cubswin:)
+
+or
+
+#ssh 10.0.0.2 -l cirros 
+    The authenticity of host '10.0.0.2 (10.0.0.2)' can't be established.
+    RSA key fingerprint is da:f6:87:1a:3f:b6:e9:a4:92:8b:ca:a8:b8:d5:28:0d.
+    Are you sure you want to continue connecting (yes/no)? yes
+    Warning: Permanently added '10.0.0.2' (RSA) to the list of known hosts.
+    #cirros@10.0.0.2's password: 
+    cubswin:)
+    $ 
+</pre>
+</li>
+</ol>
+
+<h3 id="floatingip">Configure Floating IPs to Virtual Machines</h3>
+<ol>
+<li>
+
+<h5 id="allocate-floatingip">Allocate Floating IP </h5>
+
+</li>
+
+<li>
+<h5 id="associate-floatingip">Associate Floating IP to Instance</h5>
+</li>
+
+<li>
+<h5 id="allocate-floatingip">VM1 is assigned with floating ip 10.42.0.75</h5>
+</li>
+
+<li><h5 id="allocate-floatingip">Ping the virtual machine vm1 from outside network using the assigned floating ip.</h5>
+
+<pre class="terminal">
+#ping 10.42.0.75
+#ssh cirros@192.168.0.75
+</pre>
+
+</li>
+</ol>
+
+</div>
+</div>
+</div>
+</body>
+</html>

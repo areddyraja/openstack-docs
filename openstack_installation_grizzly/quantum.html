@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+<title>
+OpenStack Grizzly Installation : Single Node
+</title>
+<link href='./stylesheets/bootstrap_1.css' rel='stylesheet' type='text/css'>
+<meta content='nanoc 3.6.3' name='generator'>
+</head>
+<body>
+<div class='container-fluid'>
+<div class='row-fluid'>
+<div class='span13' id='main'>
+
+<h1 id="openstack-grizzly-installation---single-node">OpenStack Grizzly Installation - Single Node</h1>
+
+<a name=""><h2 id="quantum">Quantum Installation</h2></a>
+Quantum manages software-defined networking for your OpenStack installation. Quantum has the following object abstractions: networks, subnets, and routers. Each has functionality that mimics its physical counterpart: networks contain subnets, and routers route traffic between different subnet and networks. Quantum should have at least one external network. The external network represents the view into a slice of the external network that is accessible outside the OpenStack installation. In addition to external networks, any Neutron set up has one or more internal networks. These software-defined networks connect directly to the VMs. Only the VMs on any given internal network, or those on subnets connected through interfaces to a similar router, can access VMs connected to the same network directly. </p>
+
+<p>Follow the Steps listed below</p>
+<ol>
+<li><a href="openstack_installation.html#open-vswitch">Install and Configure Open vSwitch</a></li>
+<li><a href="openstack_installation.html#quantum_components">Install Quantum components</a></li>
+<li><a href="openstack_installation.html#create-db">Create Quantum Database</a></li>
+<li><a href="openstack_installation.html#verify-services">Verify Quantum Services</a></li>
+<li><a href="openstack_installation.html#update-config-files">Update Quantum Configuration Files</a></li>
+<li><a href="openstack_installation.html#restart-services">Restart Quantum Services</a></li>
+</ol>
+
+
+<h3 id="open-vswitch">Install and Configure Open vSwitch</h3>
+<ol>
+<li>
+<p>Install Open vSwitch Packages:</p>
+
+<pre class="terminal">
+#apt-get install -y openvswitch-switch openvswitch-datapath-dkms
+</pre>
+
+</li>
+
+<li>
+<p>Create the bridges:</p>
+<p><code>br-int</code> will be used for VM integration</p>
+<pre class="terminal">
+#br-int will be used for VM integration
+#ovs-vsctl add-br br-int
+</pre>
+
+
+<p><code>br-ex</code> is used to access the external network.</p>
+
+<pre class="terminal">
+#ovs-vsctl add-br br-ex
+</pre>
+
+</li>
+
+<li>
+<p>This will guide you to setting up the <code>br-ex</code> interface. Edit eth1 in <code>/etc/network/interfaces</code>:</p>
+
+<pre class="terminal">
+# VM internet Access
+auto eth1
+iface eth1 inet manual
+up ifconfig $IFACE 0.0.0.0 up
+up ip link set $IFACE promisc on
+down ip link set $IFACE promisc off
+down ifconfig $IFACE down
+</pre>
+
+</li>
+
+<li>
+<p>Add <code>eth1</code> interface to <code>br-ex</code></p>
+
+<p>Internet connectivity will be lost after this step but this won't affect OpenStack's work</p>
+
+<pre class="terminal">
+#ovs-vsctl add-port br-ex eth1
+</pre>
+
+</li>
+
+<li>
+<p>Optional, If you want to get internet connection back, you can assign the <code>eth1's</code> IP address to the <code>br-ex</code> in the <code>/etc/network/interfaces</code> file</p>
+<pre class="terminal">
+auto br-ex
+iface br-ex inet static
+address 10.42.0.51
+netmask 255.255.255.0
+gateway 10.42.0.1
+dns-nameservers 8.8.8.8
+</pre>
+</li>
+</ol>
+
+<h3 id="quantum_components">Install Quantum components</h3>
+<p>Install Quantum Components</p>
+<pre class="terminal">
+#apt-get install -y quantum-server quantum-plugin-openvswitch quantum-plugin-openvswitch-agent dnsmasq quantum-dhcp-agent quantum-l3-agent
+</pre>
+
+<h3 id="create-db">Create Quantum Database</h3>
+<pre class="terminal">
+mysql -u root -p
+CREATE DATABASE quantum;
+GRANT ALL ON quantum.* TO 'quantum-user'@'%' IDENTIFIED BY 'quantum-pass';
+quit;
+</pre>
+
+<h3 id="verify-services">Verify Quantum Services</h3>
+<pre class="terminal">
+#cd /etc/init.d/; for i in $( ls quantum-* ); do sudo service $i status; done
+</pre>
+
+<h3 id="update-config-files">Update Quantum Configuration Files</h3>
+<ol><li>
+<p>Configure <code>/etc/quantum/api-paste.ini</code></p>
+<pre class="terminal">
+[filter:authtoken]
+paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
+auth_host = 192.168.100.51
+auth_port = 35357
+auth_protocol = http
+admin_tenant_name = service
+admin_user = quantum
+admin_password = service_pass
+</pre>
+</li>
+
+<li>
+<p>Configure Quantum Plugin</p>
+<p>Edit the OVS plugin configuration file <code>/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini with</code>:</p>
+<p>Under the database section</p>
+<pre class="terminal">
+[DATABASE]
+sql_connection = mysql://quantum-user:quantum-pass@192.168.100.51/quantum
+</pre>
+
+<p>Under the OVS section</p>
+<pre class="terminal">
+[OVS]
+tenant_network_type = gre
+tunnel_id_ranges = 1:1000
+integration_bridge = br-int
+tunnel_bridge = br-tun
+local_ip = 192.168.100.51
+enable_tunneling = True
+
+#Firewall driver for realizing quantum security group function
+[SECURITYGROUP]
+firewall_driver = quantum.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
+</pre>
+</li>
+
+<li>
+<p>Update  <code>/etc/quantum/metadata_agent.ini</code></p>
+
+<pre class="terminal">
+#The Quantum user information for accessing the Quantum API.
+auth_url = http://192.168.100.51:35357/v2.0
+auth_region = RegionOne
+admin_tenant_name = service
+admin_user = quantum
+admin_password = service_pass
+
+#IP address used by Nova metadata server
+nova_metadata_ip = 127.0.0.1
+
+#TCP Port used by Nova metadata server
+nova_metadata_port = 8775
+metadata_proxy_shared_secret = helloOpenStack
+</pre>
+
+</li>
+<li>
+<p>Edit your <code>/etc/quantum/quantum.conf</code></p>
+
+<pre class="terminal">
+[keystone_authtoken]
+auth_host = 192.168.100.51
+auth_port = 35357
+auth_protocol = http
+admin_tenant_name = service
+admin_user = quantum
+admin_password = service_pass
+signing_dir = /var/lib/quantum/keystone-signing
+</pre>
+</li>
+</ol>
+
+<h3 id="restart-services">Restart Quantum Services</h3>
+<pre class="terminal">
+#cd /etc/init.d/; for i in $( ls quantum-* ); do sudo service $i restart; done
+#service dnsmasq restart
+</pre>
+
+</div>
+</div>
+</div>
+</body>
+</html>

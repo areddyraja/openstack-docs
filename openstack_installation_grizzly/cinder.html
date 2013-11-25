@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+<title>
+OpenStack Grizzly Installation : Single Node
+</title>
+<link href='./stylesheets/bootstrap_1.css' rel='stylesheet' type='text/css'>
+<meta content='nanoc 3.6.3' name='generator'>
+</head>
+<body>
+<div class='container-fluid'>
+<div class='row-fluid'>
+<div class='span13' id='main'>
+
+<h1 id="openstack-grizzly-installation---single-node">OpenStack Grizzly Installation - Single Node</h1>
+
+<a name=""><h2 id="cinder">Cinder Installation</h2></a>
+<p>OpenStack Block Storage (Cinder) provides persistent block level storage devices for use with OpenStack compute instances. The block storage system manages the creation, attaching and detaching of the block devices to servers.</p>
+<p>The OpenStack Block Storage service works though the interaction of a series of daemon processes named cinder-* that reside persistently on the host machine or machines. The binaries can all be run from a single node, or spread across multiple nodes. They can also be run on the same node as other OpenStack services.</p>
+<p>OpenStack Block Storage provides persistent High Performance Block Storage resources that can be consumed by OpenStack Compute instances. This includes secondary attached storage similar to Amazon's Elastic Block Storage (EBS). In addition images can be written to a Block Storage device and specified for OpenStack Compute to use a bootable persistent instance.
+OpenStack Block Storage requires some form of back-end storage that the service is built on. The default implementation is to use LVM on a local Volume Group named "cinder-volumes".</p>
+<p>Steps to be followed for Cinder Installation</p>
+<ol>
+<li><a href="openstack_installation.html#cinder-packages">Install Cinder Packages</a></li>
+<li><a href="openstack_installation.html#cinder-db">Create Cinder Database</a></li>
+<li><a href="openstack_installation.html#configure-cinder-files">Update Cinder Configuration Files</a></li>
+<li><a href="openstack_installation.html#cinder-dbsync">Configure Cinder Database</a></li>
+<li><a href="openstack_installation.html#cinder-volume">Create Cinder Volume</a></li>
+<li><a href="openstack_installation.html#restart-cinder">Restart Cinder Services</a></li>
+</ol>
+
+<h3 id="cinder-packages">Install Cinder Packages</h3>
+
+<ol>
+<li>
+<p>Install the required packages:</p>
+
+<pre class="terminal">
+#apt-get install -y cinder-api cinder-scheduler cinder-volume iscsitarget open-iscsi iscsitarget-dkms
+</pre>
+
+</li>
+
+<li>
+<p>Configure the iscsi services:</p>
+
+<pre class="terminal">
+#sed -i 's/false/true/g' /etc/default/iscsitarget
+</pre>
+
+</li>
+<li>
+<p>Restart the services:</p>
+
+<pre class="terminal">
+#service iscsitarget start
+#service open-iscsi start
+</pre>
+
+</li>
+</ol>
+
+<h3 id="cinder-db">Create Cinder Database</h3>
+<p>Prepare a Mysql database for Cinder:</p>
+<pre class="terminal">
+mysql -u root -p
+CREATE DATABASE cinder;
+GRANT ALL ON cinder.* TO 'cinderUser'@'%' IDENTIFIED BY 'cinderPass';
+quit;
+</pre>
+
+<h3 id="configure-cinder-files">Update Cinder Configuration Files</h3>
+<ol>
+<li>
+<p>Configure <code>/etc/cinder/api-paste.ini</code> like the following:</p>
+
+<pre class="terminal">
+[filter:authtoken]
+paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
+service_protocol = http
+service_host = 10.42.0.51
+service_port = 5000
+auth_host = 192.168.100.51
+auth_port = 35357
+auth_protocol = http
+admin_tenant_name = service
+admin_user = cinder
+admin_password = service_pass
+</pre>
+
+</li>
+
+<li>
+<p>Edit the <code>/etc/cinder/cinder.conf</code> to:</p>
+
+<pre class="terminal">
+[DEFAULT]
+rootwrap_config=/etc/cinder/rootwrap.conf
+sql_connection = mysql://cinderUser:cinderPass@192.168.100.51/cinder
+api_paste_config = /etc/cinder/api-paste.ini
+iscsi_helper=ietadm
+volume_name_template = volume-%s
+volume_group = cinder-volumes
+verbose = True
+auth_strategy = keystone
+#osapi_volume_listen_port=5900
+</pre>
+
+</li>
+</ol>
+
+<h3 id="cinder-dbsync">Configure Cinder Database</h3>
+
+<p>Then, synchronize your database:</p>
+<pre class="terminal">
+#cinder-manage db sync
+</pre>
+
+<h3 id="cinder-volume">Create Cinder Volume</h3>
+<p>Cinder uses volume groups for storage. There are two ways to create the volume group.</p>
+
+<ul>
+<li>Create a LVM Volume Group by using a partition</li>
+<li>Create a LVM Volume Group by using a container file as loop device</li>
+</ul>
+
+<p><b>Create a Volume Group by using a partition</b></p>
+<p>At the time of installation of Ubuntu, leave a raw partition. Do not format or install anything in that partition.</p>
+<p>Follow below steps to use the empty partiton for creating cinder volme group. Assume <code>/dev/sda13</code> is your empty partition.</p>
+
+<ol><li>
+<p>Create Physical Volume</p>
+<pre class="terminal">
+#pvcreate /dev/sda13
+</pre>
+</li>
+
+<li>
+<p>Create Volume Group</p>
+<pre class="terminal">#vgcreate cinder-volumes /dev/sda13</pre>
+<p>The Volume group can also be created using the user interface <code>system-config-lvm</code> as an alternative to command line</p>
+<p>Alllocate the empty partition to "cinder-volumes"</p>
+
+<pre class="terminal">
+#sudo apt-get install system-config-lvm
+#system-config-lvm
+#Select the partition and name it as "cinder-volumes"
+</pre>
+</li>
+</ol>
+
+<p><b>Creating a LVM Volume Group by using a container file as loop device</b></p>
+<p>If there is no partition available, we can use loop back device to create volume group.</p>
+<ol><li>
+<p>Create a container file /dev/zero</p>
+<pre class="terminal">
+#dd if=/dev/zero of=cinder-volumes bs=1 count=0 seek=20G </pre>
+</li>
+
+<li>    
+<p>Create the loop device</p>
+<pre class="terminal">#losetup /dev/loop2 cinder-volume</pre>
+</li>
+
+<li><p>Create the partition</p>
+<pre class="terminal">
+#fdisk /dev/loop2
+#Select the following options:
+n
+p
+1
+ENTER
+ENTER
+t
+8e
+w</pre>
+</li>
+
+<li><p>Create the physical volume</p>
+<pre class="terminal">#pvcreate /dev/loop2</pre>
+</li>
+
+<li><p>Create the volume group</p>
+<pre class="terminal">
+#vgcreate cinder-volumes /dev/loop2</pre>
+</li>
+</ol>
+
+<h3 id="restart-cinder">Restart Cinder Services</h3>
+<ol><li>
+<p>Restart the cinder services:</p>
+
+<pre class="terminal">
+#cd /etc/init.d/; for i in $( ls cinder-* ); do sudo service $i restart; done</pre>
+
+</li>
+
+<li>
+<p>Verify if cinder services are running:</p>
+
+<pre class="terminal">
+#cd /etc/init.d/; for i in $( ls cinder-* ); do sudo service $i status; done</pre>
+
+</li>
+</ol>
+
+</div>
+</div>
+</div>
+</body>
+</html>

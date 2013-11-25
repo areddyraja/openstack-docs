@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+<title>
+OpenStack Grizzly Installation : Single Node
+</title>
+<link href='./stylesheets/bootstrap_1.css' rel='stylesheet' type='text/css'>
+<meta content='nanoc 3.6.3' name='generator'>
+</head>
+<body>
+<div class='container-fluid'>
+<div class='row-fluid'>
+<div class='span13' id='main'>
+
+<h1 id="openstack-grizzly-installation---single-node">OpenStack Grizzly Installation - Single Node</h1>
+
+<a name="getting-started"><h2 id="ubuntu-config">Ubuntu and Network Configuration</h2></a>
+In this section you will perform the following tasks
+<ol>
+<li><a href="openstack_installation.html#conf-ubuntu">Configure Ubuntu</a></li>
+<li><a href="openstack_installation.html#network-config">Network Configuration</a></li>
+<li><a href="openstack_installation.html#network-util">Network Utilities Installation and Configuration</a></li>
+</ol>
+<h3 id="conf-ubuntu">Configure Ubuntu</h3>
+
+<ol>
+
+
+<li>
+<p>Change to super user mode for rest of the document</p>
+
+<pre class="terminal">
+$sudo su
+</pre>
+
+</li>
+<li>
+<p>Add Grizzly repositories to get the packages for OpenStack Grizzly release:</p>
+
+<pre class="terminal">
+#apt-get install ubuntu-cloud-keyring python-software-properties software-properties-common python-keyring
+#echo deb http://ubuntu-cloud.archive.canonical.com/ubuntu precise-updates/grizzly main &gt;&gt; /etc/apt/sources.list.d/grizzly.list
+</pre>
+
+</li>
+<li>Update and Upgrade the Ubuntu System:
+<pre class="terminal">
+#apt-get update
+#apt-get upgrade
+#apt-get dist-upgrade
+</pre>
+
+</li>
+</ol>
+<p><em>Note: On AMD machines create a volume-group called “cinder-volumes” while installing
+ Ubuntu12.04 and for Intel machines create an empty partition which can later be used for 
+ creating a volume-group</em></p>
+
+<h3 id="network-config">Network Configuration</h3>
+<h4>Network Interfaces</h4>
+<ol>
+<li><p>For OpenStack Single-Node setup you will require 2 NIC's, One NIC <code>10.42.0.51
+</code> is used for external network connection i.e, Internet access and the other 
+NIC <code>192.168.100.51</code> is used for internal networking (OpenStack management).</p></li>
+
+<p><em>Note: The external NIC should have a static IP address.</em></p>
+
+<li>
+<p>Edit Network Settings to add configuration for two interfaces <code>eth0</code> and <code>eth1</code>. </p>
+
+<div>
+<img src="./images/network-interfaces.png" alt="network-interfaces">
+</div>
+<div>
+<pre class="terminal">
+#vi /etc/network/interfaces
+#For Exposing OpenStack API over the internet
+    auto eth1
+    iface eth1 inet static
+    address 10.42.0.51
+    netmask 255.255.255.0
+    gateway 10.42.0.1
+    dns-nameservers 4.4.4.4
+
+    #Not internet connected(used for OpenStack management)
+    auto eth0
+    iface eth0 inet static
+    address 192.168.100.51
+    netmask 255.255.255.0
+</pre>
+
+</div>
+
+
+</li>
+
+<li>
+<p>Restart Network Services</p>
+
+<pre class="terminal">
+#/etc/init.d/networking restart
+</pre>
+</li>
+</ol>
+<h3 id="network-util">Network Utilities Installation and Configuration</h3>
+<h4>Install VLAN and bridge-utility</h4> 
+<p>VLAN and bridge-utility packages are required for OpenStack Networking</p>
+<pre class="terminal">
+#apt-get install -y vlan bridge-utils
+</pre>
+
+<h4>Enable IP Forwarding</h4>
+
+<p>This step is required for GRE tunneling</p>
+
+<pre class="terminal">
+#sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf
+</pre>
+
+<p>To save you from rebooting, perform the following</p>
+
+<pre class="terminal">
+#sysctl net.ipv4.ip_forward=1
+</pre>
+<h3 id="mysql--rabbitmq">MySQL &amp; RabbitMQ Installation</h3>
+<p>MySQL Database is required to store  information about OpenStack components - 
+Users, Tenants, Images, Networks, Routers, Virtual Machine etc in this 
+database.</p>
+<p>Follow the Steps listed below</p>
+<ol>
+<li><a href="openstack_installation.html#install-mysql">Install MySQL</a></li>
+<li><a href="openstack_installation.html#configure-mysql">Configure MySQL</a></li>
+<li><a href="openstack_installation.html#install-rabbitmq">Install RabbitMQ</a></li>
+<li><a href="openstack_installation.html#install-ntp">Install NTP</a></li>
+</ol>
+
+<h4 id="install-mysql">Install MySQL</h4>
+<p>Execute apt-get command to download <code>mysql-server</code> and <code>python-mysql
+</code> 
+packages.</p>
+<pre class="terminal">
+#apt-get install -y mysql-server python-mysqldb
+</pre>
+
+<p>During the install, you'll be prompted for the mysql root password. Enter a password of
+ your choice and verify it.</p>
+
+
+<h4 id="configure-mysql">Configure MySQL</h4>
+<p>Bind mysql to all IP addresses to accept incoming requests:</p>
+<pre class="terminal">
+#sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mysql/my.cnf
+#service mysql restart
+</pre>
+
+<h4 id="install-rabbitmq">Install RabbitMQ</h4>
+<p>Messaging server is the heart of the system. All the commands are first sent to the 
+Messaging Service. OpenStack components picks up these messages and processes the commands
+</p>
+
+<p>The OpenStack Cloud Controller communicates with other nova components such as 
+<code>Scheduler</code>, <code>Network Controller</code> and <code>Volume Controller</code>
+using <code>AMQP</code> (Advanced Message Queue Protocol). Nova components use Remote 
+Procedure Calls (RPC) to communicate to one another.</p>
+
+<pre class="terminal">
+#apt-get install -y rabbitmq-server
+</pre>
+
+<h4 id="install-ntp">Install NTP Service</h4>
+
+<p>To keep all the services in sync, you need to install NTP, and if you do a multi-node 
+configuration you will configure one server to be the reference server.</p>
+<p>Execute apt-get to install <code>ntp</code> package</p>
+<pre class="terminal">
+#apt-get install -y ntp
+</pre>
+
+</div>
+</div>
+</div>
+</body>
+</html>

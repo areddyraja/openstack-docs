@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+<title>
+OpenStack Grizzly Installation : Single Node
+</title>
+<link href='./stylesheets/bootstrap_1.css' rel='stylesheet' type='text/css'>
+<meta content='nanoc 3.6.3' name='generator'>
+</head>
+<body>
+<div class='container-fluid'>
+<div class='row-fluid'>
+<div class='span13' id='main'>
+
+<h1 id="openstack-grizzly-installation---single-node">OpenStack Grizzly Installation - Single Node</h1>
+
+<a name=""><h2 id="glance">Glance Installation</h2></a>
+
+<p>OpenStack Image service provides users the ability to discover, register, and retrieve 
+virtual machine images. It is also known as glance project, the Image service offers a 
+REST API that allows querying of virtual machine image metadata as well as retrieval of the actual image.</p>
+ 
+<p>Virtual machine images made available through the Image service can be stored in a variety 
+of locations from simple filesystems to object-storage systems like the OpenStack Object Storage service.</p>
+<p>Steps to be followed for Glance Installation</p>
+<ol>
+<li><a href="openstack_installation.html#glance-packages">Install Glance Packages</a></li>
+<li><a href="openstack_installation.html#glance-db">Configure Glance Database</a></li>
+<li><a href="openstack_installation.html#glance-config-files">Update Glance Configuration Files</a></li>
+<li><a href="openstack_installation.html#glance-restart-pop-db">Restart Services and Configure Glance Database</a></li>
+<li><a href="openstack_installation.html#glance-create-image">Create a Glance Image using Command Line</a></li>
+</ol>
+
+<h3 id="glance-packages">Install Glance Packages</h3>
+<ol>
+<li>
+<p>Execute <code>apt-get</code> command to get the <code>glance</code> packages from the 
+repositories</p> 
+<pre class="terminal">
+#apt-get install glance
+</pre>
+
+</li>
+<li>
+<p>Verify that glance services are running by executing the following commands</p>
+
+<pre class="terminal">
+#service glance-api status
+#service glance-registry status
+</pre>
+
+</li>
+</ol>
+<h3 id="glance-db">Configure Glance Database</h3>
+<ol>
+<li>
+<p>Create a new MySQL database for Glance by executing the <code>CREATE DATABASE</code> command
+on the <code>mysql</code> command prompt. After this <b>GRANT ALL</b> permission for 
+glance tables to <b>glance-user</b></p>
+
+<pre class="terminal">
+    mysql -u root -p
+    CREATE DATABASE glance;
+    GRANT ALL ON glance.* TO 'glance-user'@'%' IDENTIFIED BY 'glance-pass';
+    quit;
+</pre>
+</li>
+</ol>
+<h3 id="glance-config-files">Update Glance Configuration Files</h3>
+<ol>
+<li>
+<p>Update <code>[filter:authtoken]</code> section in 
+<code>/etc/glance/glance-api-paste.ini</code></p>
+
+<p><b>Original Code Listing:</b></p>
+<pre>
+[filter:authtoken]
+paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
+delay_auth_decision = true
+</pre>
+
+<p><b>Modified Code Listing:</b></p>
+<pre class="terminal">
+    [filter:authtoken]
+    paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
+    delay_auth_decision = true
+    auth_host = 192.168.100.51
+    auth_port = 35357
+    auth_protocol = http
+    admin_tenant_name = service
+    admin_user = glance
+    admin_password = service_pass
+</pre>
+</li>
+
+<li>
+<p>Update <code>[filter:authtoken]</code> section in 
+<code>/etc/glance/glance-registry-paste.ini</code></p>
+<p><b>Original Code Listing:</b></p>
+<pre>
+[filter:authtoken]
+paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
+</pre>
+<p><b>Modified Code Listing:</b></p>
+<pre class="terminal">
+    [filter:authtoken]
+    paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
+    auth_host = 192.168.100.51
+    auth_port = 35357
+    auth_protocol = http
+    admin_tenant_name = service
+    admin_user = glance
+    admin_password = service_pass
+</pre>
+
+</li>
+
+<li>
+<p>Update <code>/etc/glance/glance-api.conf</code> as shown below</p>
+<ol>
+<li>
+<p>sql_connection value is configured to point to MySQL Instance configured above</p>
+<p><b>Original Code Listing:</b></p>
+<pre>
+sql_connection = sqlite:///glance.sqlite
+</pre>
+<p><b>Modified Code Listing:</b></p>
+<pre>
+sql_connection = mysql://glance-user:glance-pass@192.168.100.51/glance
+</pre>
+</li>
+<li>
+<p>Paste Flavor in the file <code>glance-api.conf</code> is configured to keystone</p>
+<p><b>Original Code Listing:</b></p>
+<pre>
+#flavor=
+</pre>
+<p><b>Modified Code Listing:</b></p>
+<pre>
+flavor = keystone
+</pre>
+<i>Note : The Python Paste package contains Python modules that help in 
+implementing WSGI middleware. Keystone is configured to be part of the paste pipeline
+for Glance APIs
+</i>
+</li>
+</ol>
+<li>
+<p>Update <code>/etc/glance/glance-registry.conf</code> with:</p>
+
+<pre class="terminal">
+    sql_connection = mysql://glance-user:glance-pass@192.168.100.51/glance
+    And:
+    [paste_deploy]
+    flavor = keystone
+</pre>
+</li>
+</ol>
+
+<h3 id="glance-restart-pop-db">Restart Services and Configure Glance Database</h3>
+<ol>
+<li>
+<p>Restart the glance-api and glance-registry services:</p>
+
+<pre class="terminal">
+#service glance-api restart; service glance-registry restart
+</pre>
+
+</li>
+
+<li>
+<p>Synchronize the glance database using <code>glance-manage</code> command</p>
+
+<pre class="terminal">
+#glance-manage db_sync
+</pre>
+
+</li>
+
+<li>
+<p>Restart the services again to take into account the new modifications</p>
+
+<pre class="terminal">
+#service glance-registry restart; service glance-api restart
+</pre>
+
+</li>
+</ol>
+<h3 id="glance-create-image">Create a Glance Image using Command Line</h3>
+<ol>
+<li>
+<p>To verify the image service Glance, upload the cirros cloud image directly from the internet:</p>
+
+<pre class="terminal">
+#glance image-create --name myFirstImage --is-public true --container-format bare --disk-format qcow2 --location https://launchpad.net/    cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-disk.img
+
++------------------+--------------------------------------+
+| Property         | Value                                |
++------------------+--------------------------------------+
+| checksum         | d972013792949d0d3ba628fbe8685bce     |
+| container_format | bare                                 |
+| created_at       | 2013-10-08T18:59:18                  |
+| deleted          | False                                |
+| deleted_at       | None                                 |
+| disk_format      | qcow2                                |
+| id               | acafc7c0-40aa-4026-9673-b879898e1fc2 |
+| is_public        | True                                 |
+| min_disk         | 0                                    |
+| min_ram          | 0                                    |
+| name             | CirrOS 0.3.1                         |
+| owner            | efa984b0a914450e9a47788ad330699d     |
+| protected        | False                                |
+| size             | 13147648                             |
+| status           | active                               |
+| updated_at       | 2013-05-08T18:59:18                  |
++------------------+--------------------------------------+
+</pre>
+
+</li>
+
+<li>
+<p>List the uploaded image</p>
+
+<pre class="terminal">
+#glance image-list
++--------------------------------------+-----------------+-------------+------------------+----------+--------+
+| ID                                   | Name            | Disk Format | Container Format | Size     | Status |
++--------------------------------------+-----------------+-------------+------------------+----------+--------+
+| acafc7c0-40aa-4026-9673-b879898e1fc2 | CirrOS 0.3.1    | qcow2       | bare             | 13147648 | active |
++--------------------------------------+-----------------+-------------+------------------+----------+--------+
+</pre>
+
+</li>
+</ol>
+
+</div>
+</div>
+</div>
+</body>
+</html>
